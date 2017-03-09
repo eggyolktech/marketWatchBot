@@ -1,0 +1,1 @@
+python get_fx_rate_alerts.py
