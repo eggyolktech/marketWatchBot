@@ -7,6 +7,10 @@ import requests
 import re
 from datetime import date
 from datetime import datetime
+import configparser
+#config = ConfigParser.RawConfigParser()
+#config.read('ConfigFile.properties')
+
 
 def get_sunday(input):
     d = input.toordinal()
@@ -77,6 +81,8 @@ def send_to_tg_chatroom(passage):
   
 # sync top 100 list
 passage = get_fx_calendar()
+
+#print(passage)
 
 # Send a message to a chat room (chat room ID retrieved from getUpdates)
 send_to_tg_chatroom(passage)
