@@ -78,6 +78,9 @@ def send_to_tg_chatroom(passage):
     bot_id = "193192163:AAGC4RFnLmU7uJSbrJFPz1y36202O_NJcDU"
     result = urllib.request.urlopen("https://api.telegram.org/bot" + bot_id + "/sendMessage", urllib.parse.urlencode({ "parse_mode": "HTML", "chat_id": -172861420, "text": passage }).encode("utf-8")).read()
     print(result) 
+    
+    result = urllib.request.urlopen("https://api.telegram.org/bot" + bot_id + "/sendMessage", urllib.parse.urlencode({ "parse_mode": "HTML", "chat_id": -1001091025553, "text": passage }).encode("utf-8")).read()
+    print(result) 
   
 # sync top 100 list
 passage = get_fx_calendar()
