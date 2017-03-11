@@ -7,7 +7,7 @@ import requests
 import re
 from datetime import date
 from datetime import datetime
-import configparser
+#import configparser
 #config = ConfigParser.RawConfigParser()
 #config.read('ConfigFile.properties')
 
