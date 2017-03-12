@@ -12,16 +12,11 @@ import configparser
 #config.read('ConfigFile.properties')
 
 
-def get_aastocks_etf_stat():
+def get_aastocks_etf_stat(url):
 
     passage = ""
 
-    url = "http://www.aastocks.com/en/stocks/etf/search.aspx?t=5&s=421&o=0&y=3"
-    
-    #http://www.aastocks.com/en/stocks/market/industry/sector-industry-details.aspx?industrysymbol=5011&t=1&hk=0&s=10&o=0
-    #http://www.aastocks.com/en/stocks/market/industry/sector-industry-details.aspx?industrysymbol=6013&t=1&s=10&o=0&p=
-    
-    print("Url: [" + url + "]")
+    print("ETF Url: [" + url + "]")
     
     r = requests.get(url)
     html = r.text
@@ -54,22 +49,62 @@ def get_aastocks_etf_stat():
         _policy = re.sub(r'[^\x00-\x7F]+','', _policy)
         
         passage = passage + "<b>" + str(count) + ". " + _etfname + " (" + _etfcode + ")" + "</b>" + "\n" + "DPS " + _dps + " <i>@" + _latesty + "</i> " + _policy + "\n\n"
-        
-        
-        #print(passage)
-    
-   #<tr> <td valign="middle" class="col1" style="padding-left: 2px;"> <a href="/en/stocks/quote/detail-quote.aspx?symbol=02818" class="a8 cls etfDLSName" title="ETF - Ping An of China CSI RAFI A-Share 50 ETF">Ping An of China CSI RAFI A-Share 50 ETF</a> </td> <td valign="middle" class="col2"><a href="http://www.aastocks.com/en/ltp/rtquote.aspx?symbol=02818" class="a14 cls" title="02818">02818.HK</a></td> <td valign="middle" class="col3 cls"><span class="greya">HKD</span> 15.070</td> <td valign="middle" class="col4 cls"><b>90.89%</b></td> <td valign="middle" class="col5 cls">N/A</td> <td valign="middle" class="col6 cls">N/A</td> <td valign="middle" class="col7 cls">N/A</td> <td valign="middle" class="col8 cls">N/A</td> <td valign="middle" class="col9">&nbsp;Annual</td> <td valign="middle" class="col10"><a href="/en/stocks/analysis/dividend.aspx?symbol=02818" class="lnk">View&nbsp;&gt;&gt;</a></td> <td class="col11" style="padding-right: 2px;"><input type="checkbox" onclick="AddComp('02818', 'Ping An of China CSI RAFI A-Share 50 ETF', this)"></td> </tr> 
 
     if (passage == ""):
-        passage = "No event for today."
+        passage = "No ETFs record for today."
     else:
-        passage = "<b>Top 10 ETFs with highest Divdends</b>\n\n" + passage
+        passage = "<b>Top 10 ETFs with highest dividends</b>\n\n" + passage
     
+    print("Passage: [" + passage + "]")
+    return passage
+
+def get_aastocks_hy_stat(url, industry):
+
+    passage = ""
+    
+    print("Url: [" + url + "]")
+    
+    r = requests.get(url)
+    html = r.text
+    soup = BeautifulSoup(html, "html5lib")
+    
+    table = soup.find('table', id="tbTS")
+    tbody = table.find('tbody')
+    rows = tbody.findAll('tr')
+    
+    count = 0
+    
+    # skip the skewed records
+    for row in rows:
+    
+        if (count == 10):
+            break
+            
+        count = count + 1
+        
+        _name = row.select('td')[0].select('div')[0].select('div')[0].select('span')[0].text
+        _code = row.select('td')[0].select('a')[0].text
+        
+        _quote = row.select('td')[2].text
+        _peratio = row.select('td')[7].text
+        _pbratio = row.select('td')[8].text
+        _yield = row.select('td')[9].text
+        _marketcap = row.select('td')[10].text  
+
+        print(_name)
+        print(_code)
+        
+        passage = passage + "<b>" + str(count) + ". " + _name + " (" + _code + ")" + "</b>" + "\n" + "$" + _quote + " <i>@" + _yield + ", P/E(x): " + _peratio + ", P/B(x): " + _pbratio +"</i> MCP: " + _marketcap + "\n\n"
+
+    if (passage == ""):
+        passage = "No bank stock records for today."
+    else:
+        passage = "<b>Top 10 " + industry + " with highest dividends</b>\n\n" + passage
     
     print("Passage: [" + passage + "]")
     return passage
     
- 
+    
 def send_to_tg_chatroom(passage): 
 
     bot_id = "193192163:AAGC4RFnLmU7uJSbrJFPz1y36202O_NJcDU"
@@ -79,10 +114,20 @@ def send_to_tg_chatroom(passage):
     #result = urllib.request.urlopen("https://api.telegram.org/bot" + bot_id + "/sendMessage", urllib.parse.urlencode({ "parse_mode": "HTML", "chat_id": -1001091025553, "text": passage }).encode("utf-8")).read()
     #print(result) 
   
-# sync top 100 list
-passage = get_aastocks_etf_stat()
-
-print(passage)
+passage = get_aastocks_etf_stat("http://www.aastocks.com/en/stocks/etf/search.aspx?t=5&s=421&o=0&y=3")
 
 # Send a message to a chat room (chat room ID retrieved from getUpdates)
 send_to_tg_chatroom(passage)
+
+passage = get_aastocks_hy_stat("http://www.aastocks.com/en/stocks/market/industry/sector-industry-details.aspx?industrysymbol=5011&t=1&hk=0&s=10&o=0", "Banks")
+
+send_to_tg_chatroom(passage)
+
+passage = get_aastocks_hy_stat("http://www.aastocks.com/en/stocks/market/industry/sector-industry-details.aspx?industrysymbol=6013&t=1&s=10&o=0&p=", "REITs")
+
+send_to_tg_chatroom(passage)
+
+passage = get_aastocks_hy_stat("http://www.aastocks.com/en/stocks/market/industry/sector-industry-details.aspx?industrysymbol=8001&t=1&s=10&o=0&p=", "Conglomerates")
+
+send_to_tg_chatroom(passage)
+
