@@ -8,8 +8,9 @@ import re
 from datetime import date
 from datetime import datetime
 import configparser
-#config = ConfigParser.RawConfigParser()
-#config.read('ConfigFile.properties')
+
+config = configparser.ConfigParser()
+config.read('config.properties')
 
 
 def get_aastocks_etf_stat(url):
@@ -107,12 +108,15 @@ def get_aastocks_hy_stat(url, industry):
     
 def send_to_tg_chatroom(passage): 
 
-    bot_id = "193192163:AAGC4RFnLmU7uJSbrJFPz1y36202O_NJcDU"
-    result = urllib.request.urlopen("https://api.telegram.org/bot" + bot_id + "/sendMessage", urllib.parse.urlencode({ "parse_mode": "HTML", "chat_id": -172861420, "text": passage }).encode("utf-8")).read()
-    print(result) 
+    bot_id = config.get("telegram", "bot-id")    
+    chat_list = config.items("telegram-chat")
     
-    #result = urllib.request.urlopen("https://api.telegram.org/bot" + bot_id + "/sendMessage", urllib.parse.urlencode({ "parse_mode": "HTML", "chat_id": -1001091025553, "text": passage }).encode("utf-8")).read()
-    #print(result) 
+    for key, chat_id in chat_list:
+        print("Chat to send: " + key + " => " + chat_id);
+        
+        result = urllib.request.urlopen("https://api.telegram.org/bot" + bot_id + "/sendMessage", urllib.parse.urlencode({ "parse_mode": "HTML", "chat_id": chat_id, "text": passage }).encode("utf-8")).read()
+        print(result)
+        
   
 passage = get_aastocks_etf_stat("http://www.aastocks.com/en/stocks/etf/search.aspx?t=5&s=421&o=0&y=3")
 
