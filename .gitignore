@@ -104,4 +104,7 @@ log/**
 media/**
 !media/**/init.txt
 
+# Config
+config.properties
+
 

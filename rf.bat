@@ -1,1 +1,0 @@
-python run_fx_bot_watcher.py
