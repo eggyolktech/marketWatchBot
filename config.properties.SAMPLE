@@ -7,4 +7,8 @@ chat-ptcode = TG_CHAT_ID
 
 [dailyfx]
 
+calendar-year=2017
+calendar-week=0312
+calendar-url=https://www.dailyfx.com/calendar?previous=true&week=%(calendar-year)s/%(calendar-week)s&currentweek=currentweek&tz=+08:00&currency=&importance=high
+
 [aastocks]

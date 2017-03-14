@@ -36,16 +36,16 @@ def get_fx_calendar():
     # else, today is sunday (7)
     else:
         start_of_week = now.strftime("%m%d") 
-        
-    url = "https://www.dailyfx.com/calendar?previous=true&week=" + str(year) + "/" +  start_of_week + "&currentweek=currentweek&tz=+08:00&currency=&importance=high"
+    
+    config.set("dailyfx", "calendar-year", str(year))
+    config.set("dailyfx", "calendar-week", start_of_week)
+    url = config.get("dailyfx", "calendar-url")
 
     print("Url: [" + url + "]")
     
     r = requests.get(url)
     html = r.text
     soup = BeautifulSoup(html, "html5lib")
-    
-    #table = soup.find('table', {'id': 'daily-cal4'})
     
     for tr in soup.find_all('tr', {'data-importance': 'high'}):
            
@@ -76,19 +76,18 @@ def get_fx_calendar():
  
 def send_to_tg_chatroom(passage): 
 
-    bot_id = config.get("telegram", "bot-id")    
     chat_list = config.items("telegram-chat")
+    bot_send_url = config.get("telegram","bot-send-url")
     
     for key, chat_id in chat_list:
         print("Chat to send: " + key + " => " + chat_id);
+
+        result = urllib.request.urlopen(bot_send_url, urllib.parse.urlencode({ "parse_mode": "HTML", "chat_id": chat_id, "text": passage }).encode("utf-8")).read()
         
-        result = urllib.request.urlopen("https://api.telegram.org/bot" + bot_id + "/sendMessage", urllib.parse.urlencode({ "parse_mode": "HTML", "chat_id": chat_id, "text": passage }).encode("utf-8")).read()
         print(result)
   
 # sync top 100 list
 passage = get_fx_calendar()
-
-#print(passage)
 
 # Send a message to a chat room (chat room ID retrieved from getUpdates)
 send_to_tg_chatroom(passage)
