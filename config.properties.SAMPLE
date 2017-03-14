@@ -2,8 +2,8 @@
 bot-id=YOUR_TG_BOT_ID
 
 [telegram-chat]
-chat-goldenwokchaan = TG_CHAT_ID
-chat-ptcode = TG_CHAT_ID
+chat-goldenwokchaan = TG_CHAT_ID1
+chat-ptcode = TG_CHAT_ID2
 
 [dailyfx]
 
