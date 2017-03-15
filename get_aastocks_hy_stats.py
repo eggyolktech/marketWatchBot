@@ -108,30 +108,27 @@ def get_aastocks_hy_stat(url, industry):
     
 def send_to_tg_chatroom(passage): 
 
-    bot_id = config.get("telegram", "bot-id")    
     chat_list = config.items("telegram-chat")
+    bot_send_url = config.get("telegram","bot-send-url")
     
     for key, chat_id in chat_list:
         print("Chat to send: " + key + " => " + chat_id);
+
+        result = urllib.request.urlopen(bot_send_url, urllib.parse.urlencode({ "parse_mode": "HTML", "chat_id": chat_id, "text": passage }).encode("utf-8")).read()
         
-        result = urllib.request.urlopen("https://api.telegram.org/bot" + bot_id + "/sendMessage", urllib.parse.urlencode({ "parse_mode": "HTML", "chat_id": chat_id, "text": passage }).encode("utf-8")).read()
         print(result)
-        
-  
-passage = get_aastocks_etf_stat("http://www.aastocks.com/en/stocks/etf/search.aspx?t=5&s=421&o=0&y=3")
+              
 
-# Send a message to a chat room (chat room ID retrieved from getUpdates)
-send_to_tg_chatroom(passage)
-
-passage = get_aastocks_hy_stat("http://www.aastocks.com/en/stocks/market/industry/sector-industry-details.aspx?industrysymbol=5011&t=1&hk=0&s=10&o=0", "Banks")
+passage = get_aastocks_etf_stat(config.get("aastocks","hy-url-etf"))
 
 send_to_tg_chatroom(passage)
 
-passage = get_aastocks_hy_stat("http://www.aastocks.com/en/stocks/market/industry/sector-industry-details.aspx?industrysymbol=6013&t=1&s=10&o=0&p=", "REITs")
+url_list = config.items("aastocks-hy-industry")
 
-send_to_tg_chatroom(passage)
+for key, url in url_list:
+    print("Industry to retrieve: " + key + " => " + url)
 
-passage = get_aastocks_hy_stat("http://www.aastocks.com/en/stocks/market/industry/sector-industry-details.aspx?industrysymbol=8001&t=1&s=10&o=0&p=", "Conglomerates")
+    passage = get_aastocks_hy_stat(url, key.split("-")[-1])
+    send_to_tg_chatroom(passage)
 
-send_to_tg_chatroom(passage)
 

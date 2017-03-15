@@ -12,3 +12,11 @@ calendar-week=0312
 calendar-url=https://www.dailyfx.com/calendar?previous=true&week=%(calendar-year)s/%(calendar-week)s&currentweek=currentweek&tz=+08:00&currency=&importance=high
 
 [aastocks]
+
+hy-url-etf=http://www.aastocks.com/en/stocks/etf/search.aspx?t=5&s=421&o=0&y=3
+
+[aastocks-hy-industry]
+
+hy-url-banks=http://www.aastocks.com/en/stocks/market/industry/sector-industry-details.aspx?industrysymbol=5011&t=1&hk=0&s=10&o=0
+hy-url-reits=http://www.aastocks.com/en/stocks/market/industry/sector-industry-details.aspx?industrysymbol=6013&t=1&s=10&o=0&p=
+hy-url-conglomerates=http://www.aastocks.com/en/stocks/market/industry/sector-industry-details.aspx?industrysymbol=8001&t=1&s=10&o=0&p=
