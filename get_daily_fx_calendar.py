@@ -1,4 +1,3 @@
-# imdb process import
 from bs4 import BeautifulSoup
 from decimal import Decimal
 import urllib.request
