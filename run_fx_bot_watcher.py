@@ -3,7 +3,6 @@ import os, django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pricewatch.settings")
 django.setup()
 
-# imdb process import
 from pricealert.models import PriceAlert
 import sys
 import time
@@ -33,11 +32,11 @@ def on_callback_query(msg):
     query_id, from_id, query_data = telepot.glance(msg, flavor='callback_query')
     print('Callback Query:', query_id, from_id, query_data)
     
-    result = query_data + ":" + get_fx_live_rate(query_data)
+    result = query_data + ": " + get_fx_live_rate(query_data)
     
     #for alert in PriceAlert.objects.filter(symbol=str(query_data),alert_status='1'):
     #    result += "\n" + str(alert)
-
+    
     bot.answerCallbackQuery(query_id, text=result)
    
 def get_fx_live_rate(quote):
@@ -62,7 +61,15 @@ def get_fx_live_rate(quote):
     live_rate = ''
     
     if(rate):
-        return rate.find('Bid').text + " / " + rate.find('Ask').text
+        
+        direction = u'\U000027A1'
+        
+        if (int(rate.find('Direction').text) > 0):
+            direction = u'\U00002B06'
+        elif (int(rate.find('Direction').text) < 0):
+            direction = u'\U00002B07'
+
+        return "Bid: "rate.find('Bid').text + " / Ask: " + rate.find('Ask').text + " " + direction
     else:
         return "No live rate is returned."
     
