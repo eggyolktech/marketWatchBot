@@ -20,7 +20,7 @@ def on_chat_message(msg):
     print(msg)
     print("Text Command: " + msg['text'])
     
-    command = msg['text']
+    command = msg['text'].split("@")[0]
     
     keyboard_list = []
     reply = ""
@@ -60,8 +60,10 @@ def on_chat_message(msg):
         f = urllib.request.urlopen('http://cdn2.ettoday.net/images/1613/1613045.jpg')
         bot.sendPhoto(chat_id, f)      
     else:
-        bot.sendMessage(chat_id, '金鑊鏟 Bot v1.0.2 \n /fx - FX Quote \n /idq - Index Quote \n /cmd - Commodities Quote \n /funny - Time will tell')
-
+        menu = '金鑊鏟 Bot v1.0.2 \n\n' + ' /fx - FX Quote ' + u'\U0001F4B9' + '\n\n' + ' /idq - Index Quote ' + u'\U0001F4C8' + '\n\n' + ' /cmd - Commodities Quote ' + u'\U0001F30E' + '\n\n' + ' /funny - Time will tell... ' + u'\U0001F52D'
+    
+        bot.sendMessage(chat_id, menu)
+        
 def on_callback_query(msg):
     query_id, from_id, query_data = telepot.glance(msg, flavor='callback_query')
     print('Callback Query:', query_id, from_id, query_data)
