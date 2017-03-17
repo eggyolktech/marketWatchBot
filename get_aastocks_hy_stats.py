@@ -118,16 +118,24 @@ def send_to_tg_chatroom(passage):
         print(result)
               
 
-passage = get_aastocks_etf_stat(config.get("aastocks","hy-url-etf"))
+              
+def main():
 
-send_to_tg_chatroom(passage)
+    passage = get_aastocks_etf_stat(config.get("aastocks","hy-url-etf"))
 
-url_list = config.items("aastocks-hy-industry")
-
-for key, url in url_list:
-    print("Industry to retrieve: " + key + " => " + url)
-
-    passage = get_aastocks_hy_stat(url, key.split("-")[-1])
     send_to_tg_chatroom(passage)
+
+    url_list = config.items("aastocks-hy-industry")
+
+    for key, url in url_list:
+        print("Industry to retrieve: " + key + " => " + url)
+
+        passage = get_aastocks_hy_stat(url, key.split("-")[-1])
+        send_to_tg_chatroom(passage)
+
+if __name__ == "__main__":
+    main()                
+              
+
 
 

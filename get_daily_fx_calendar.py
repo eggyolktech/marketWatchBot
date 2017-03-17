@@ -84,9 +84,15 @@ def send_to_tg_chatroom(passage):
         result = urllib.request.urlopen(bot_send_url, urllib.parse.urlencode({ "parse_mode": "HTML", "chat_id": chat_id, "text": passage }).encode("utf-8")).read()
         
         print(result)
-  
-# sync top 100 list
-passage = get_fx_calendar()
 
-# Send a message to a chat room (chat room ID retrieved from getUpdates)
-send_to_tg_chatroom(passage)
+def main():
+    # sync top 100 list
+    passage = get_fx_calendar()
+
+    # Send a message to a chat room (chat room ID retrieved from getUpdates)
+    send_to_tg_chatroom(passage)
+
+if __name__ == "__main__":
+    main()        
+        
+

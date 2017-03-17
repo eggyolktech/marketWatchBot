@@ -1,5 +1,6 @@
 [telegram]
 bot-id=YOUR_TG_BOT_ID
+bot-send-url=https://api.telegram.org/bot%(bot-id)s/sendMessage
 
 [telegram-chat]
 chat-goldenwokchaan = TG_CHAT_ID1

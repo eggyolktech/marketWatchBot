@@ -13,6 +13,8 @@ from decimal import Decimal
 import urllib.request
 import urllib.parse
 import requests
+import random
+from get_daily_fx_calendar import get_fx_calendar
 
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
@@ -55,12 +57,21 @@ def on_chat_message(msg):
     
         keyboard = InlineKeyboardMarkup(inline_keyboard=keyboard_list)
         bot.sendMessage(chat_id, 'Please tap on the Commodity to quote', reply_markup=keyboard) 
-        
+    
+    elif (command == "/cal"):
+    
+        bot.sendMessage(chat_id, '<i>Retreiving Event Calendar...</i>', parse_mode='HTML')
+        passage = get_fx_calendar()
+        bot.sendMessage(chat_id, passage, parse_mode='HTML')
+    
     elif (command == "/funny"):
-        f = urllib.request.urlopen('http://cdn2.ettoday.net/images/1613/1613045.jpg')
+        
+        funny_list = ['http://cdn2.ettoday.net/images/1613/1613045.jpg', 'https://i0.wp.com/farm6.staticflickr.com/5462/9214555634_bb1859cd18.jpg', 'https://i1.wp.com/farm8.staticflickr.com/7412/9211776213_2229c5f440.jpg', 'https://i0.wp.com/farm6.staticflickr.com/5338/9214716454_19304819fe.jpg', 'http://i.imgur.com/1yTUg.jpg']
+        
+        f = urllib.request.urlopen(random.choice(funny_list))
         bot.sendPhoto(chat_id, f)      
     else:
-        menu = '金鑊鏟 Bot v1.0.2 \n\n' + ' /fx - FX Quote ' + u'\U0001F4B9' + '\n\n' + ' /idq - Index Quote ' + u'\U0001F4C8' + '\n\n' + ' /cmd - Commodities Quote ' + u'\U0001F30E' + '\n\n' + ' /funny - Time will tell... ' + u'\U0001F52D'
+        menu = '金鑊鏟 Bot v1.0.3 (不定期 Down 機) \n\n' + ' /fx - FX Quote ' + u'\U0001F4B9' + '\n\n' + ' /idq - Index Quote ' + u'\U0001F4C8' + '\n\n' + ' /cmd - Commodities Quote ' + u'\U0001F30E' + '\n\n' + ' /cal - Coming Events ' + u'\U0001F4C5' + '\n\n' + ' /funny - Time will tell... ' + u'\U0000231B'
     
         bot.sendMessage(chat_id, menu)
         
