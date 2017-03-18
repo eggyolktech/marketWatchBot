@@ -90,9 +90,19 @@ def on_chat_message(msg):
         
         if (industry == "ETF"):
             passage = get_aastocks_etf_stat(config.get("aastocks","hy-url-etf"))
-            bot.sendMessage(chat_id, passage, parse_mode='HTML')        
+        elif (industry == "Banks"):
+            passage = get_aastocks_hy_stat(config.get("aastocks-hy-industry","hy-url-banks"), "Banks")
+        elif (industry == "REIT"):
+            passage = get_aastocks_hy_stat(config.get("aastocks-hy-industry","hy-url-reits"), "REIT")
+        elif (industry == "Cong"):   
+            passage = get_aastocks_hy_stat(config.get("aastocks-hy-industry","hy-url-conglomerates"), "Conglomerates")
         else:
-            bot.sendMessage(chat_id, '<i>Sorry! Top 10 List does not exist for specified target [' + industry + '] </i>', parse_mode='HTML')
+            passage = '<i>Sorry! Top 10 List not found for target [' + industry + '] </i>'
+            
+        bot.sendMessage(chat_id, passage, parse_mode='HTML') 
+        
+        bot.sendMessage(chat_id, 'Back to Top 10 Menu - /top10', parse_mode='HTML')
+        
     else:
         menu = '金鑊鏟 Bot v1.0.3 \n\n' + ' /fx - FX Quote ' + u'\U0001F4B9' + '\n\n' + ' /idq - Index Quote ' + u'\U0001F4C8' + '\n\n' + ' /cmd - Commodities Quote ' + u'\U0001F30E' + '\n\n' + ' /cal - Coming Events ' + u'\U0001F4C5' + '\n\n' + ' /funny - Time will tell... ' + u'\U0000231B'
     
