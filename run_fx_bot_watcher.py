@@ -174,7 +174,7 @@ def get_fx_live_rate(quote):
     else:
         return "No live rate is returned."
     
-TOKEN = "193192163:AAGC4RFnLmU7uJSbrJFPz1y36202O_NJcDU" # get token from command-line
+TOKEN = config.get("telegram","bot-id") # get token from command-line
 
 bot = telepot.Bot(TOKEN)
 print(bot.getMe())
