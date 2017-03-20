@@ -29,6 +29,7 @@ def on_chat_message(msg):
     print("Text Command: " + msg['text'])
     
     command = msg['text'].split("@")[0]
+    EL = '\n\n'
     
     keyboard_list = []
     reply = ""
@@ -65,9 +66,18 @@ def on_chat_message(msg):
         bot.sendMessage(chat_id, 'Please tap on the Commodity to quote', reply_markup=keyboard) 
   
     elif (command == "/top10"):
+    
+        menuitemlist = [{'command': '/ttETF', 'desc': 'High Dividends ETF', 'icon': u'\U0001F4B0'},
+                    {'command': '/ttBanks', 'desc': 'High Dividends Banks', 'icon': u'\U0001F3E6'},
+                    {'command': '/ttREIT', 'desc': 'High Dividends REIT', 'icon': u'\U0001F3E2'},
+                    {'command': '/ttCong', 'desc': 'High Dividends Conglomerates', 'icon': u'\U0001F310'},
+        ]
+ 
+        passage = 'Please tap on the Top 10 list to show '
         
-        passage = 'Please tap on the Top 10 list to show \n\n' + ' /ttETF - High Dividends ETF ' + u'\U0001F4B0' + '\n\n' + ' /ttBanks - High Dividends Banks ' + u'\U0001F3E6' + '\n\n' + ' /ttREIT - High Dividends REIT ' + u'\U0001F3E2' + '\n\n' + ' /ttCong - Conglomerates ' + u'\U0001F310'
-        
+        for menuitem in menuitemlist:
+            passage = passage + EL + ' ' + menuitem['command'] + ' - ' + menuitem['desc'] + ' ' + menuitem['icon']
+ 
         bot.sendMessage(chat_id, passage, parse_mode='HTML')
       
     elif (command == "/cal"):
@@ -99,12 +109,23 @@ def on_chat_message(msg):
         else:
             passage = '<i>Sorry! Top 10 List not found for target [' + industry + '] </i>'
             
+        passage = passage + 'Back to Top 10 Menu - /top10'
         bot.sendMessage(chat_id, passage, parse_mode='HTML') 
         
-        bot.sendMessage(chat_id, 'Back to Top 10 Menu - /top10', parse_mode='HTML')
+    else:    
+    
+        menuitemlist = [{'command': '/fx', 'desc': 'FX Quote', 'icon': u'\U0001F4B9'},
+                        {'command': '/idq', 'desc': 'Index Quote', 'icon': u'\U0001F4C8'},
+                        {'command': '/cmd', 'desc': 'Commodities Quote', 'icon': u'\U0001F30E'},
+                        {'command': '/cal', 'desc': 'Coming Market Events', 'icon': u'\U0001F4C5'},
+                        {'command': '/top10', 'desc': 'Top 10 List', 'icon': u'\U0001F51F'},
+                        {'command': '/funny', 'desc': 'Time will tell...', 'icon': u'\U0000231B'},
+        ]
         
-    else:
-        menu = '金鑊鏟 Bot v1.0.3 \n\n' + ' /fx - FX Quote ' + u'\U0001F4B9' + '\n\n' + ' /idq - Index Quote ' + u'\U0001F4C8' + '\n\n' + ' /cmd - Commodities Quote ' + u'\U0001F30E' + '\n\n' + ' /cal - Coming Events ' + u'\U0001F4C5' + '\n\n' + ' /funny - Time will tell... ' + u'\U0000231B'
+        menu = '金鑊鏟 Bot v1.0.4'
+        
+        for menuitem in menuitemlist:
+            menu = menu + EL + ' ' + menuitem['command'] + ' - ' + menuitem['desc'] + ' ' + menuitem['icon']
     
         bot.sendMessage(chat_id, menu)
         
