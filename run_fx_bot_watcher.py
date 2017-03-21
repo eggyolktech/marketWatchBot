@@ -86,12 +86,6 @@ def on_chat_message(msg):
         passage = get_fx_calendar()
         bot.sendMessage(chat_id, passage, parse_mode='HTML')
     
-    elif (command == "/funny"):
-        
-        funny_list = ['http://cdn2.ettoday.net/images/1613/1613045.jpg', 'https://i0.wp.com/farm6.staticflickr.com/5462/9214555634_bb1859cd18.jpg', 'https://i1.wp.com/farm8.staticflickr.com/7412/9211776213_2229c5f440.jpg', 'https://i0.wp.com/farm6.staticflickr.com/5338/9214716454_19304819fe.jpg', 'http://i.imgur.com/1yTUg.jpg']
-        
-        f = urllib.request.urlopen(random.choice(funny_list))
-        bot.sendPhoto(chat_id, f)     
     elif (command.startswith("/tt")):
     
         bot.sendMessage(chat_id, '<i>Retreiving Top 10 List...</i>', parse_mode='HTML')
@@ -119,7 +113,6 @@ def on_chat_message(msg):
                         {'command': '/cmd', 'desc': 'Commodities Quote', 'icon': u'\U0001F30E'},
                         {'command': '/cal', 'desc': 'Coming Market Events', 'icon': u'\U0001F4C5'},
                         {'command': '/top10', 'desc': 'Top 10 List', 'icon': u'\U0001F51F'},
-                        {'command': '/funny', 'desc': 'Time will tell...', 'icon': u'\U0000231B'},
         ]
         
         menu = '金鑊鏟 Bot v1.0.4'
