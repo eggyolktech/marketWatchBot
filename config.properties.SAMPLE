@@ -6,6 +6,14 @@ bot-send-url=https://api.telegram.org/bot%(bot-id)s/sendMessage
 chat-goldenwokchaan = TG_CHAT_ID1
 chat-ptcode = TG_CHAT_ID2
 
+[fxcm]
+
+rates-xml=https://rates.fxcm.com/RatesXML
+
+[wsj]
+
+dxy-url=http://quotes.wsj.com/index/DXY/
+
 [dailyfx]
 
 calendar-year=2017

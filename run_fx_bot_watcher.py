@@ -9,14 +9,11 @@ import time
 import telepot
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
 from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
-from bs4 import BeautifulSoup
 from decimal import Decimal
-import urllib.request
-import urllib.parse
-import requests
 import random
 from get_daily_fx_calendar import get_fx_calendar
 from get_aastocks_hy_stats import get_aastocks_etf_stat, get_aastocks_hy_stat
+from get_fx_live_rate import get_fx_live_rate, get_dxy_live_rate
 import configparser
 
 config = configparser.ConfigParser()
@@ -40,6 +37,7 @@ def on_chat_message(msg):
                        [InlineKeyboardButton(text='AUDUSD', callback_data='AUDUSD'), InlineKeyboardButton(text='NZDUSD', callback_data='NZDUSD'), InlineKeyboardButton(text='USDCAD', callback_data='USDCAD')],
                        [InlineKeyboardButton(text='USDCHF', callback_data='USDCHF'), InlineKeyboardButton(text='EURJPY', callback_data='EURJPY'), InlineKeyboardButton(text='GBPJPY', callback_data='GBPJPY')],
                        [InlineKeyboardButton(text='EURGBP', callback_data='EURGBP'), InlineKeyboardButton(text='AUDNZD', callback_data='AUDNZD'), InlineKeyboardButton(text='USDCNH', callback_data='USDCNH')],
+                       [InlineKeyboardButton(text='DXY', callback_data='DXY')]
                ]
     
         keyboard = InlineKeyboardMarkup(inline_keyboard=keyboard_list)
@@ -115,7 +113,7 @@ def on_chat_message(msg):
                         {'command': '/top10', 'desc': 'Top 10 List', 'icon': u'\U0001F51F'},
         ]
         
-        menu = '金鑊鏟 Bot v1.0.4'
+        menu = '金鑊鏟 Bot v1.0.5'
         
         for menuitem in menuitemlist:
             menu = menu + EL + ' ' + menuitem['command'] + ' - ' + menuitem['desc'] + ' ' + menuitem['icon']
@@ -126,46 +124,18 @@ def on_callback_query(msg):
 
     query_id, from_id, query_data = telepot.glance(msg, flavor='callback_query')
     print('Callback Query:', query_id, from_id, query_data)
+    
+    result = "No live rate is available"
 
     # if query data is available
     if query_data:
     
-        result = query_data + ": " + get_fx_live_rate(query_data)
+        if query_data == "DXY":
+            result = query_data + ": " + get_dxy_live_rate()
+        else:  
+            result = query_data + ": " + get_fx_live_rate(query_data)
+        
         bot.answerCallbackQuery(query_id, text=result)
-   
-def get_fx_live_rate(quote):
-
-    url = "https://rates.fxcm.com/RatesXML"
-   
-    r = requests.get(url)
-    xml = r.text
-    soup = BeautifulSoup(xml, 'xml')
-
-    #<Rate Symbol="EURUSD">
-    #<Bid>1.05896</Bid>
-    #<Ask>1.06001</Ask>
-    #<High>1.06287</High>
-    #<Low>1.05372</Low>
-    #<Direction>0</Direction>
-    #<Last>16:57:55</Last>
-    #</Rate>
-    # look in the main node for object's with attr=name, optionally look up attrs with regex
-    
-    rate = soup.find('Rate', {'Symbol': quote})
-    live_rate = ''
-    
-    if(rate):
-        
-        direction = u'\U000027A1'
-        
-        if (int(rate.find('Direction').text) > 0):
-            direction = u'\U00002B06'
-        elif (int(rate.find('Direction').text) < 0):
-            direction = u'\U00002B07'
-
-        return "Bid: " + rate.find('Bid').text + " / Ask: " + rate.find('Ask').text + " " + direction
-    else:
-        return "No live rate is returned."
     
 TOKEN = config.get("telegram","bot-id") # get token from command-line
 
