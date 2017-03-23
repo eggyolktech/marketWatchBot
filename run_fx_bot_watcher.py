@@ -10,10 +10,12 @@ import telepot
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
 from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
 from decimal import Decimal
+import urllib.request
 import random
 from get_daily_fx_calendar import get_fx_calendar
 from get_aastocks_hy_stats import get_aastocks_etf_stat, get_aastocks_hy_stat
 from get_fx_live_rate import get_fx_live_rate, get_dxy_live_rate
+from get_aastocks_chart import get_hkg_chart_by_type
 import configparser
 
 config = configparser.ConfigParser()
@@ -103,6 +105,11 @@ def on_chat_message(msg):
             
         passage = passage + 'Back to Top 10 Menu - /top10'
         bot.sendMessage(chat_id, passage, parse_mode='HTML') 
+
+    elif (command == "/qq"):
+        
+        f = urllib.request.urlopen(get_hkg_chart_by_type("TEST", 4))
+        bot.sendPhoto(chat_id, f)     
         
     else:    
     
