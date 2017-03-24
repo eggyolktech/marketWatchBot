@@ -18,6 +18,8 @@ from get_fx_live_rate import get_fx_live_rate, get_dxy_live_rate
 from get_aastocks_chart import get_hkg_chart_by_type
 import configparser
 
+from classes.TimeFrame import TimeFrame
+
 config = configparser.ConfigParser()
 config.read('config.properties')
 
@@ -107,8 +109,8 @@ def on_chat_message(msg):
         bot.sendMessage(chat_id, passage, parse_mode='HTML') 
 
     elif (command == "/qq"):
-        
-        f = urllib.request.urlopen(get_hkg_chart_by_type("TEST", 4))
+
+        f = urllib.request.urlopen(get_hkg_chart_by_type("TEST", TimeFrame.WEEKLY))
         bot.sendPhoto(chat_id, f)     
         
     else:    
