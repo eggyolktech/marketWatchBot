@@ -108,21 +108,58 @@ def on_chat_message(msg):
         passage = passage + 'Back to Top 10 Menu - /top10'
         bot.sendMessage(chat_id, passage, parse_mode='HTML') 
 
-    elif (command == "/qq"):
+    elif (command.startswith("/q")):
+    
+        tf = command[2:3]
+        code = command[3:]
+        timeframe = TimeFrame.DAILY
+        
+        menu = '<b>Quote AAStocks Charts Command</b>'
+        
+        menuitemlist = [{'command': '/qM[StockCode]', 'desc': 'Quote Monthly Chart', 'icon': u'\U0001F4C8'},
+                    {'command': '/qw[StockCode]', 'desc': 'Quote Weekly Chart', 'icon': u'\U0001F4C8'},
+                    {'command': '/qd[StockCode]', 'desc': 'Quote Daily Chart', 'icon': u'\U0001F4C8'},
+                    {'command': '/qh[StockCode]', 'desc': 'Quote Hourly Chart', 'icon': u'\U0001F4C8'},
+                    {'command': '/qm[StockCode]', 'desc': 'Quote Minutes Chart', 'icon': u'\U0001F4C8'},
+        ]
 
-        f = urllib.request.urlopen(get_hkg_chart_by_type("TEST", TimeFrame.WEEKLY))
-        bot.sendPhoto(chat_id, f)     
+        for menuitem in menuitemlist:
+            menu = menu + EL + ' ' + menuitem['command'] + ' - ' + menuitem['desc'] + ' ' + menuitem['icon']
+        
+        if (tf == "M"):
+            timeframe = TimeFrame.MONTHLY
+        elif (tf.lower() == "w"):
+            timeframe = TimeFrame.WEEKLY
+        elif (tf.lower() == "d"):
+            timeframe = TimeFrame.DAILY
+        elif (tf.lower() == "h"):
+            timeframe = TimeFrame.HOURLY
+        elif (tf.lower() == "m"):
+            timeframe = TimeFrame.MINUTE
+        else:        
+            bot.sendMessage(chat_id, menu, parse_mode='HTML') 
+            return
+
+        if code:
+            bot.sendMessage(chat_id, '<i>Retrieving AAStocks Chart...</i>', parse_mode='HTML')
+            f = urllib.request.urlopen(get_hkg_chart_by_type(code, timeframe))
+            bot.sendPhoto(chat_id, f)
+        else:
+            stockcode = random.choice(["2628", "939", "2800", "8141", "AAPL", "GOOG", "GS"])
+            passage = "<i>Usage:</i> " + command + "[StockCode] (e.g. " + command + stockcode + ")"
+            bot.sendMessage(chat_id, passage, parse_mode='HTML') 
         
     else:    
     
         menuitemlist = [{'command': '/fx', 'desc': 'FX Quote', 'icon': u'\U0001F4B9'},
-                        {'command': '/idq', 'desc': 'Index Quote', 'icon': u'\U0001F4C8'},
+                        {'command': '/idq', 'desc': 'Index Quote', 'icon': u'\U0001F310'},
                         {'command': '/cmd', 'desc': 'Commodities Quote', 'icon': u'\U0001F30E'},
                         {'command': '/cal', 'desc': 'Coming Market Events', 'icon': u'\U0001F4C5'},
                         {'command': '/top10', 'desc': 'Top 10 List', 'icon': u'\U0001F51F'},
+                        {'command': '/q', 'desc': 'Quick Chart', 'icon': u'\U0001F4C8'},
         ]
         
-        menu = '金鑊鏟 Bot v1.0.5'
+        menu = '金鑊鏟 Bot v1.0.6'
         
         for menuitem in menuitemlist:
             menu = menu + EL + ' ' + menuitem['command'] + ' - ' + menuitem['desc'] + ' ' + menuitem['icon']
