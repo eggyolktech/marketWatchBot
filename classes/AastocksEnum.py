@@ -1,0 +1,46 @@
+from enum import Enum
+
+class TimeFrame(Enum):
+    MONTHLY = 2060
+    WEEKLY = 11
+    DAILY = 6
+    HOURLY = 5023
+    MINUTE = 5012
+
+class FxCode(Enum):
+    USD    = 900200
+    USDJPY = 900202
+    USDCAD = 900207
+    USDCHF = 900204
+    AUDUSD = 900205
+    NZDUSD = 900206
+    EURUSD = 900201
+    EURJPY = 900212
+    EURCHF = 910659
+    GBPJPY = 900213
+    GBPUSD = 900203
+    AUDNZD = 910059
+    CNYHKD = 900225
+    USDSGD = 900229
+    SGDHKD = 900223
+    HKDKRW = 910186
+    MYRHKD = 910307
+    HKDINR = 910200
+    
+class IndexCode(Enum):
+    HSI   = 110000
+    HSRC  = 110030
+    HSCEI = 110010
+    GEM   = 110050
+    HSIF  = 110001
+    HSIU  = 110002
+    HSIP  = 110003
+    HSIC  = 110004
+    VHSI  = 110041
+    DJIA = 111000
+    NASDAQ = 111100
+    SSE = 2000001
+    SS300 = 2000300
+
+
+
