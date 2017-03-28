@@ -11,6 +11,8 @@ from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
 from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
 from decimal import Decimal
 import urllib.request
+import urllib.error
+from socket import timeout
 import random
 from get_daily_fx_calendar import get_fx_calendar
 from get_aastocks_hy_stats import get_aastocks_etf_stat, get_aastocks_hy_stat
@@ -18,7 +20,7 @@ from get_fx_live_rate import get_fx_live_rate, get_dxy_live_rate
 from get_aastocks_chart import get_hkg_chart_by_type
 import configparser
 
-from classes.TimeFrame import TimeFrame
+from classes.AastocksEnum import TimeFrame, FxCode, IndexCode
 
 config = configparser.ConfigParser()
 config.read('config.properties')
@@ -30,7 +32,8 @@ def on_chat_message(msg):
     print("Text Command: " + msg['text'])
     
     command = msg['text'].split("@")[0]
-    EL = '\n\n'
+    DEL = '\n\n'
+    EL = '\n'
     
     keyboard_list = []
     reply = ""
@@ -78,7 +81,7 @@ def on_chat_message(msg):
         passage = 'Please tap on the Top 10 list to show '
         
         for menuitem in menuitemlist:
-            passage = passage + EL + ' ' + menuitem['command'] + ' - ' + menuitem['desc'] + ' ' + menuitem['icon']
+            passage = passage + DEL + ' ' + menuitem['command'] + ' - ' + menuitem['desc'] + ' ' + menuitem['icon']
  
         bot.sendMessage(chat_id, passage, parse_mode='HTML')
       
@@ -114,17 +117,25 @@ def on_chat_message(msg):
         code = command[3:]
         timeframe = TimeFrame.DAILY
         
-        menu = '<b>Quote AAStocks Charts Command</b>'
+        menu = '<b>Quote AAStocks Charts Command</b> ' + u'\U0001F4C8'
         
-        menuitemlist = [{'command': '/qM[StockCode]', 'desc': 'Quote Monthly Chart', 'icon': u'\U0001F4C8'},
-                    {'command': '/qw[StockCode]', 'desc': 'Quote Weekly Chart', 'icon': u'\U0001F4C8'},
-                    {'command': '/qd[StockCode]', 'desc': 'Quote Daily Chart', 'icon': u'\U0001F4C8'},
-                    {'command': '/qh[StockCode]', 'desc': 'Quote Hourly Chart', 'icon': u'\U0001F4C8'},
-                    {'command': '/qm[StockCode]', 'desc': 'Quote Minutes Chart', 'icon': u'\U0001F4C8'},
+        menuitemlist = [{'command': '/qM[Code]', 'desc': 'Monthly Chart', 'icon': u'\U0001F4C8'},
+                    {'command': '/qw[Code]', 'desc': 'Weekly Chart', 'icon': u'\U0001F4C8'},
+                    {'command': '/qd[Code]', 'desc': 'Daily Chart', 'icon': u'\U0001F4C8'},
+                    {'command': '/qh[Code]', 'desc': 'Hourly Chart', 'icon': u'\U0001F4C8'},
+                    {'command': '/qm[Code]', 'desc': 'Minutes Chart', 'icon': u'\U0001F4C8'},
         ]
+        
+        fxc = ", ".join([str(x.name) for x in FxCode][:5])
+        idxc = ", ".join([str(x.name) for x in IndexCode][:8])
 
         for menuitem in menuitemlist:
-            menu = menu + EL + ' ' + menuitem['command'] + ' - ' + menuitem['desc'] + ' ' + menuitem['icon']
+            menu = menu + EL + ' ' + menuitem['command'] + ' - ' + menuitem['desc']
+        
+        menu = menu + DEL + "<b>[Code]</b>"
+        menu = menu + EL + "Stock: 5, 2628, 87001, 8141, AAPL, GOOG, GS, ..."   
+        menu = menu + EL + "FX: " + fxc + ", ..."
+        menu = menu + EL + "Index: " + idxc + ", ..."  
         
         if (tf == "M"):
             timeframe = TimeFrame.MONTHLY
@@ -141,9 +152,14 @@ def on_chat_message(msg):
             return
 
         if code:
-            bot.sendMessage(chat_id, '<i>Retrieving AAStocks Chart...</i>', parse_mode='HTML')
-            f = urllib.request.urlopen(get_hkg_chart_by_type(code, timeframe))
-            bot.sendPhoto(chat_id, f)
+            #bot.sendMessage(chat_id, '<i>Retrieving AAStocks Chart...</i>', parse_mode='HTML')
+            
+            try:
+                f = urllib.request.urlopen(get_hkg_chart_by_type(code, timeframe), timeout=10)
+            except:
+                bot.sendMessage(chat_id, 'Request Timeout', parse_mode='HTML')
+            else:
+                bot.sendPhoto(chat_id, f)
         else:
             stockcode = random.choice(["2628", "939", "2800", "8141", "AAPL", "GOOG", "GS"])
             passage = "<i>Usage:</i> " + command + "[StockCode] (e.g. " + command + stockcode + ")"
@@ -159,10 +175,10 @@ def on_chat_message(msg):
                         {'command': '/q', 'desc': 'Quick Chart', 'icon': u'\U0001F4C8'},
         ]
         
-        menu = '金鑊鏟 Bot v1.0.6'
+        menu = '金鑊鏟 Bot v1.0.7'
         
         for menuitem in menuitemlist:
-            menu = menu + EL + ' ' + menuitem['command'] + ' - ' + menuitem['desc'] + ' ' + menuitem['icon']
+            menu = menu + DEL + ' ' + menuitem['command'] + ' - ' + menuitem['desc'] + ' ' + menuitem['icon']
     
         bot.sendMessage(chat_id, menu)
         
