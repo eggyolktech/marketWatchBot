@@ -18,6 +18,7 @@ from get_daily_fx_calendar import get_fx_calendar
 from get_aastocks_hy_stats import get_aastocks_etf_stat, get_aastocks_hy_stat
 from get_fx_live_rate import get_fx_live_rate, get_dxy_live_rate
 from get_aastocks_chart import get_hkg_chart_by_type
+from get_aastocks_news import get_latest_news_by_code
 import configparser
 
 from classes.AastocksEnum import TimeFrame, FxCode, IndexCode
@@ -117,23 +118,24 @@ def on_chat_message(msg):
         code = command[3:]
         timeframe = TimeFrame.DAILY
         
-        menu = '<b>Quote AAStocks Charts Command</b> ' + u'\U0001F4C8'
+        menu = '<b>AAStocks Quick Command</b> ' + u'\U0001F4C8'
         
         menuitemlist = [{'command': '/qM[Code]', 'desc': 'Monthly Chart', 'icon': u'\U0001F4C8'},
                     {'command': '/qw[Code]', 'desc': 'Weekly Chart', 'icon': u'\U0001F4C8'},
                     {'command': '/qd[Code]', 'desc': 'Daily Chart', 'icon': u'\U0001F4C8'},
                     {'command': '/qh[Code]', 'desc': 'Hourly Chart', 'icon': u'\U0001F4C8'},
                     {'command': '/qm[Code]', 'desc': 'Minutes Chart', 'icon': u'\U0001F4C8'},
+                    {'command': '/qn[Code]', 'desc': 'Lastest New (HK Stock Only)', 'icon': u'\U0001F4C8'},
         ]
         
-        fxc = ", ".join([str(x.name) for x in FxCode][:5])
-        idxc = ", ".join([str(x.name) for x in IndexCode][:8])
+        fxc = ", ".join(['/qh' + str(x.name) for x in FxCode][:3])
+        idxc = ", ".join(['/qd' + str(x.name) for x in IndexCode][:3])
 
         for menuitem in menuitemlist:
             menu = menu + EL + ' ' + menuitem['command'] + ' - ' + menuitem['desc']
         
-        menu = menu + DEL + "<b>[Code]</b>"
-        menu = menu + EL + "Stock: 5, 2628, 87001, 8141, AAPL, GOOG, GS, ..."   
+        menu = menu + DEL + "<b>Sample</b>"
+        menu = menu + EL + "Stock: /qd5, /qm607, /qMAAPL, /qwMCD, ..."   
         menu = menu + EL + "FX: " + fxc + ", ..."
         menu = menu + EL + "Index: " + idxc + ", ..."  
         
@@ -147,12 +149,15 @@ def on_chat_message(msg):
             timeframe = TimeFrame.HOURLY
         elif (tf.lower() == "m"):
             timeframe = TimeFrame.MINUTE
+        elif (tf.lower() == "n"):
+            bot.sendMessage(chat_id, get_latest_news_by_code(code, 5), parse_mode='HTML')
+            return            
         else:        
             bot.sendMessage(chat_id, menu, parse_mode='HTML') 
             return
 
         if code:
-            #bot.sendMessage(chat_id, '<i>Retrieving AAStocks Chart...</i>', parse_mode='HTML')
+            bot.sendMessage(chat_id, u'\U0000231B', parse_mode='HTML')
             
             try:
                 f = urllib.request.urlopen(get_hkg_chart_by_type(code, timeframe), timeout=10)
@@ -165,7 +170,7 @@ def on_chat_message(msg):
             passage = "<i>Usage:</i> " + command + "[StockCode] (e.g. " + command + stockcode + ")"
             bot.sendMessage(chat_id, passage, parse_mode='HTML') 
         
-    else:    
+    elif (command.startswith("/")):    
     
         menuitemlist = [{'command': '/fx', 'desc': 'FX Quote', 'icon': u'\U0001F4B9'},
                         {'command': '/idq', 'desc': 'Index Quote', 'icon': u'\U0001F310'},
@@ -175,12 +180,15 @@ def on_chat_message(msg):
                         {'command': '/q', 'desc': 'Quick Chart', 'icon': u'\U0001F4C8'},
         ]
         
-        menu = '金鑊鏟 Bot v1.0.7'
+        menu = '金鑊鏟 Bot v1.0.8'
         
         for menuitem in menuitemlist:
             menu = menu + DEL + ' ' + menuitem['command'] + ' - ' + menuitem['desc'] + ' ' + menuitem['icon']
     
-        bot.sendMessage(chat_id, menu)
+        bot.sendMessage(chat_id, menu, parse_mode='HTML')
+        
+    else: 
+        print("DO NOTHING for non / command")
         
 def on_callback_query(msg):
 
