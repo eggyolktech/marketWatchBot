@@ -43,4 +43,3 @@ class IndexCode(Enum):
     SS300 = 2000300
 
 
-

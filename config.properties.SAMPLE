@@ -29,3 +29,6 @@ hy-url-etf=http://www.aastocks.com/en/stocks/etf/search.aspx?t=5&s=421&o=0&y=3
 hy-url-banks=http://www.aastocks.com/en/stocks/market/industry/sector-industry-details.aspx?industrysymbol=5011&t=1&hk=0&s=10&o=0
 hy-url-reits=http://www.aastocks.com/en/stocks/market/industry/sector-industry-details.aspx?industrysymbol=6013&t=1&s=10&o=0&p=
 hy-url-conglomerates=http://www.aastocks.com/en/stocks/market/industry/sector-industry-details.aspx?industrysymbol=8001&t=1&s=10&o=0&p=
+
+[credit-suisse]
+cbbc-url=http://warrants-hk.credit-suisse.com/home/cbbc_delta_chart/cbbc_os_100.jpg

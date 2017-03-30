@@ -26,6 +26,8 @@ from classes.AastocksEnum import TimeFrame, FxCode, IndexCode
 config = configparser.ConfigParser()
 config.read('config.properties')
 
+LOADING = [u'\U0000231B', u'\U0001F6AC', u'\U0001F37B', u'\U0001F377', u'\U000023F3', u'\U0000231A']
+
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
     
@@ -88,13 +90,13 @@ def on_chat_message(msg):
       
     elif (command == "/cal"):
     
-        bot.sendMessage(chat_id, '<i>Retreiving Event Calendar...</i>', parse_mode='HTML')
+        bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')
         passage = get_fx_calendar()
         bot.sendMessage(chat_id, passage, parse_mode='HTML')
     
     elif (command.startswith("/tt")):
     
-        bot.sendMessage(chat_id, '<i>Retreiving Top 10 List...</i>', parse_mode='HTML')
+        bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')
         
         industry = command[3:]
         
@@ -118,14 +120,15 @@ def on_chat_message(msg):
         code = command[3:]
         timeframe = TimeFrame.DAILY
         
-        menu = '<b>AAStocks Quick Command</b> ' + u'\U0001F4C8'
+        menu = '<b>Quick Quote Command</b> ' + u'\U0001F4C8'
         
         menuitemlist = [{'command': '/qM[Code]', 'desc': 'Monthly Chart', 'icon': u'\U0001F4C8'},
                     {'command': '/qw[Code]', 'desc': 'Weekly Chart', 'icon': u'\U0001F4C8'},
                     {'command': '/qd[Code]', 'desc': 'Daily Chart', 'icon': u'\U0001F4C8'},
                     {'command': '/qh[Code]', 'desc': 'Hourly Chart', 'icon': u'\U0001F4C8'},
                     {'command': '/qm[Code]', 'desc': 'Minutes Chart', 'icon': u'\U0001F4C8'},
-                    {'command': '/qn[Code]', 'desc': 'Lastest New (HK Stock Only)', 'icon': u'\U0001F4C8'},
+                    {'command': '/qn[Code]', 'desc': 'Latest News (HK Stock Only)', 'icon': u'\U0001F4C8'},
+                    {'command': '/qc', 'desc': 'CBBC Distribution', 'icon': u'\U0001F42E'},
         ]
         
         fxc = ", ".join(['/qh' + str(x.name) for x in FxCode][:3])
@@ -151,18 +154,21 @@ def on_chat_message(msg):
             timeframe = TimeFrame.MINUTE
         elif (tf.lower() == "n"):
             bot.sendMessage(chat_id, get_latest_news_by_code(code, 5), parse_mode='HTML')
-            return            
+            return         
+        elif (tf.lower() == "c"):
+            bot.sendMessage(chat_id,  u'\U0001F42E' +  u'\U0001F43B' + u'\U0001F4CA' + EL + config.get("credit-suisse","cbbc-url"), parse_mode='HTML')
+            return                 
         else:        
             bot.sendMessage(chat_id, menu, parse_mode='HTML') 
             return
 
         if code:
-            bot.sendMessage(chat_id, u'\U0000231B', parse_mode='HTML')
+            bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')
             
             try:
                 f = urllib.request.urlopen(get_hkg_chart_by_type(code, timeframe), timeout=10)
             except:
-                bot.sendMessage(chat_id, 'Request Timeout', parse_mode='HTML')
+                bot.sendMessage(chat_id, u'\U000026D4' + ' Request Timeout', parse_mode='HTML')
             else:
                 bot.sendPhoto(chat_id, f)
         else:
@@ -177,10 +183,10 @@ def on_chat_message(msg):
                         {'command': '/cmd', 'desc': 'Commodities Quote', 'icon': u'\U0001F30E'},
                         {'command': '/cal', 'desc': 'Coming Market Events', 'icon': u'\U0001F4C5'},
                         {'command': '/top10', 'desc': 'Top 10 List', 'icon': u'\U0001F51F'},
-                        {'command': '/q', 'desc': 'Quick Chart', 'icon': u'\U0001F4C8'},
+                        {'command': '/q', 'desc': 'Quick Command', 'icon': u'\U0001F4C8'},
         ]
         
-        menu = '金鑊鏟 Bot v1.0.8'
+        menu = '金鑊鏟 Bot v1.0.9'
         
         for menuitem in menuitemlist:
             menu = menu + DEL + ' ' + menuitem['command'] + ' - ' + menuitem['desc'] + ' ' + menuitem['icon']
