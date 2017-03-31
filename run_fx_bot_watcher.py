@@ -31,7 +31,6 @@ LOADING = [u'\U0000231B', u'\U0001F6AC', u'\U0001F37B', u'\U0001F377', u'\U00002
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
     
-    print(msg)
     print("Text Command: " + msg['text'])
     
     command = msg['text'].split("@")[0]
@@ -116,18 +115,28 @@ def on_chat_message(msg):
 
     elif (command.startswith("/q")):
     
-        tf = command[2:3]
-        code = command[3:]
+        try:            
+            cmds = command.split(' ')
+            quote = cmds[0]
+            params = cmds[1:]
+        except IndexError:
+            params = ""
+            
+        print("Quote: " + quote)
+        print("Param: " + str(params))
+    
+        tf = quote[2:3]
+        code = quote[3:]
         timeframe = TimeFrame.DAILY
         
         menu = '<b>Quick Quote Command</b> ' + u'\U0001F4C8'
         
-        menuitemlist = [{'command': '/qM[Code]', 'desc': 'Monthly Chart', 'icon': u'\U0001F4C8'},
-                    {'command': '/qw[Code]', 'desc': 'Weekly Chart', 'icon': u'\U0001F4C8'},
-                    {'command': '/qd[Code]', 'desc': 'Daily Chart', 'icon': u'\U0001F4C8'},
-                    {'command': '/qh[Code]', 'desc': 'Hourly Chart', 'icon': u'\U0001F4C8'},
-                    {'command': '/qm[Code]', 'desc': 'Minutes Chart', 'icon': u'\U0001F4C8'},
-                    {'command': '/qn[Code]', 'desc': 'Latest News (HK Stock Only)', 'icon': u'\U0001F4C8'},
+        menuitemlist = [{'command': '/qM[code] [option]', 'desc': 'Monthly Chart', 'icon': u'\U0001F4C8'},
+                    {'command': '/qw[code] [option]', 'desc': 'Weekly Chart', 'icon': u'\U0001F4C8'},
+                    {'command': '/qd[code] [option]', 'desc': 'Daily Chart', 'icon': u'\U0001F4C8'},
+                    {'command': '/qh[code] [option]', 'desc': 'Hourly Chart', 'icon': u'\U0001F4C8'},
+                    {'command': '/qm[code] [option]', 'desc': 'Minutes Chart', 'icon': u'\U0001F4C8'},
+                    {'command': '/qn[code]', 'desc': 'Latest News (HK Only)', 'icon': u'\U0001F4C8'},
                     {'command': '/qc', 'desc': 'CBBC Distribution', 'icon': u'\U0001F42E'},
         ]
         
@@ -137,10 +146,13 @@ def on_chat_message(msg):
         for menuitem in menuitemlist:
             menu = menu + EL + ' ' + menuitem['command'] + ' - ' + menuitem['desc']
         
+        menu = menu + DEL + "[option]: bb - Show Bollinger Bands"
+        
         menu = menu + DEL + "<b>Sample</b>"
-        menu = menu + EL + "Stock: /qd5, /qm607, /qMAAPL, /qwMCD, ..."   
-        menu = menu + EL + "FX: " + fxc + ", ..."
-        menu = menu + EL + "Index: " + idxc + ", ..."  
+        menu = menu + EL + "Stock: /qd5, /qm607, /qMAAPL, /qwMCD"   
+        menu = menu + EL + "FX: " + fxc
+        menu = menu + EL + "Index: " + idxc  
+        menu = menu + EL + "News (HK Only): /qn5, /qn3333"
         
         if (tf == "M"):
             timeframe = TimeFrame.MONTHLY
@@ -153,24 +165,38 @@ def on_chat_message(msg):
         elif (tf.lower() == "m"):
             timeframe = TimeFrame.MINUTE
         elif (tf.lower() == "n"):
-            bot.sendMessage(chat_id, get_latest_news_by_code(code, 5), parse_mode='HTML')
+            bot.sendMessage(chat_id, get_latest_news_by_code(code, 8), parse_mode='HTML')
             return         
         elif (tf.lower() == "c"):
-            bot.sendMessage(chat_id,  u'\U0001F42E' +  u'\U0001F43B' + u'\U0001F4CA' + EL + config.get("credit-suisse","cbbc-url"), parse_mode='HTML')
+
+            bot.sendMessage(chat_id, u'\U0001F42E' +  u'\U0001F43B' + u'\U0001F4CA', parse_mode='HTML')
+            
+            try:
+                f = urllib.request.urlopen(config.get("credit-suisse","cbbc-url"), timeout=10)
+            except:
+                bot.sendMessage(chat_id, u'\U000026D4' + ' Request Timeout', parse_mode='HTML')
+            else:
+                bot.sendPhoto(chat_id, f)                
             return                 
         else:        
             bot.sendMessage(chat_id, menu, parse_mode='HTML') 
             return
 
         if code:
-            bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')
-            
-            try:
-                f = urllib.request.urlopen(get_hkg_chart_by_type(code, timeframe), timeout=10)
-            except:
-                bot.sendMessage(chat_id, u'\U000026D4' + ' Request Timeout', parse_mode='HTML')
+        
+            if(is_white_listed(chat_id)):
+                print("White Listed: [" + str(chat_id) + "]")        
+                bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')
+                
+                try:
+                    f = urllib.request.urlopen(get_hkg_chart_by_type(code, timeframe, params), timeout=10)
+                except:
+                    bot.sendMessage(chat_id, u'\U000026D4' + ' Request Timeout', parse_mode='HTML')
+                else:
+                    bot.sendPhoto(chat_id, f)
             else:
-                bot.sendPhoto(chat_id, f)
+                print("Not in White List: [" + str(chat_id) + "]")
+                bot.sendMessage(chat_id, u'\U000026D4' + ' Request Timeout', parse_mode='HTML')
         else:
             stockcode = random.choice(["2628", "939", "2800", "8141", "AAPL", "GOOG", "GS"])
             passage = "<i>Usage:</i> " + command + "[StockCode] (e.g. " + command + stockcode + ")"
@@ -195,6 +221,17 @@ def on_chat_message(msg):
         
     else: 
         print("DO NOTHING for non / command")
+
+def is_white_listed(in_chat_id):
+    
+    chat_list = config.items("telegram-chat")
+    
+    for key, chat_id in chat_list:
+        #print("Compare: " + str(chat_id) + " <=> " + str(in_chat_id));
+        if (str(in_chat_id) == str(chat_id)):
+            return True;
+    
+    return False;
         
 def on_callback_query(msg):
 
