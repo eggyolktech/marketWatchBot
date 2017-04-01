@@ -199,7 +199,7 @@ def on_chat_message(msg):
                 bot.sendMessage(chat_id, u'\U000026D4' + ' Request Timeout', parse_mode='HTML')
         else:
             stockcode = random.choice(["2628", "939", "2800", "8141", "AAPL", "GOOG", "GS"])
-            passage = "<i>Usage:</i> " + command + "[StockCode] (e.g. " + command + stockcode + ")"
+            passage = "<i>Usage:</i> " + command.split(' ')[0] + "[StockCode] (e.g. " + command.split(' ')[0] + stockcode + ")"
             bot.sendMessage(chat_id, passage, parse_mode='HTML') 
         
     elif (command.startswith("/")):    
