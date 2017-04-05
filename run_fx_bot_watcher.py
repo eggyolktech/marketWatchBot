@@ -27,6 +27,7 @@ config = configparser.ConfigParser()
 config.read('config.properties')
 
 LOADING = [u'\U0000231B', u'\U0001F6AC', u'\U0001F37B', u'\U0001F377', u'\U000023F3', u'\U0000231A']
+QQLIST = {'Fx', 'Index', 'ETF', 'Bluechip', 'Industry'}
 
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
@@ -138,6 +139,7 @@ def on_chat_message(msg):
                     {'command': '/qm[code] [option]', 'desc': 'Minutes Chart', 'icon': u'\U0001F4C8'},
                     {'command': '/qn[code]', 'desc': 'Latest News (HK Only)', 'icon': u'\U0001F4C8'},
                     {'command': '/qc', 'desc': 'CBBC Distribution', 'icon': u'\U0001F42E'},
+                    {'command': '/qq', 'desc': 'Quick Menu', 'icon': u'\U0001F42E'},
         ]
         
         fxc = ", ".join(['/qh' + str(x.name) for x in FxCode][:3])
@@ -178,6 +180,18 @@ def on_chat_message(msg):
             else:
                 bot.sendPhoto(chat_id, f)                
             return                 
+        elif (tf.lower() == "q"):
+        
+            if (code in QQLIST):
+                bot.sendMessage(chat_id, u'\U000026D4' + ' Service Not Available', parse_mode='HTML')
+                return
+            else:
+                passage = "<i>Use the following shortcuts to list quote items:</i> " + DEL
+                for list in QQLIST:
+                    passage = passage + "/qq" + list +  " - List " + list + " codes" + DEL
+                    
+                bot.sendMessage(chat_id, passage, parse_mode='HTML')
+                return
         else:        
             bot.sendMessage(chat_id, menu, parse_mode='HTML') 
             return
