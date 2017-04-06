@@ -157,15 +157,24 @@ def on_chat_message(msg):
         menu = menu + EL + "News (HK Only): /qn5, /qn3333"
         
         if (tf == "M"):
-            timeframe = TimeFrame.MONTHLY
+            if (code.isalpha()):
+                timeframe = TimeFrame.MONTHLYSHORT
+            else:
+                timeframe = TimeFrame.MONTHLY
         elif (tf.lower() == "w"):
             timeframe = TimeFrame.WEEKLY
         elif (tf.lower() == "d"):
             timeframe = TimeFrame.DAILY
         elif (tf.lower() == "h"):
-            timeframe = TimeFrame.HOURLY
+            if (code.isalpha()):
+                timeframe = TimeFrame.HOURLYSHORT
+            else:
+                timeframe = TimeFrame.HOURLY
         elif (tf.lower() == "m"):
-            timeframe = TimeFrame.MINUTE
+            if (code.isalpha()):
+                timeframe = TimeFrame.MINUTESHORT
+            else:
+                timeframe = TimeFrame.MINUTE
         elif (tf.lower() == "n"):
             bot.sendMessage(chat_id, get_latest_news_by_code(code, 8), parse_mode='HTML')
             return         

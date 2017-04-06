@@ -2,10 +2,13 @@ from enum import Enum
 
 class TimeFrame(Enum):
     MONTHLY = 2060
+    MONTHLYSHORT = 54
     WEEKLY = 11
     DAILY = 6
     HOURLY = 5023
+    HOURLYSHORT = 4
     MINUTE = 5012
+    MINUTESHORT = 0
 
 class FxCode(Enum):
     USD    = 900200
