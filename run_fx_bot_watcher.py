@@ -19,15 +19,14 @@ from get_aastocks_hy_stats import get_aastocks_etf_stat, get_aastocks_hy_stat
 from get_fx_live_rate import get_fx_live_rate, get_dxy_live_rate
 from get_aastocks_chart import get_hkg_chart_by_type
 from get_aastocks_news import get_latest_news_by_code
+from get_quick_list import get_qq_command_list, get_qq_command_tf_list
 import configparser
 
 from classes.AastocksEnum import TimeFrame, FxCode, IndexCode
+from classes.AastocksConstants import *
 
 config = configparser.ConfigParser()
 config.read('config.properties')
-
-LOADING = [u'\U0000231B', u'\U0001F6AC', u'\U0001F37B', u'\U0001F377', u'\U000023F3', u'\U0000231A']
-QQLIST = {'Fx', 'Index', 'ETF', 'Bluechip', 'Industry'}
 
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
@@ -35,8 +34,6 @@ def on_chat_message(msg):
     print("Text Command: " + msg['text'])
     
     command = msg['text'].split("@")[0]
-    DEL = '\n\n'
-    EL = '\n'
     
     keyboard_list = []
     reply = ""
@@ -192,7 +189,10 @@ def on_chat_message(msg):
         elif (tf.lower() == "q"):
         
             if (code in QQLIST):
-                bot.sendMessage(chat_id, u'\U000026D4' + ' Service Not Available', parse_mode='HTML')
+                bot.sendMessage(chat_id, get_qq_command_list(code) , parse_mode='HTML')
+                return
+            elif (code):
+                bot.sendMessage(chat_id, get_qq_command_tf_list(code) , parse_mode='HTML')
                 return
             else:
                 passage = "<i>Use the following shortcuts to list quote items:</i> " + DEL

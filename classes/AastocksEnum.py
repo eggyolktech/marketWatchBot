@@ -43,6 +43,6 @@ class IndexCode(Enum):
     DJIA = 111000
     NASDAQ = 111100
     SSE = 2000001
-    SS300 = 2000300
+    #SS300 = 2000300
 
 
