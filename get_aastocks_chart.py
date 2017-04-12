@@ -13,21 +13,61 @@ config.read('config.properties')
 
 from classes.AastocksEnum import TimeFrame, FxCode, IndexCode
 
-def get_hkg_chart_by_type(code, timeframe, params):
+def get_hkg_chart_by_type(code, action, params):
 
     url = ""
     is_bb = False
+    is_num = False
+    is_CN = False
+    is_US = False
+    is_FX = False
     
     for p in params:
         if (p.lower() == "bb"):
             is_bb = True;
     
-    if (is_number(code)):
+    # Determine which code type base on input format
+    is_num = is_number(code)
+    
+    if (is_num and len(code) == 6 and code[:1] == "6"):
+        code = code + ".SH"
+        is_CN = True
+    elif (is_num and len(code) == 6):
+        code = code + ".SZ"
+        is_CN = True
+    elif (is_num):
         code = code + ".HK"    
     elif (code.isalpha()):
         code = get_aastocks_alpha_code(code)
+        if (".US" in code):
+            is_US = True
+        elif (code[:1] == "9"):
+            is_FX = True
     else:
         code = "110000.HK"    
+    
+    # Determine time frame to use base on code type
+    timeframe = TimeFrame.DAILY
+    
+    if (action == "M"):
+        if (is_US or is_CN):
+            timeframe = TimeFrame.MONTHLYSHORT
+        else:
+            timeframe = TimeFrame.MONTHLY
+    elif (action.lower() == "w"):
+        timeframe = TimeFrame.WEEKLY
+    elif (action.lower() == "d"):
+        timeframe = TimeFrame.DAILY
+    elif (action.lower() == "h"):
+        if (is_FX):
+            timeframe = TimeFrame.HOURLYSHORT
+        else:
+            timeframe = TimeFrame.HOURLY
+    elif (action.lower() == "m"):
+        if (is_FX):
+            timeframe = TimeFrame.MINUTESHORT
+        else:
+            timeframe = TimeFrame.MINUTE
     
     main = "http://charts.aastocks.com/servlet/Charts?fontsize=12&15MinDelay=F&lang=1&titlestyle=1&vol=1&chart=left&type=1"
     

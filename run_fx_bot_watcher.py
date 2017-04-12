@@ -123,9 +123,8 @@ def on_chat_message(msg):
         print("Quote: " + quote)
         print("Param: " + str(params))
     
-        tf = quote[2:3]
+        action = quote[2:3]
         code = quote[3:]
-        timeframe = TimeFrame.DAILY
         
         menu = '<b>Quick Quote Command</b> ' + u'\U0001F4C8'
         
@@ -148,34 +147,39 @@ def on_chat_message(msg):
         menu = menu + DEL + "[option]: bb - Show Bollinger Bands"
         
         menu = menu + DEL + "<b>Sample</b>"
-        menu = menu + EL + "Stock: /qd5, /qm607, /qMAAPL, /qwMCD"   
+        menu = menu + EL + "Stock: /qd5, /qm601318, /qMAAPL, /qwMCD"   
         menu = menu + EL + "FX: " + fxc
         menu = menu + EL + "Index: " + idxc  
         menu = menu + EL + "News (HK Only): /qn5, /qn3333"
         
-        if (tf == "M"):
-            if (code.isalpha()):
-                timeframe = TimeFrame.MONTHLYSHORT
+        
+        if (action in ["M", "w", "W", "d", "D", "h", "H", "m"]):
+        
+            # Bucket Scenario to display stock chart
+            if code:
+            
+                if(is_white_listed(chat_id)):
+                    print("White Listed: [" + str(chat_id) + "]")        
+                    bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')
+                    
+                    try:
+                        f = urllib.request.urlopen(get_hkg_chart_by_type(code, action, params), timeout=10)
+                    except:
+                        bot.sendMessage(chat_id, u'\U000026D4' + ' Request Timeout', parse_mode='HTML')
+                    else:
+                        bot.sendPhoto(chat_id, f)
+                else:
+                    print("Not in White List: [" + str(chat_id) + "]")
+                    bot.sendMessage(chat_id, u'\U000026D4' + ' Request Timeout', parse_mode='HTML')
             else:
-                timeframe = TimeFrame.MONTHLY
-        elif (tf.lower() == "w"):
-            timeframe = TimeFrame.WEEKLY
-        elif (tf.lower() == "d"):
-            timeframe = TimeFrame.DAILY
-        elif (tf.lower() == "h"):
-            if (code.isalpha()):
-                timeframe = TimeFrame.HOURLYSHORT
-            else:
-                timeframe = TimeFrame.HOURLY
-        elif (tf.lower() == "m"):
-            if (code.isalpha()):
-                timeframe = TimeFrame.MINUTESHORT
-            else:
-                timeframe = TimeFrame.MINUTE
-        elif (tf.lower() == "n"):
+                stockcode = random.choice(["2628", "939", "2800", "8141", "AAPL", "GOOG", "GS"])
+                passage = "<i>Usage:</i> " + command.split(' ')[0] + "[StockCode] (e.g. " + command.split(' ')[0] + stockcode + ")"
+                bot.sendMessage(chat_id, passage, parse_mode='HTML')
+   
+        elif (action.lower() == "n"):
             bot.sendMessage(chat_id, get_latest_news_by_code(code, 8), parse_mode='HTML')
             return         
-        elif (tf.lower() == "c"):
+        elif (action.lower() == "c"):
 
             bot.sendMessage(chat_id, u'\U0001F42E' +  u'\U0001F43B' + u'\U0001F4CA', parse_mode='HTML')
             
@@ -186,7 +190,7 @@ def on_chat_message(msg):
             else:
                 bot.sendPhoto(chat_id, f)                
             return                 
-        elif (tf.lower() == "q"):
+        elif (action.lower() == "q"):
         
             if (code in QQLIST):
                 bot.sendMessage(chat_id, get_qq_command_list(code) , parse_mode='HTML')
@@ -204,26 +208,6 @@ def on_chat_message(msg):
         else:        
             bot.sendMessage(chat_id, menu, parse_mode='HTML') 
             return
-
-        if code:
-        
-            if(is_white_listed(chat_id)):
-                print("White Listed: [" + str(chat_id) + "]")        
-                bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')
-                
-                try:
-                    f = urllib.request.urlopen(get_hkg_chart_by_type(code, timeframe, params), timeout=10)
-                except:
-                    bot.sendMessage(chat_id, u'\U000026D4' + ' Request Timeout', parse_mode='HTML')
-                else:
-                    bot.sendPhoto(chat_id, f)
-            else:
-                print("Not in White List: [" + str(chat_id) + "]")
-                bot.sendMessage(chat_id, u'\U000026D4' + ' Request Timeout', parse_mode='HTML')
-        else:
-            stockcode = random.choice(["2628", "939", "2800", "8141", "AAPL", "GOOG", "GS"])
-            passage = "<i>Usage:</i> " + command.split(' ')[0] + "[StockCode] (e.g. " + command.split(' ')[0] + stockcode + ")"
-            bot.sendMessage(chat_id, passage, parse_mode='HTML') 
         
     elif (command.startswith("/")):    
     
