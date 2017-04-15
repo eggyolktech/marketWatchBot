@@ -19,6 +19,7 @@ from get_aastocks_hy_stats import get_aastocks_etf_stat, get_aastocks_hy_stat
 from get_fx_live_rate import get_fx_live_rate, get_dxy_live_rate
 from get_aastocks_chart import get_hkg_chart_by_type
 from get_aastocks_news import get_latest_news_by_code
+from get_hkex_ccass_info import get_latest_ccass_info
 from get_quick_list import get_qq_command_list, get_qq_command_tf_list
 import configparser
 
@@ -133,7 +134,8 @@ def on_chat_message(msg):
                     {'command': '/qd[code] [option]', 'desc': 'Daily Chart', 'icon': u'\U0001F4C8'},
                     {'command': '/qh[code] [option]', 'desc': 'Hourly Chart', 'icon': u'\U0001F4C8'},
                     {'command': '/qm[code] [option]', 'desc': 'Minutes Chart', 'icon': u'\U0001F4C8'},
-                    {'command': '/qn[code]', 'desc': 'Latest News (HK Only)', 'icon': u'\U0001F4C8'},
+                    {'command': '/qn[code]', 'desc': 'Latest News (HK Only)', 'icon': u'\U0001F4C8'},                    
+                    {'command': '/qC[code]', 'desc': 'CCASS Top 10 Distribution', 'icon': u'\U0001F42E'},
                     {'command': '/qc', 'desc': 'CBBC Distribution', 'icon': u'\U0001F42E'},
                     {'command': '/qq', 'desc': 'Quick Menu', 'icon': u'\U0001F42E'},
         ]
@@ -150,8 +152,7 @@ def on_chat_message(msg):
         menu = menu + EL + "Stock: /qd5, /qm601318, /qMAAPL, /qwMCD"   
         menu = menu + EL + "FX: " + fxc
         menu = menu + EL + "Index: " + idxc  
-        menu = menu + EL + "News (HK Only): /qn5, /qn3333"
-        
+        menu = menu + EL + "News / CCASS: /qn5, /qn3333, /qC606"        
         
         if (action in ["M", "w", "W", "d", "D", "h", "H", "m"]):
         
@@ -178,8 +179,14 @@ def on_chat_message(msg):
    
         elif (action.lower() == "n"):
             bot.sendMessage(chat_id, get_latest_news_by_code(code, 8), parse_mode='HTML')
-            return         
-        elif (action.lower() == "c"):
+            return    
+            
+        elif (action == "C"):
+            bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')         
+            bot.sendMessage(chat_id, get_latest_ccass_info(code, 10) , parse_mode='HTML')
+            return
+            
+        elif (action == "c"):
 
             bot.sendMessage(chat_id, u'\U0001F42E' +  u'\U0001F43B' + u'\U0001F4CA', parse_mode='HTML')
             
@@ -219,7 +226,7 @@ def on_chat_message(msg):
                         {'command': '/q', 'desc': 'Quick Command', 'icon': u'\U0001F4C8'},
         ]
         
-        menu = '金鑊鏟 Bot v1.0.9'
+        menu = '金鑊鏟 Bot v1.1.1'
         
         for menuitem in menuitemlist:
             menu = menu + DEL + ' ' + menuitem['command'] + ' - ' + menuitem['desc'] + ' ' + menuitem['icon']
