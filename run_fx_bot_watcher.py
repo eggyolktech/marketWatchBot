@@ -21,6 +21,7 @@ from get_aastocks_chart import get_hkg_chart_by_type
 from get_aastocks_news import get_latest_news_by_code
 from get_hkex_ccass_info import get_latest_ccass_info
 from get_quick_list import get_qq_command_list, get_qq_command_tf_list
+from get_yahoo_stock_info import get_stocks_rs_charts
 import configparser
 
 from classes.AastocksEnum import TimeFrame, FxCode, IndexCode
@@ -137,6 +138,7 @@ def on_chat_message(msg):
                     {'command': '/qn[code]', 'desc': 'Latest News (HK Only)', 'icon': u'\U0001F4C8'},                    
                     {'command': '/qC[code]', 'desc': 'CCASS Top 10 Distribution', 'icon': u'\U0001F42E'},
                     {'command': '/qc', 'desc': 'CBBC Distribution', 'icon': u'\U0001F42E'},
+                    {'command': '/qr[code1] [code2]', 'desc': 'Relative Strength', 'icon': u'\U0001F42E'},
                     {'command': '/qq', 'desc': 'Quick Menu', 'icon': u'\U0001F42E'},
         ]
         
@@ -152,7 +154,8 @@ def on_chat_message(msg):
         menu = menu + EL + "Stock: /qd5, /qm601318, /qMAAPL, /qwMCD"   
         menu = menu + EL + "FX: " + fxc
         menu = menu + EL + "Index: " + idxc  
-        menu = menu + EL + "News / CCASS: /qn5, /qn3333, /qC606"        
+        menu = menu + EL + "News / CCASS: /qn5, /qn3333, /qC606"     
+        menu = menu + EL + "Rel Strength: /qr5 2388"           
         
         if (action in ["M", "w", "W", "d", "D", "h", "H", "m"]):
         
@@ -184,6 +187,26 @@ def on_chat_message(msg):
         elif (action == "C"):
             bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')         
             bot.sendMessage(chat_id, get_latest_ccass_info(code, 10) , parse_mode='HTML')
+            return
+            
+        elif (action == "r"):
+            bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')         
+            try:
+            
+                code1 = ""
+                code2 = ""
+            
+                if (code and len(params) >= 1):
+                    code1 = code
+                    code2 = params[0]
+                 
+                chart = get_stocks_rs_charts(code1, code2)
+                print("Chart Path: [" + chart + "]")
+            except Exception as e:
+                print("Exception raised: [" + str(e) +  "]")
+                bot.sendMessage(chat_id, u'\U000026D4' + ' ' + str(e), parse_mode='HTML')
+            else:
+                bot.sendPhoto(chat_id=chat_id, photo=open(chart, 'rb'))      
             return
             
         elif (action == "c"):
