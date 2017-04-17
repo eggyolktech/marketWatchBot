@@ -7,6 +7,7 @@ import re
 from datetime import date
 from datetime import datetime
 import configparser
+import json
 
 config = configparser.ConfigParser()
 config.read('config.properties')
@@ -18,22 +19,44 @@ QQ = "/qq"
 
 def get_qq_command_list(code):
 
-
-    passage = ""
-    QQLIST = {'Fx', 'Index', 'ETF', 'Bluechip', 'Industry'}
+    passage = "Quick Access List for " + code + DEL
     
     if (code == "Fx"):
-        passage = "Quick Access List for " + code + DEL
         for name, member in FxCode.__members__.items():
             passage = passage + QQ + name + EL    
     elif (code == "Index"):
-        passage = "Quick Access List for " + code + DEL
         for name, member in IndexCode.__members__.items():
             passage = passage + QQ + name + EL
+    elif (code == "IndexComposite"):
+        
+        with open('data/list_IndexList.json', encoding="utf-8") as data_file:    
+            indexlists = json.load(data_file)    
+            
+        for indexlist in indexlists:
+            passage = passage + QQ + "IC" + indexlist["code"] + " (" + indexlist["label"] + ")" + EL       
     else:
         passage = u'\U000026D4' + ' Service Not Available'
     return passage   
+
+def get_qq_command_detail_list(code):
+
+    passage = "Quick Access Detail List for " + code + DEL
     
+    if (code.startswith("IC")):
+    
+        with open('data/list_IndexList.json', encoding="utf-8") as data_file:    
+            indexlists = json.load(data_file)  
+        
+        indexCode = code.replace("IC", "")
+        filtered_index = [x for x in indexlists if x['code'] == indexCode]
+        
+        for stock in filtered_index[0]["list"]:
+            passage = passage + QQ + stock["code"] + " (" + stock["label"] + ")" + EL
+        
+    else:
+        passage = u'\U000026D4' + ' Service Not Available'
+    return passage       
+  
 def get_qq_command_tf_list(code):
 
     passage = "Quick Chart List for " + code + DEL
@@ -48,7 +71,7 @@ def get_qq_command_tf_list(code):
 
 def main():
 
-    print(get_latest_news_by_code("939", 5).encode("utf-8"))
+    print(get_qq_command_list("IndexComposite").encode("utf-8"))
     
 def is_number(s):
     try:

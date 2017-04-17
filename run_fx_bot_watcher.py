@@ -20,7 +20,7 @@ from get_fx_live_rate import get_fx_live_rate, get_dxy_live_rate
 from get_aastocks_chart import get_hkg_chart_by_type
 from get_aastocks_news import get_latest_news_by_code
 from get_hkex_ccass_info import get_latest_ccass_info
-from get_quick_list import get_qq_command_list, get_qq_command_tf_list
+from get_quick_list import get_qq_command_list, get_qq_command_tf_list, get_qq_command_detail_list
 from get_yahoo_stock_info import get_stocks_rs_charts
 import configparser
 
@@ -225,13 +225,16 @@ def on_chat_message(msg):
             if (code in QQLIST):
                 bot.sendMessage(chat_id, get_qq_command_list(code) , parse_mode='HTML')
                 return
+            elif (code[0:2] in QQSUBLIST):
+                bot.sendMessage(chat_id, get_qq_command_detail_list(code) , parse_mode='HTML')
+                return
             elif (code):
                 bot.sendMessage(chat_id, get_qq_command_tf_list(code) , parse_mode='HTML')
                 return
             else:
                 passage = "<i>Use the following shortcuts to list quote items:</i> " + DEL
                 for list in QQLIST:
-                    passage = passage + "/qq" + list +  " - List " + list + " codes" + DEL
+                    passage = passage + "/qq" + list +  EL + " - List " + list + " codes" + EL
                     
                 bot.sendMessage(chat_id, passage, parse_mode='HTML')
                 return
