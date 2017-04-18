@@ -9,41 +9,50 @@ import matplotlib.pyplot as plt   # Import matplotlib
 config = configparser.ConfigParser()
 config.read('config.properties')
 
-def get_stocks_rs_charts(code1, code2):
+def get_stocks_rs_charts(codelist):
 
     DEL = "\n\n"
     EL = "\n"
     chartpath = ""
-
-    if (is_number(code1) and is_number(code2)):
-        print("Codes to Compare: [" + code1 + ", " + code2 + "]")
-    else:
-        raise ValueError("<i>Usage:</i> " + "/qr" + "[code1] [code2] (e.g. " + "/qr2800 2822" + ")")    
+    codelist = codelist[:10]
     
-    # We will look at stock prices over the past year, starting at January 1, 2016
+    # We will look at stock prices over the past year, starting at April 1, 2016
     start = datetime.datetime(2016,4,1)
     end = datetime.date.today()
- 
-    # Let's get Apple stock data; Apple's ticker symbol is AAPL
-    # First argument is the series we want, second is the source ("yahoo" for Yahoo! Finance), third is the start date, fourth is the end date
-    code1 = code1.rjust(4, '0') + ".HK"
-    code2 = code2.rjust(4, '0') + ".HK"
-    #code1 = "HSI"
-    code1tf = web.DataReader(code1, "yahoo", start, end)
-    code2tf = web.DataReader(code2, "yahoo", start, end)
- 
-    startdate1 = code1tf.index[0]
-    startdate2 = code2tf.index[0]
 
-    if (startdate1 < startdate2):        
-        code1tf = code1tf.loc[startdate2:]
-    elif (startdate1 > startdate2):
-        code2tf = code2tf.loc[startdate1:]
+    for code in codelist:
+        if (not is_number(code)):
+            raise ValueError("Non-numeric code found: [" + code + "]<br><i>Usage:</i> " + "/qr" + "[code1] [code2] [code3].... (e.g. " + "/qr2800 2822 2823" + ")")    
+
+    startdatelist = []  
+    stockcodelist = []
+    codedflist = []    
+            
+    for code in codelist:
+        code = code.rjust(4, '0') + ".HK"
+        codedf = web.DataReader(code, "yahoo", start, end)
+        print("Retrieved Data from Yahoo for code: [" + code + "]")
+        
+        stockcodelist.append(code)
+        codedflist.append(codedf)
+        startdatelist.append(codedf.index[0])
+        
+    maxstartdate = max(startdatelist)
     
-    stocks = pd.DataFrame({code1: code1tf["Adj Close"],
-                           code2: code2tf["Adj Close"]})
-                           
+    codedfloclist = []
     
+    for codedf in codedflist:
+        codedf = codedf.loc[maxstartdate:]
+        codedfloclist.append(codedf)    
+    
+    # form the df dict
+    codedic = {}
+    
+    for idx, codeval in enumerate(stockcodelist):
+        codedic[codeval] = codedfloclist[idx]["Adj Close"]
+    
+    stocks = pd.DataFrame(codedic)
+
     print(stocks.head())
     
     stocks_return = stocks.apply(lambda x: x / x[0])    
@@ -59,14 +68,16 @@ def get_stocks_rs_charts(code1, code2):
     #plt.show()
     
     return chartpath   
-    
+   
 def main():
 
     try:
-        print(get_stocks_rs_charts("494", "293"))
-        #print(get_stocks_rs_charts("5", "2388111"))
-        print(get_stocks_rs_charts("5", "2388A"))
-        print(get_stocks_rs_charts("66 ", "2388"))
+        print(get_stocks_rs_charts("494 293".split()))
+        #print(get_stocks_rs_charts("5 2388111".split()))
+        print(get_stocks_rs_charts("2388".split()))
+        print(get_stocks_rs_charts("66 2388".split()))
+        print(get_stocks_rs_charts(["66", "2828", "2800"]))
+        
     except ValueError as ve:
         print("Value Error: [" + str(ve) + "]")
     except Exception as e:

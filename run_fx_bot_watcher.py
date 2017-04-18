@@ -192,16 +192,9 @@ def on_chat_message(msg):
         elif (action == "r"):
             bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')         
             try:
-            
-                code1 = ""
-                code2 = ""
-            
-                if (code and len(params) >= 1):
-                    code1 = code
-                    code2 = params[0]
-                 
-                chart = get_stocks_rs_charts(code1, code2)
+                chart = get_stocks_rs_charts([code] + params)
                 print("Chart Path: [" + chart + "]")
+
             except Exception as e:
                 print("Exception raised: [" + str(e) +  "]")
                 bot.sendMessage(chat_id, u'\U000026D4' + ' ' + str(e), parse_mode='HTML')
@@ -225,7 +218,7 @@ def on_chat_message(msg):
             if (code in QQLIST):
                 bot.sendMessage(chat_id, get_qq_command_list(code) , parse_mode='HTML')
                 return
-            elif (code[0:2] in QQSUBLIST):
+            elif (code[0:5] in QQSUBLIST):
                 bot.sendMessage(chat_id, get_qq_command_detail_list(code) , parse_mode='HTML')
                 return
             elif (code):
