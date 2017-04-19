@@ -21,7 +21,7 @@ from get_aastocks_chart import get_hkg_chart_by_type
 from get_aastocks_news import get_latest_news_by_code
 from get_hkex_ccass_info import get_latest_ccass_info
 from get_quick_list import get_qq_command_list, get_qq_command_tf_list, get_qq_command_detail_list
-from get_yahoo_stock_info import get_stocks_rs_charts
+from get_yahoo_stock_info import get_stocks_rs_charts, get_stocks_rs_industry_list, get_stocks_rs_list
 import configparser
 
 from classes.AastocksEnum import TimeFrame, FxCode, IndexCode
@@ -188,6 +188,38 @@ def on_chat_message(msg):
             bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')         
             bot.sendMessage(chat_id, get_latest_ccass_info(code, 10) , parse_mode='HTML')
             return
+
+        elif (action == "R"):
+            
+            if (not code):
+                bot.sendMessage(chat_id, get_stocks_rs_industry_list(), parse_mode='HTML') 
+                return
+            elif (code):
+                
+                # getting top 10 stock list within industry first
+                result = get_stocks_rs_list(code.strip(), 12)
+                passage = result[0]
+                codelist = result[1]
+                
+                if (len(codelist) > 0):
+                    bot.sendMessage(chat_id, passage, parse_mode='HTML')
+                else:
+                    bot.sendMessage(passage)
+                    return
+                
+                # generating RS charts accordingly
+                bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')
+                try:
+                    print("Chart Code List: [" + str(codelist) + "]")
+                    chart = get_stocks_rs_charts(codelist)
+                    print("Chart Path: [" + chart + "]")
+
+                except Exception as e:
+                    print("Exception raised: [" + str(e) +  "]")
+                    bot.sendMessage(chat_id, u'\U000026D4' + ' ' + str(e), parse_mode='HTML')
+                else:
+                    bot.sendPhoto(chat_id=chat_id, photo=open(chart, 'rb'))
+                return               
             
         elif (action == "r"):
             bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')         

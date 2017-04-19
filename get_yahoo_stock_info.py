@@ -4,10 +4,48 @@ import time
 import datetime
 import configparser
 import matplotlib.pyplot as plt   # Import matplotlib
+import json
 
+from classes.AastocksConstants import *
 
 config = configparser.ConfigParser()
 config.read('config.properties')
+
+def get_stocks_rs_industry_list():
+
+    passage = "List Relative Strength by Industries" + DEL
+
+    with open('data/list_TopIndustryList.json', encoding="utf-8") as data_file:    
+        indexlists = json.load(data_file)    
+        
+    for indexlist in indexlists:
+        code = indexlist["code"]
+        passage = passage + "/qR" + code + " (" + indexlist["label"] + ")" + EL  
+        
+    return passage  
+    
+def get_stocks_rs_list(code, limit):
+
+    result = []
+    codelist = []
+    
+    with open('data/list_TopIndustryList.json', encoding="utf-8") as data_file:    
+        indexlists = json.load(data_file)  
+    
+    filtered_index = [x for x in indexlists if x['code'] == code]
+    
+    passage = "Top " + str(limit) + " Stocks List in " + filtered_index[0]['label'] + "" + DEL
+    
+    if (filtered_index):
+        for stock in filtered_index[0]["list"][0:limit]:
+            codelist.append(stock["code"])
+            passage = passage + stock["code"] + " (" + stock["label"] + ")" + EL
+    else:
+        passage = u'\U000026D4' + ' List Not Available'
+    
+    result.append(passage)
+    result.append(codelist)
+    return result
 
 def get_stocks_rs_charts(codelist):
 
@@ -29,7 +67,12 @@ def get_stocks_rs_charts(codelist):
     codedflist = []    
             
     for code in codelist:
+        
+        if (code[0] == "0"):
+            code = code[1:]
+    
         code = code.rjust(4, '0') + ".HK"
+        
         codedf = web.DataReader(code, "yahoo", start, end)
         print("Retrieved Data from Yahoo for code: [" + code + "]")
         
@@ -49,17 +92,18 @@ def get_stocks_rs_charts(codelist):
     codedic = {}
     
     for idx, codeval in enumerate(stockcodelist):
-        codedic[codeval] = codedfloclist[idx]["Adj Close"]
+        codedic[codeval] = codedfloclist[idx]["Close"]
     
     stocks = pd.DataFrame(codedic)
 
     print(stocks.head())
+    print(stocks.tail())
     
     stocks_return = stocks.apply(lambda x: x / x[0])    
     
     plt.style.use('ggplot')
     
-    stocks_return.plot(figsize=(10,6), grid = True, linewidth=1.0, title="Relative Strength since 2016 Apr").axhline(y = 1, color = "black", lw = 1) 
+    stocks_return.plot(figsize=(10,6), grid = True, linewidth=1.0, title="Relative Strength since 2016 Apr", colormap = plt.cm.nipy_spectral).axhline(y = 1, color = "black", lw = 1) 
     plt.legend(loc='upper left')
     
     chartpath = "C:\\Temp\\" + 'ychart' + str(int(round(time.time() * 1000))) + '.png'
