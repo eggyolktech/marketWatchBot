@@ -211,14 +211,18 @@ def on_chat_message(msg):
                 bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')
                 try:
                     print("Chart Code List: [" + str(codelist) + "]")
-                    chart = get_stocks_rs_charts(codelist)
-                    print("Chart Path: [" + chart + "]")
+                    result = get_stocks_rs_charts(codelist)
+                    chartpath = result[0]
+                    invalidcodelist = result[1]
+                    print("Chart Path: [" + chartpath + "]")
 
                 except Exception as e:
                     print("Exception raised: [" + str(e) +  "]")
                     bot.sendMessage(chat_id, u'\U000026D4' + ' ' + str(e), parse_mode='HTML')
                 else:
-                    bot.sendPhoto(chat_id=chat_id, photo=open(chart, 'rb'))
+                    if(len(invalidcodelist) > 0):
+                        bot.sendMessage(chat_id, u'\U000026D4' + " Stocks with no data: " + str(invalidcodelist) , parse_mode='HTML')
+                    bot.sendPhoto(chat_id=chat_id, photo=open(chartpath, 'rb'))
                 return               
             
         elif (action == "r"):

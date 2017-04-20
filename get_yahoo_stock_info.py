@@ -64,7 +64,9 @@ def get_stocks_rs_charts(codelist):
 
     startdatelist = []  
     stockcodelist = []
-    codedflist = []    
+    codedflist = []
+    invalidcodelist = []
+    result = []    
             
     for code in codelist:
         
@@ -73,8 +75,12 @@ def get_stocks_rs_charts(codelist):
     
         code = code.rjust(4, '0') + ".HK"
         
-        codedf = web.DataReader(code, "yahoo", start, end)
-        print("Retrieved Data from Yahoo for code: [" + code + "]")
+        try:
+            codedf = web.DataReader(code, "yahoo", start, end)
+            print("Retrieved Data from Yahoo for code: [" + code + "]")
+        except Exception as e:
+            print("Exception raised: [" + str(e) +  "]")
+            invalidcodelist.append(code)   
         
         stockcodelist.append(code)
         codedflist.append(codedf)
@@ -111,7 +117,10 @@ def get_stocks_rs_charts(codelist):
     plt.savefig(chartpath, bbox_inches='tight')
     #plt.show()
     
-    return chartpath   
+    result.append(chartpath)
+    result.append(invalidcodelist)
+    return result
+    
    
 def main():
 
