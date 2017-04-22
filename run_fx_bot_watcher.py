@@ -155,7 +155,7 @@ def on_chat_message(msg):
         menu = menu + EL + "FX: " + fxc
         menu = menu + EL + "Index: " + idxc  
         menu = menu + EL + "News / CCASS: /qn5, /qn3333, /qC606"     
-        menu = menu + EL + "Rel Strength: /qr5 2388"           
+        menu = menu + EL + "Rel Strength: /qr5 2388 3988, /qR (by sectors)"           
         
         if (action in ["M", "w", "W", "d", "D", "h", "H", "m"]):
         
