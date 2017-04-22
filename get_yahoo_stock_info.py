@@ -114,6 +114,8 @@ def get_stocks_rs_charts(codelist):
     
     chartpath = "C:\\Temp\\" + 'ychart' + str(int(round(time.time() * 1000))) + '.png'
     
+    #print(chartpath)
+    
     plt.savefig(chartpath, bbox_inches='tight')
     #plt.show()
     
