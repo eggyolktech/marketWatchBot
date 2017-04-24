@@ -13,6 +13,23 @@ config.read('config.properties')
 
 from classes.AastocksEnum import TimeFrame, FxCode, IndexCode
 
+
+def get_hkg_chart_list_by_type(code, action, params):
+    
+    url_dict_list = []
+    ind_params = []
+    
+    if (len(params) > 0 and params[-1].lower() == "bb"):
+        ind_params.append("bb")
+    
+    url_dict_list.append({'code': code, 'url': get_hkg_chart_by_type(code, action, ind_params)})
+    
+    for p in params:
+        if (not p == "bb"):
+            url_dict_list.append({'code': p, 'url': get_hkg_chart_by_type(p, action, ind_params)})
+    
+    return url_dict_list
+
 def get_hkg_chart_by_type(code, action, params):
 
     url = ""
@@ -109,7 +126,11 @@ def get_aastocks_alpha_code(code):
     
 def main():
 
-    print(get_hkg_chart_by_type("939", TimeFrame.MINUTE))
+    tf = "W"
+    print(get_hkg_chart_list_by_type("939", tf, ["bb"]))
+    print(get_hkg_chart_list_by_type("939", tf, [""]))
+    print(get_hkg_chart_list_by_type("939", tf, ["3988", "2388", "BABA"]))
+    print(get_hkg_chart_list_by_type("939", tf, ["3988", "2388", "BABA", "bb"]))
     
 def is_number(s):
     try:

@@ -17,7 +17,7 @@ import random
 from get_daily_fx_calendar import get_fx_calendar
 from get_aastocks_hy_stats import get_aastocks_etf_stat, get_aastocks_hy_stat
 from get_fx_live_rate import get_fx_live_rate, get_dxy_live_rate
-from get_aastocks_chart import get_hkg_chart_by_type
+from get_aastocks_chart import get_hkg_chart_list_by_type
 from get_aastocks_news import get_latest_news_by_code
 from get_hkex_ccass_info import get_latest_ccass_info
 from get_quick_list import get_qq_command_list, get_qq_command_tf_list, get_qq_command_detail_list
@@ -166,12 +166,15 @@ def on_chat_message(msg):
                     print("White Listed: [" + str(chat_id) + "]")        
                     bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')
                     
-                    try:
-                        f = urllib.request.urlopen(get_hkg_chart_by_type(code, action, params), timeout=10)
-                    except:
-                        bot.sendMessage(chat_id, u'\U000026D4' + ' Request Timeout', parse_mode='HTML')
-                    else:
-                        bot.sendPhoto(chat_id, f)
+                    linklist = get_hkg_chart_list_by_type(code, action, params)
+                    
+                    for link_dict in linklist:
+                        try:
+                            f = urllib.request.urlopen(link_dict['url'], timeout=10)
+                        except:
+                            bot.sendMessage(chat_id, u'\U000026D4' + ' Request Timeout for [' + link_dict['code'] + ']', parse_mode='HTML')
+                        else:
+                            bot.sendPhoto(chat_id, f)
                 else:
                     print("Not in White List: [" + str(chat_id) + "]")
                     bot.sendMessage(chat_id, u'\U000026D4' + ' Request Timeout', parse_mode='HTML')
