@@ -58,9 +58,9 @@ def get_stocks_rs_charts(codelist):
     start = datetime.datetime(2016,4,1)
     end = datetime.date.today()
 
-    for code in codelist:
-        if (not is_number(code)):
-            raise ValueError("Non-numeric code found: [" + code + "]<br><i>Usage:</i> " + "/qr" + "[code1] [code2] [code3].... (e.g. " + "/qr2800 2822 2823" + ")")    
+    #for code in codelist:
+    #    if (not is_number(code)):
+    #        raise ValueError("Non-numeric code found: [" + code + "]\n<i>Usage:</i> " + "/qr" + "[code1] [code2] [code3].... (e.g. " + "/qr2800 2822 2823" + ")")    
 
     startdatelist = []  
     stockcodelist = []
@@ -72,22 +72,30 @@ def get_stocks_rs_charts(codelist):
         
         if (code[0] == "0"):
             code = code[1:]
-    
-        code = code.rjust(4, '0') + ".HK"
+        
+        if (is_number(code)):
+            code = code.rjust(4, '0') + ".HK"
+        else:
+            code = code.upper()            
+            if (code in ['HSI', 'HSCE', 'HSCC',  'HSNF',  'HSNC',  'HSNU', 'HSNP']):
+                code = "^" + code
         
         try:
             codedf = web.DataReader(code, "yahoo", start, end)
+            if (not '^' in code or code == "^HSI"):
+                codedf = codedf[codedf.Volume != 0]
+                
             print("Retrieved Data from Yahoo for code: [" + code + "]")
+            
+            stockcodelist.append(code)
+            codedflist.append(codedf)
+            startdatelist.append(codedf.index[0])
+
         except Exception as e:
             print("Exception raised: [" + str(e) +  "]")
             invalidcodelist.append(code)   
         
-        stockcodelist.append(code)
-        codedflist.append(codedf)
-        startdatelist.append(codedf.index[0])
-        
-    maxstartdate = max(startdatelist)
-    
+    maxstartdate = max(startdatelist)   
     codedfloclist = []
     
     for codedf in codedflist:
@@ -106,10 +114,10 @@ def get_stocks_rs_charts(codelist):
     print(stocks.tail())
     
     stocks_return = stocks.apply(lambda x: x / x[0])    
-    
+
     plt.style.use('ggplot')
     
-    stocks_return.plot(figsize=(10,6), grid = True, linewidth=1.0, title="Relative Strength since 2016 Apr", colormap = plt.cm.nipy_spectral).axhline(y = 1, color = "black", lw = 1) 
+    stocks_return.plot(figsize=(10,6), grid = True, linewidth=1.0, title="Relative Strength since 2016 Apr", colormap = plt.cm.rainbow).axhline(y = 1, color = "black", lw = 1) 
     plt.legend(loc='upper left')
     
     chartpath = "C:\\Temp\\" + 'ychart' + str(int(round(time.time() * 1000))) + '.png'
