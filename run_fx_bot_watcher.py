@@ -19,7 +19,7 @@ from get_aastocks_hy_stats import get_aastocks_etf_stat, get_aastocks_hy_stat
 from get_fx_live_rate import get_fx_live_rate, get_dxy_live_rate
 from get_aastocks_chart import get_hkg_chart_list_by_type
 from get_aastocks_news import get_latest_news_by_code
-from get_hkex_ccass_info import get_latest_ccass_info
+from get_hkex_ccass_info import get_latest_ccass_info, get_shareholding_disclosure
 from get_quick_list import get_qq_command_list, get_qq_command_tf_list, get_qq_command_detail_list
 from get_yahoo_stock_info import get_stocks_rs_charts, get_stocks_rs_industry_list, get_stocks_rs_list
 import configparser
@@ -189,7 +189,8 @@ def on_chat_message(msg):
             
         elif (action == "C"):
             bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')         
-            bot.sendMessage(chat_id, get_latest_ccass_info(code, 10) , parse_mode='HTML')
+            bot.sendMessage(chat_id, get_latest_ccass_info(code, 20) , parse_mode='HTML')
+            bot.sendMessage(chat_id, get_shareholding_disclosure(code) , parse_mode='HTML')
             return
 
         elif (action == "R"):
