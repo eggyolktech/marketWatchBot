@@ -21,7 +21,7 @@ from get_aastocks_chart import get_hkg_chart_list_by_type
 from get_aastocks_news import get_latest_news_by_code
 from get_hkex_ccass_info import get_latest_ccass_info, get_shareholding_disclosure
 from get_quick_list import get_qq_command_list, get_qq_command_tf_list, get_qq_command_detail_list
-from get_yahoo_stock_info import get_stocks_rs_charts, get_stocks_rs_industry_list, get_stocks_rs_list
+from get_google_stock_info import get_stocks_rs_charts, get_stocks_rs_industry_list, get_stocks_rs_list
 import configparser
 
 from classes.AastocksEnum import TimeFrame, FxCode, IndexCode
