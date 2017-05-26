@@ -43,6 +43,7 @@ def get_shareholding_disclosure(code):
         # detail table
         print("Detail Url: [" + 'http://sdinotice.hkex.com.hk/di/' + link + "]")
         r2 = requests.get('http://sdinotice.hkex.com.hk/di/' + link)
+        print(r2.headers['content-type'])
         html2 = r2.text
         
         soup2 = BeautifulSoup(html2, "html.parser")
@@ -157,7 +158,7 @@ def main():
     
     #print(get_latest_ccass_info("99999", 5).encode("utf-8"))
     
-    print(get_shareholding_disclosure("2899").encode("utf-8"))
+    print(get_shareholding_disclosure("1980").encode("utf-8"))
 
     
 def is_number(s):

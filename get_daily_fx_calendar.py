@@ -87,7 +87,7 @@ def send_to_tg_chatroom(passage):
 
 def main():
     # sync top 100 list
-    passage = get_fx_calendar()
+    passage = "Major Market Events for today" + "\n\n" + get_fx_calendar()
 
     # Send a message to a chat room (chat room ID retrieved from getUpdates)
     send_to_tg_chatroom(passage)
