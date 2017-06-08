@@ -21,7 +21,7 @@ config.read('config.properties')
 
 def get_stocks_rs_industry_list():
 
-    passage = "List Relative Strength by Industries" + DEL
+    passage = "List Relative Strength by Industries" + DEL + "/qRINDEX (HSI Indexes)" + EL
 
     with open('data/list_TopIndustryList.json', encoding="utf-8") as data_file:    
         indexlists = json.load(data_file)    
@@ -29,7 +29,7 @@ def get_stocks_rs_industry_list():
     for indexlist in indexlists:
         code = indexlist["code"]
         passage = passage + "/qR" + code + " (" + indexlist["label"] + ")" + EL  
-        
+    
     return passage  
     
 def get_stocks_rs_list(code, limit):
@@ -37,20 +37,32 @@ def get_stocks_rs_list(code, limit):
     result = []
     codelist = []
     
-    with open('data/list_TopIndustryList.json', encoding="utf-8") as data_file:    
-        indexlists = json.load(data_file)  
-    
-    filtered_index = [x for x in indexlists if x['code'] == code]
-    
-    passage = "Top " + str(limit) + " Stocks List in " + filtered_index[0]['label'] + "" + DEL
-    
-    if (filtered_index):
-        for stock in filtered_index[0]["list"][0:limit]:
-            codelist.append(stock["code"])
-            passage = passage + stock["code"] + " (" + stock["label"] + ")" + EL
+    if (code == "INDEX"):
+
+        INDEX_LIST = [('HSI', 'INDEXHANGSENG:HSI'), ('HSCEI', 'INDEXHANGSENG:HSCEI'), ('HSP', 'INDEXHANGSENG:HSI.P'), ('HSF', 'INDEXHANGSENG:HSI.F'), ('HSU', 'INDEXHANGSENG:HSI.U'), ('HSC', 'INDEXHANGSENG:HSI.C')]
+        
+        passage = "Index List: " + DEL
+        
+        for key, value in INDEX_LIST:
+            codelist.append(value)
+            passage = passage + key + " (" + value + ")" + EL
+
     else:
-        passage = u'\U000026D4' + ' List Not Available'
     
+        with open('data/list_TopIndustryList.json', encoding="utf-8") as data_file:    
+            indexlists = json.load(data_file)  
+        
+        filtered_index = [x for x in indexlists if x['code'] == code]
+        
+        passage = "Top " + str(limit) + " Stocks List in " + filtered_index[0]['label'] + "" + DEL
+        
+        if (filtered_index):
+            for stock in filtered_index[0]["list"][0:limit]:
+                codelist.append(stock["code"])
+                passage = passage + stock["code"] + " (" + stock["label"] + ")" + EL
+        else:
+            passage = u'\U000026D4' + ' List Not Available'
+        
     result.append(passage)
     result.append(codelist)
     return result

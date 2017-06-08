@@ -201,7 +201,7 @@ def on_chat_message(msg):
             elif (code):
                 
                 # getting top 10 stock list within industry first
-                result = get_stocks_rs_list(code.strip(), 12)
+                result = get_stocks_rs_list(code.strip(), 15)
                 passage = result[0]
                 codelist = result[1]
                 
