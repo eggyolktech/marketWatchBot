@@ -108,7 +108,7 @@ def get_qq_command_tf_list(code):
 
 def main():
 
-    print(get_qq_command_list("IndexComposite").encode("utf-8"))
+    print(get_qq_command_list("HKIndexesComposite").encode("utf-8"))
     
 def is_number(s):
     try:

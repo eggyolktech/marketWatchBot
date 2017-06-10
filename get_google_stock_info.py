@@ -3,8 +3,15 @@ import pandas_datareader.data as web  # Package and modules for importing data; 
 import time
 import datetime
 import configparser
-import matplotlib.pyplot as plt   # Import matplotlib
 import json
+
+import os
+import matplotlib as mpl
+if os.environ.get('DISPLAY','') == '':
+    print('no display found. Using non-interactive Agg backend')
+    mpl.use('Agg')
+
+import matplotlib.pyplot as plt   # Import matplotlib
 
 from bs4 import BeautifulSoup
 import urllib.request
@@ -18,6 +25,7 @@ from classes.AastocksConstants import *
 
 config = configparser.ConfigParser()
 config.read('config.properties')
+
 
 def get_stocks_rs_industry_list():
 
@@ -79,7 +87,11 @@ def get_historical_price_from_google(code):
 
     soup = BeautifulSoup(r2, "html5lib")
     tabulkb = soup.find("table", {"class" : "gf-table historical_price"})
-    csvfilename = "C:\\Temp\\histdata\\" + code.replace(":", "") + '.csv'
+    
+    if not os.name == 'nt':
+        csvfilename = "/tmp/histdata/" + code.replace(":", "") + '.csv'
+    else:    
+        csvfilename = "C:\\Temp\\histdata\\" + code.replace(":", "") + '.csv'
 
     with open(csvfilename, 'w') as csvfile:
 
@@ -198,7 +210,10 @@ def get_stocks_rs_charts(codelist):
     stocks_return.plot(figsize=(10,6), grid = True, linewidth=1.0, title="Relative Strength since 2016", colormap = plt.cm.Dark2).axhline(y = 1, color = "black", lw = 1) 
     plt.legend(loc='upper left')
     
-    chartpath = "C:\\Temp\\rscharts\\" + 'gchart' + str(int(round(time.time() * 1000))) + '.png'
+    if not os.name == 'nt':
+        chartpath = "/tmp/rscharts/" + 'gchart' + str(int(round(time.time() * 1000))) + '.png'
+    else:
+        chartpath = "C:\\Temp\\rscharts\\" + 'gchart' + str(int(round(time.time() * 1000))) + '.png'
     
     #print(chartpath)
     

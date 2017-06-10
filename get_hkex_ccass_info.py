@@ -154,7 +154,7 @@ def get_latest_ccass_info(code, number):
     
 def main():
 
-    #print(get_latest_ccass_info("939", 5).encode("utf-8"))
+    print(get_latest_ccass_info("939", 5).encode("utf-8"))
     
     #print(get_latest_ccass_info("99999", 5).encode("utf-8"))
     
