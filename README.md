@@ -1,5 +1,4 @@
-# marketWatchBot
-
+# marketWatchBot Init (Digital Ocean)
 sudo apt-get install python3-pip
 sudo apt-get install python3-tk
 
@@ -9,10 +8,15 @@ pip install html5lib
 pip install pandas
 pip install pandas_datareader
 pip install matplotlib
-pip install selenium
+pip install lxml
+pip install telepot
 
-# Start the Telegram bot
+# At Window
 cd C:\Users\Hin\djangodev\
 myvenv\Scripts\activate
 cd C:\Users\Hin\djangodev\pricewatch\
 run_fx_bot_watcher.py
+
+# At digital Ocean
+cd /app/markerWatchBot
+nohup python run_fx_bot_watcher.py >> startBot.log 2> /dev/null &

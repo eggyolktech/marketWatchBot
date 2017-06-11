@@ -107,4 +107,5 @@ media/**
 # Config
 config.properties
 
-
+# Log
+*.out

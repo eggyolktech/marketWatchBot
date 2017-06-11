@@ -1,9 +1,6 @@
 # django shell import
-import os, django
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pricewatch.settings")
-django.setup()
+import os
 
-from pricealert.models import PriceAlert
 import sys
 import time
 import telepot
@@ -27,8 +24,13 @@ import configparser
 from classes.AastocksEnum import TimeFrame, FxCode, IndexCode
 from classes.AastocksConstants import *
 
+# Load static properties
 config = configparser.ConfigParser()
 config.read('config.properties')
+
+# Redirect stdout to file
+#old_stdout = sys.stdout
+#sys.stdout = open("xxxx.log", 'w')
 
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)

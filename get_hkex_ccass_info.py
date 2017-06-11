@@ -4,6 +4,7 @@ import urllib.request
 import urllib.parse
 import requests
 import re
+import os
 from datetime import date
 from datetime import datetime
 import configparser
@@ -72,7 +73,10 @@ def get_latest_ccass_info(code, number):
     DEL = "\n\n"
     EL = "\n"
     passage = ""
-
+    
+    if (not os.name == 'nt'):
+        return ""
+ 
     if (is_number(code) and is_number(number)):
         print("Code to Quote: [" + code + "]")
         print("Number to Grab: [" + str(number) + "]")           
