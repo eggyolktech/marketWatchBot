@@ -45,7 +45,7 @@ def get_stocks_rs_list(code, limit):
     result = []
     codelist = []
     
-    if (code == "INDEX"):
+    if (code.upper() == "INDEX"):
 
         INDEX_LIST = [('HSI', 'INDEXHANGSENG:HSI'), ('HSCEI', 'INDEXHANGSENG:HSCEI'), ('HSP', 'INDEXHANGSENG:HSI.P'), ('HSF', 'INDEXHANGSENG:HSI.F'), ('HSU', 'INDEXHANGSENG:HSI.U'), ('HSC', 'INDEXHANGSENG:HSI.C')]
         
