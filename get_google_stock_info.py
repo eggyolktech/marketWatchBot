@@ -29,7 +29,9 @@ config.read('config.properties')
 
 def get_stocks_rs_industry_list():
 
-    passage = "List Relative Strength by Industries" + DEL + "/qRINDEX (HSI Indexes)" + EL
+    passage = "List Relative Strength by Industries" + DEL + "/qRHK (HSI Indexes)" + EL
+    passage = passage + "/qRUS1 (US ETF by Sectors)" + EL
+    passage = passage + "/qRUS2 (US Major ETF)" + EL
 
     with open('data/list_TopIndustryList.json', encoding="utf-8") as data_file:    
         indexlists = json.load(data_file)    
@@ -45,16 +47,29 @@ def get_stocks_rs_list(code, limit):
     result = []
     codelist = []
     
-    if (code.upper() == "INDEX"):
+    if (code.upper() == "HK"):
 
         INDEX_LIST = [('HSI', 'INDEXHANGSENG:HSI'), ('HSCEI', 'INDEXHANGSENG:HSCEI'), ('HSP', 'INDEXHANGSENG:HSI.P'), ('HSF', 'INDEXHANGSENG:HSI.F'), ('HSU', 'INDEXHANGSENG:HSI.U'), ('HSC', 'INDEXHANGSENG:HSI.C')]
         
-        passage = "Index List: " + DEL
+        passage = "HK Sector List: " + DEL
         
         for key, value in INDEX_LIST:
             codelist.append(value)
             passage = passage + key + " (" + value + ")" + EL
 
+    elif ("US" in code.upper()):
+    
+        if (code.upper()[-1] == "1"):
+            INDEX_LIST_1 = [('Technology SPRD', 'XLK'), ('Financial SPRD', 'XLF'), ('Energy SPRD', 'XLE'), ('Industrial SPRD', 'XLI'), ('Utilities SPRD', 'XLU'), ('Health Care SPRD', 'XLV'), ('Consumer Staples SPRD', 'XLP'), ('Consumer Discretionary SPRD', 'XLY'), ('Materials SPRD', 'XLB'), ('Gold SPRD', 'GLD'), ('S&P', 'INDEXCBOE:SPX') ]
+        else:
+            INDEX_LIST_2 = [('Vanguard Developed Market', 'VEA'), ('Vanguard Emerging Market', 'VWO'),  ('Vanguard REIT', 'VNQ'), ('Gold SPRD', 'GLD'), ('20Y TBond', 'TLT'), ('S&P', 'INDEXCBOE:SPX') ]
+        
+        passage = "US Sector List: " + DEL
+        
+        for key, value in INDEX_LIST:
+            codelist.append(value)
+            passage = passage + key + " (" + value + ")" + EL            
+            
     else:
     
         with open('data/list_TopIndustryList.json', encoding="utf-8") as data_file:    
@@ -135,7 +150,7 @@ def get_stocks_rs_charts(codelist):
     DEL = "\n\n"
     EL = "\n"
     chartpath = ""
-    codelist = codelist[:10]
+    codelist = codelist[:15]
     
     # We will look at stock prices over the past year, starting at April 1, 2016
     start = datetime.datetime(2016,4,1)
@@ -151,7 +166,7 @@ def get_stocks_rs_charts(codelist):
     invalidcodelist = []
     result = []    
     
-    INDEX_LIST = [('HSI', 'INDEXHANGSENG:HSI'), ('HSCEI', 'INDEXHANGSENG:HSCEI'), ('HSP', 'INDEXHANGSENG:HSI.P'), ('HSF', 'INDEXHANGSENG:HSI.F'), ('HSU', 'INDEXHANGSENG:HSI.U'), ('HSC', 'INDEXHANGSENG:HSI.C'), ('DAX', 'INDEXDB:DAX'), ('SPX', 'INDEXCBOE:SPX'), ('NASDAQ', 'INDEXNASDAQ:NDX'), ('DJI', 'INDEXDJX:.DJI'), ('NIKKEI', 'INDEXNIKKEI:NI225'), ('FTSE', 'INDEXFTSE:UKX'), ('CAC', 'INDEXEURO:PX1')]
+    INDEX_LIST = [('HSI', 'INDEXHANGSENG:HSI'), ('HSCEI', 'INDEXHANGSENG:HSCEI'), ('HSP', 'INDEXHANGSENG:HSI.P'), ('HSF', 'INDEXHANGSENG:HSI.F'), ('HSU', 'INDEXHANGSENG:HSI.U'), ('HSC', 'INDEXHANGSENG:HSI.C'), ('DAX', 'INDEXDB:DAX'), ('SPX', 'INDEXCBOE:SPX'), ('NASDAQ', 'INDEXNASDAQ:NDX'), ('DJI', 'INDEXDJX:.DJI'), ('NIKKEI', 'INDEXNIKKEI:NI225'), ('FTSE', 'INDEXFTSE:UKX'), ('CAC', 'INDEXEURO:PX1'),('Vanguard Developed Market', 'VEA'), ('Vanguard Emerging Market', 'VWO'),  ('Vanguard REIT', 'VNQ'), ('Technology SPRD', 'XLK'), ('Financial SPRD', 'XLF'), ('Energy SPRD', 'XLE'), ('Industrial SPRD', 'XLI'), ('Utilities SPRD', 'XLU'), ('Health Care SPRD', 'XLV'), ('Consumer Staples SPRD', 'XLP'), ('Consumer Discretionary SPRD', 'XLY'), ('Materials SPRD', 'XLB'), ('Gold SPRD', 'GLD'), ('20Y TBond', 'TLT'), ('S&P', 'INDEXCBOE:SPX') ]
             
     for code in codelist:
         
