@@ -23,6 +23,7 @@ import configparser
 
 from classes.AastocksEnum import TimeFrame, FxCode, IndexCode
 from classes.AastocksConstants import *
+import resource
 
 # Load static properties
 config = configparser.ConfigParser()
@@ -331,6 +332,16 @@ def on_callback_query(msg):
         bot.answerCallbackQuery(query_id, text=result)
     
 TOKEN = config.get("telegram","bot-id") # get token from command-line
+
+# Set resource limit
+rsrc = resource.RLIMIT_DATA
+soft, hard = resource.getrlimit(rsrc)
+print('Soft limit start as :' + str(soft))
+
+resource.setrlimit(rsrc, (300 * 1024, hard))
+soft, hard = resource.getrlimit(rsrc)
+
+print('Soft limit start as :' + str(soft))
 
 bot = telepot.Bot(TOKEN)
 print(bot.getMe())

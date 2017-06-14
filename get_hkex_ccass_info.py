@@ -75,7 +75,7 @@ def get_latest_ccass_info(code, number):
     passage = ""
     
     if (not os.name == 'nt'):
-        return ""
+        return ("Sorry, CCASS service is not available now.")
  
     if (is_number(code) and is_number(number)):
         print("Code to Quote: [" + code + "]")
