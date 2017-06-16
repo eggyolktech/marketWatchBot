@@ -1,15 +1,26 @@
+#!/usr/bin/python
+
 from bs4 import BeautifulSoup
 from decimal import Decimal
 import urllib.request
 import urllib.parse
 import requests
 import re
-from datetime import date
-from datetime import datetime
+import os
+from datetime import date, datetime
+
+import sys
+
+sys.path.append( os.path.join( os.path.dirname(__file__), os.path.pardir ) )
+print(sys.path)
+
+import telegram
 import configparser
 
 config = configparser.ConfigParser()
-config.read('config.properties')
+config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'config.properties')
+print(config_path)
+config.read(config_path)
 
 
 def get_sunday(input):

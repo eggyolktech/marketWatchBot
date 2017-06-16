@@ -11,7 +11,7 @@ import urllib.request
 import urllib.error
 from socket import timeout
 import random
-from get_daily_fx_calendar import get_fx_calendar
+from dailyfx import market_calendar
 from get_aastocks_hy_stats import get_aastocks_etf_stat, get_aastocks_hy_stat
 from get_fx_live_rate import get_fx_live_rate, get_dxy_live_rate
 from get_aastocks_chart import get_hkg_chart_list_by_type
@@ -93,7 +93,7 @@ def on_chat_message(msg):
     elif (command == "/cal"):
     
         bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')
-        passage = get_fx_calendar()
+        passage = market_calendar.get_fx_calendar()
         bot.sendMessage(chat_id, passage, parse_mode='HTML')
     
     elif (command.startswith("/tt")):
