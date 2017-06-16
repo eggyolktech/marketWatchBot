@@ -60,9 +60,9 @@ def get_stocks_rs_list(code, limit):
     elif ("US" in code.upper()):
     
         if (code.upper()[-1] == "1"):
-            INDEX_LIST_1 = [('Technology SPRD', 'XLK'), ('Financial SPRD', 'XLF'), ('Energy SPRD', 'XLE'), ('Industrial SPRD', 'XLI'), ('Utilities SPRD', 'XLU'), ('Health Care SPRD', 'XLV'), ('Consumer Staples SPRD', 'XLP'), ('Consumer Discretionary SPRD', 'XLY'), ('Materials SPRD', 'XLB'), ('Gold SPRD', 'GLD'), ('S&P', 'INDEXCBOE:SPX') ]
+            INDEX_LIST = [('Technology SPRD', 'XLK'), ('Financial SPRD', 'XLF'), ('Energy SPRD', 'XLE'), ('Industrial SPRD', 'XLI'), ('Utilities SPRD', 'XLU'), ('Health Care SPRD', 'XLV'), ('Consumer Staples SPRD', 'XLP'), ('Consumer Discretionary SPRD', 'XLY'), ('Materials SPRD', 'XLB'), ('Gold SPRD', 'GLD'), ('S&P', 'INDEXCBOE:SPX') ]
         else:
-            INDEX_LIST_2 = [('Vanguard Developed Market', 'VEA'), ('Vanguard Emerging Market', 'VWO'),  ('Vanguard REIT', 'VNQ'), ('Gold SPRD', 'GLD'), ('20Y TBond', 'TLT'), ('S&P', 'INDEXCBOE:SPX') ]
+            INDEX_LIST = [('Vanguard Developed Market', 'VEA'), ('Vanguard Emerging Market', 'VWO'),  ('Vanguard REIT', 'VNQ'), ('Gold SPRD', 'GLD'), ('20Y TBond', 'TLT'), ('S&P', 'INDEXCBOE:SPX') ]
         
         passage = "US Sector List: " + DEL
         

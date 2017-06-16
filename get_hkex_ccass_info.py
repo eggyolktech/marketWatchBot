@@ -74,8 +74,10 @@ def get_latest_ccass_info(code, number):
     EL = "\n"
     passage = ""
     
-    if (not os.name == 'nt'):
-        return ("Sorry, CCASS service is not available now.")
+    if (os.name == 'nt'):
+        browser = webdriver.Chrome('C:\project\common\chromedriver.exe')
+    else:
+        browser = webdriver.PhantomJS() 
  
     if (is_number(code) and is_number(number)):
         print("Code to Quote: [" + code + "]")
@@ -83,7 +85,6 @@ def get_latest_ccass_info(code, number):
     else:
         return "<i>Usage:</i> " + "/qC" + "[StockCode] (e.g. " + "/qC2899" + ")"   
     
-    browser = webdriver.Chrome('C:\project\common\chromedriver.exe')
     browser.get(r'http://www.hkexnews.hk/sdw/search/searchsdw_c.aspx')
 
     elemCode = browser.find_element_by_name('txtStockCode')
@@ -162,7 +163,7 @@ def main():
     
     #print(get_latest_ccass_info("99999", 5).encode("utf-8"))
     
-    print(get_shareholding_disclosure("1980").encode("utf-8"))
+    #print(get_shareholding_disclosure("1980").encode("utf-8"))
 
     
 def is_number(s):
