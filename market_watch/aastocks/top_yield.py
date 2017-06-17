@@ -1,18 +1,18 @@
+#!/usr/bin/python
+
 from bs4 import BeautifulSoup
 from decimal import Decimal
-import urllib.request
-import urllib.parse
 import requests
 import re
 from datetime import date
 from datetime import datetime
-import configparser
+from market_watch.telegram import bot_sender
+from market_watch.util import config_loader
 
-config = configparser.ConfigParser()
-config.read('config.properties')
+# load config
+config = config_loader.load()
 
-
-def get_aastocks_etf_stat(url):
+def get_etf_stat(url):
 
     passage = ""
 
@@ -58,7 +58,7 @@ def get_aastocks_etf_stat(url):
     print("Passage: [" + passage + "]")
     return passage
 
-def get_aastocks_hy_stat(url, industry):
+def get_hy_stat(url, industry):
 
     passage = ""
     
@@ -104,34 +104,19 @@ def get_aastocks_hy_stat(url, industry):
     print("Passage: [" + passage + "]")
     return passage
     
-    
-def send_to_tg_chatroom(passage): 
-
-    chat_list = config.items("telegram-chat")
-    bot_send_url = config.get("telegram","bot-send-url")
-    
-    for key, chat_id in chat_list:
-        print("Chat to send: " + key + " => " + chat_id);
-
-        result = urllib.request.urlopen(bot_send_url, urllib.parse.urlencode({ "parse_mode": "HTML", "chat_id": chat_id, "text": passage }).encode("utf-8")).read()
-        
-        print(result)
-              
-
-              
 def main():
 
-    passage = get_aastocks_etf_stat(config.get("aastocks","hy-url-etf"))
+    passage = get_etf_stat(config.get("aastocks","hy-url-etf"))
 
-    send_to_tg_chatroom(passage)
+    bot_sender.broadcast(passage)
 
     url_list = config.items("aastocks-hy-industry")
 
     for key, url in url_list:
         print("Industry to retrieve: " + key + " => " + url)
 
-        passage = get_aastocks_hy_stat(url, key.split("-")[-1])
-        send_to_tg_chatroom(passage)
+        passage = get_hy_stat(url, key.split("-")[-1])
+        bot_sender.broadcast(passage)
 
 if __name__ == "__main__":
     main()                

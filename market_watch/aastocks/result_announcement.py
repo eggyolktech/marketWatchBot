@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from bs4 import BeautifulSoup
 from decimal import Decimal
 import urllib.request
@@ -6,13 +8,9 @@ import requests
 import re
 from datetime import date
 from datetime import datetime
-import configparser
 
-from classes.AastocksConstants import *
-
-config = configparser.ConfigParser()
-config.read('config.properties')
-
+from market_watch.common.AastocksConstants import *
+from market_watch.telegram import bot_sender
 
 def get_aastocks_calendar():
 
@@ -49,25 +47,13 @@ def get_aastocks_calendar():
     
     print("Passage: [" + str(passage.encode('utf-8')) + "]")
     return passage
- 
-def send_to_tg_chatroom(passage): 
-
-    chat_list = config.items("telegram-chat")
-    bot_send_url = config.get("telegram","bot-send-url")
-    
-    for key, chat_id in chat_list:
-        print("Chat to send: " + key + " => " + chat_id);
-
-        result = urllib.request.urlopen(bot_send_url, urllib.parse.urlencode({ "parse_mode": "HTML", "chat_id": chat_id, "text": passage }).encode("utf-8")).read()
-        
-        print(result)
 
 def main():
     # sync top 100 list
     passage = get_aastocks_calendar()
 
     # Send a message to a chat room (chat room ID retrieved from getUpdates)
-    send_to_tg_chatroom(passage)
+    bot_sender.broadcast(passage)
 
 if __name__ == "__main__":
     main()        

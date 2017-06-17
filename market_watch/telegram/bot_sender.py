@@ -4,12 +4,11 @@ import configparser
 import os
 import urllib.request
 import urllib.parse
+from market_watch.util import config_loader
 
-config = configparser.ConfigParser()
-config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'config.properties')
-config.read(config_path)
+config = config_loader.load()
 
-def send_to_chat(passage): 
+def broadcast(passage): 
 
     chat_list = config.items("telegram-chat")
     bot_send_url = config.get("telegram","bot-send-url")
@@ -26,7 +25,7 @@ def main():
     passage = "Test"
 
     # Send a message to a chat room (chat room ID retrieved from getUpdates)
-    send(passage)
+    broadcast(passage)
 
 if __name__ == "__main__":
     main() 

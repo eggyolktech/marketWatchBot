@@ -4,12 +4,8 @@ import feedparser
 from time import gmtime
 from datetime import datetime
 import time
-import urllib.request
-import configparser
 
-
-config = configparser.ConfigParser()
-config.read('../config.properties')
+from market_watch.telegram import bot_sender
 
 CHECK_PERIOD = 60
 
@@ -43,25 +39,13 @@ def get_market_alerts():
     print("Passage: [" + passage + "]")
     passage = ""
     return passage
- 
-def send_to_tg_chatroom(passage): 
-
-    chat_list = config.items("telegram-chat")
-    bot_send_url = config.get("telegram","bot-send-url")
-    
-    for key, chat_id in chat_list:
-        print("Chat to send: " + key + " => " + chat_id);
-
-        result = urllib.request.urlopen(bot_send_url, urllib.parse.urlencode({ "parse_mode": "HTML", "chat_id": chat_id, "text": passage }).encode("utf-8")).read()
-        
-        print(result)
 
 def main():
     passage = get_market_alerts()
 
     # Send a message to a chat room (chat room ID retrieved from getUpdates)
     if(passage):
-        send_to_tg_chatroom(passage)
+        bot_sender.broadcast(passage)
 
 if __name__ == "__main__":
     main()        

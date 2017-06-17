@@ -11,16 +11,22 @@ pip install matplotlib
 pip install lxml
 pip install telepot
 
-# At Window
-cd C:\Users\Hin\djangodev\
-myvenv\Scripts\activate
-cd C:\Users\Hin\djangodev\pricewatch\
-run_fx_bot_watcher.py
+###### At Windows ######
+cd %APP_FOLDER%\telegram
+bot_watcher.py
 
-# At digital Ocean
-cd /app/marketWatchBot
-nohup python run_fx_bot_watcher.py >> ./log/run_fx_bot_watcher.log 2> /dev/null &
+###### At digital Ocean ######
+cd /app/marketWatchBot/market_watch
+nohup ./bot_watcher.py >> ../log/bot_watcher.log 2> /dev/null &
+
+# Setup at .profile
+alias startBot='cd /app/marketWatchBot/market_watch/telegram; nohup ./bot_watcher.py >> ../log/bot_watcher.log 2>/dev/null &'
+alias stopBot='pkill -f bot_watcher.py'
+
+export PYTHONPATH=$(find /app/ -maxdepth 1 -type d | sed '/\/\./d' | tr '\n' ':' | sed 's/:$//')
 
 # Crontab
-32 07 * * 1-5 python /app/marketWatchBot/get_daily_fx_calendar.py >> /app/marketWatchBot/log/get_daily_fx_calendar.log 2>&1
-32 07 * * 1-5 python /app/marketWatchBot/get_aastocks_calendar.py >> /app/marketWatchBot/log/get_aastocks_calendar.log 2>&1
+00 07 * * 1-5 cd $APPMW/dailyfx; ./market_calendar.py >> $APPMW/log/dailyfx.log 2>&1
+00 08 * * 1-5 cd $APPMW/aastocks; ./result_announcements.py >> $APPMW/log/aastocks.log 2>&1
+00 * * * 1-7 cd $APPMW/dailyfx; ./market_alerts.py >> $APPMW/log/dailyfx.log 2>&1
+

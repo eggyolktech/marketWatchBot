@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from bs4 import BeautifulSoup
 from decimal import Decimal
 import urllib.request
@@ -6,10 +8,6 @@ import requests
 import re
 from datetime import date
 from datetime import datetime
-import configparser
-
-config = configparser.ConfigParser()
-config.read('config.properties')
 
 def get_latest_news_by_code(code, number):
 

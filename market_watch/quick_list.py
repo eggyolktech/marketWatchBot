@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from bs4 import BeautifulSoup
 from decimal import Decimal
 import urllib.request
@@ -6,14 +8,10 @@ import requests
 import re
 from datetime import date
 from datetime import datetime
-import configparser
 import json
 
-config = configparser.ConfigParser()
-config.read('config.properties')
-
-from classes.AastocksEnum import TimeFrame, FxCode, IndexCode
-from classes.AastocksConstants import *
+from market_watch.common.AastocksEnum import TimeFrame, FxCode, IndexCode
+from market_watch.common.AastocksConstants import *
 
 QQ = "/qq"
 

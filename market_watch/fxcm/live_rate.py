@@ -1,12 +1,13 @@
+#!/usr/bin/python
+
 from bs4 import BeautifulSoup
 from decimal import Decimal
 import urllib.request
 import urllib.parse
 import requests
-import configparser
+from market_watch.util import config_loader
 
-config = configparser.ConfigParser()
-config.read('config.properties')
+config = config_loader.load()
 
 def get_fx_live_rate(quote):
 

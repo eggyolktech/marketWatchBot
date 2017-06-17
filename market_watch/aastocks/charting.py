@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from bs4 import BeautifulSoup
 from decimal import Decimal
 import urllib.request
@@ -6,12 +8,8 @@ import requests
 import re
 from datetime import date
 from datetime import datetime
-import configparser
 
-config = configparser.ConfigParser()
-config.read('config.properties')
-
-from classes.AastocksEnum import TimeFrame, FxCode, IndexCode
+from market_watch.common.AastocksEnum import TimeFrame, FxCode, IndexCode
 
 
 def get_hkg_chart_list_by_type(code, action, params):

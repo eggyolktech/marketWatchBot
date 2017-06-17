@@ -1,7 +1,4 @@
-# django shell import
-import os, django
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pricewatch.settings")
-django.setup()
+#!/usr/bin/python
 
 # imdb process import
 from bs4 import BeautifulSoup

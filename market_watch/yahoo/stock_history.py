@@ -1,15 +1,13 @@
+#!/usr/bin/python
+
 import pandas as pd
 import pandas_datareader.data as web  # Package and modules for importing data; this code may change depending on pandas version
 import time
 import datetime
-import configparser
 import matplotlib.pyplot as plt   # Import matplotlib
 import json
 
-from classes.AastocksConstants import *
-
-config = configparser.ConfigParser()
-config.read('config.properties')
+from market_watch.common.AastocksConstants import *
 
 def get_stocks_rs_industry_list():
 

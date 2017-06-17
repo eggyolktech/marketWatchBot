@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 # django shell import
 import os
 

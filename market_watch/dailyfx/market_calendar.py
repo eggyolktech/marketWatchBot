@@ -2,26 +2,16 @@
 
 from bs4 import BeautifulSoup
 from decimal import Decimal
-import urllib.request
-import urllib.parse
 import requests
 import re
 import os
 from datetime import date, datetime
 
-import sys
+from market_watch.telegram import bot_sender
+from market_watch.util import config_loader
 
-sys.path.append( os.path.join( os.path.dirname(__file__), os.path.pardir ) )
-print(sys.path)
-
-import telegram
-import configparser
-
-config = configparser.ConfigParser()
-config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'config.properties')
-print(config_path)
-config.read(config_path)
-
+# load config
+config = config_loader.load() 
 
 def get_sunday(input):
     d = input.toordinal()
@@ -83,25 +73,13 @@ def get_fx_calendar():
     
     print("Passage: [" + passage + "]")
     return passage
- 
-def send_to_tg_chatroom(passage): 
-
-    chat_list = config.items("telegram-chat")
-    bot_send_url = config.get("telegram","bot-send-url")
-    
-    for key, chat_id in chat_list:
-        print("Chat to send: " + key + " => " + chat_id);
-
-        result = urllib.request.urlopen(bot_send_url, urllib.parse.urlencode({ "parse_mode": "HTML", "chat_id": chat_id, "text": passage }).encode("utf-8")).read()
-        
-        print(result)
 
 def main():
     # sync top 100 list
     passage = "Major Market Events for today" + "\n\n" + get_fx_calendar()
 
     # Send a message to a chat room (chat room ID retrieved from getUpdates)
-    send_to_tg_chatroom(passage)
+    bot_sender.boardcast(passage)
 
 if __name__ == "__main__":
     main()        

@@ -1,18 +1,14 @@
+#!/usr/bin/python
+
 from bs4 import BeautifulSoup
 from decimal import Decimal
-import urllib.request
-import urllib.parse
 import requests
 import re
 import os
 from datetime import date
 from datetime import datetime
-import configparser
-
 from selenium import webdriver
 
-config = configparser.ConfigParser()
-config.read('config.properties')
 
 def get_shareholding_disclosure(code):
 
@@ -163,7 +159,7 @@ def main():
     
     #print(get_latest_ccass_info("99999", 5).encode("utf-8"))
     
-    #print(get_shareholding_disclosure("1980").encode("utf-8"))
+    print(get_shareholding_disclosure("1980").encode("utf-8"))
 
     
 def is_number(s):
