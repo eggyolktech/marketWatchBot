@@ -79,7 +79,7 @@ def main():
     passage = "Major Market Events for today" + "\n\n" + get_fx_calendar()
 
     # Send a message to a chat room (chat room ID retrieved from getUpdates)
-    bot_sender.boardcast(passage)
+    bot_sender.broadcast(passage)
 
 if __name__ == "__main__":
     main()        
