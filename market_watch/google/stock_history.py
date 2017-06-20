@@ -30,7 +30,7 @@ def get_stocks_rs_industry_list():
     passage = passage + "/qRUS1 (US ETF by Sectors)" + EL
     passage = passage + "/qRUS2 (US Major ETF)" + EL
 
-    with open('data/list_TopIndustryList.json', encoding="utf-8") as data_file:    
+    with open('../data/list_TopIndustryList.json', encoding="utf-8") as data_file:    
         indexlists = json.load(data_file)    
         
     for indexlist in indexlists:
@@ -69,7 +69,7 @@ def get_stocks_rs_list(code, limit):
             
     else:
     
-        with open('data/list_TopIndustryList.json', encoding="utf-8") as data_file:    
+        with open('../data/list_TopIndustryList.json', encoding="utf-8") as data_file:    
             indexlists = json.load(data_file)  
         
         filtered_index = [x for x in indexlists if x['code'] == code]

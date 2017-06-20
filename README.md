@@ -26,6 +26,7 @@ alias stopBot='pkill -f bot_watcher.py'
 export PYTHONPATH=$(find /app/ -maxdepth 1 -type d | sed '/\/\./d' | tr '\n' ':' | sed 's/:$//')
 
 # Crontab
+PYTHONPATH=/app/marketWatchBot/
 00 07 * * 1-5 cd $APPMW/dailyfx; ./market_calendar.py >> $APPMW/log/dailyfx.log 2>&1
 00 08 * * 1-5 cd $APPMW/aastocks; ./result_announcement.py >> $APPMW/log/aastocks.log 2>&1
 00 * * * 1-7 cd $APPMW/dailyfx; ./market_alerts.py >> $APPMW/log/dailyfx.log 2>&1
