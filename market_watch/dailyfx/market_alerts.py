@@ -37,7 +37,7 @@ def get_market_alerts():
     print("Total # of posts processed: %s" % (count-1))
     
     print("Passage: [" + passage + "]")
-    passage = ""
+    #passage = ""
     return passage
 
 def main():
