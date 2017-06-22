@@ -8,9 +8,12 @@ from market_watch.util import config_loader
 
 config = config_loader.load()
 
-def broadcast(passage): 
-
-    chat_list = config.items("telegram-chat")
+def broadcast(passage, is_test=False): 
+    
+    if (is_test):
+        chat_list = config.items("telegram-chat-test")
+    else:
+        chat_list = config.items("telegram-chat")
     bot_send_url = config.get("telegram","bot-send-url")
     
     for key, chat_id in chat_list:
@@ -25,7 +28,7 @@ def main():
     passage = "Test"
 
     # Send a message to a chat room (chat room ID retrieved from getUpdates)
-    broadcast(passage)
+    broadcast(passage, True)
 
 if __name__ == "__main__":
     main() 
