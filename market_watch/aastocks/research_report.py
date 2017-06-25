@@ -28,6 +28,8 @@ def get_latest_reports(period):
     passages = [] 
     passage = ""
     now = datetime.now()
+    
+    print("Timestamp now: [" + str(now) + "]")
 
     for div in soup.findAll('div', ref=re.compile("^NOW")):
         a = div.find('a', {"class", "h6"})
@@ -55,8 +57,8 @@ def get_latest_reports(period):
     
 def main():
 
-    for report in get_latest_reports(30):
-        bot_sender.broadcast(report, True)
+    for report in get_latest_reports(40):
+        bot_sender.broadcast(report)
    
 if __name__ == "__main__":
     main()                
