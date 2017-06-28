@@ -71,12 +71,12 @@ def get_latest_reports(period, reporttype=1):
 def main():
 
     # profit warning (+ve)
-    for report in get_latest_reports(30, 1):
+    for report in get_latest_reports(45, 1):
         print(report)
         bot_sender.broadcast(report)
 
     # profit warning (-ve)
-    for report in get_latest_reports(30, 2):
+    for report in get_latest_reports(45, 2):
         print(report)
         bot_sender.broadcast(report)
    
