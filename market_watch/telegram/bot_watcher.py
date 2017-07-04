@@ -21,7 +21,7 @@ from market_watch.hkex import ccass_loader
 from market_watch.google import stock_history
 
 from market_watch.util import config_loader
-from market_watch import quick_list
+from market_watch import quick_list, quick_tracker
 
 from market_watch.common.AastocksEnum import TimeFrame, FxCode, IndexCode
 from market_watch.common.AastocksConstants import *
@@ -96,26 +96,63 @@ def on_chat_message(msg):
         passage = market_calendar.get_fx_calendar()
         bot.sendMessage(chat_id, passage, parse_mode='HTML')
     
-    elif (command.startswith("/tt")):
+    elif (command.startswith("/t")):
     
-        bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')
-        
-        industry = command[3:]
-        
-        if (industry == "ETF"):
-            passage = top_yield.get_etf_stat(config.get("aastocks","hy-url-etf"))
-        elif (industry == "Banks"):
-            passage = top_yield.get_hy_stat(config.get("aastocks-hy-industry","hy-url-banks"), "Banks")
-        elif (industry == "REIT"):
-            passage = top_yield.get_hy_stat(config.get("aastocks-hy-industry","hy-url-reits"), "REIT")
-        elif (industry == "Cong"):   
-            passage = top_yield.get_hy_stat(config.get("aastocks-hy-industry","hy-url-conglomerates"), "Conglomerates")
-        else:
-            passage = '<i>Sorry! Top 10 List not found for target [' + industry + '] </i>'
+        try:            
+            action = quote[2:3]
+            params = quote[3:]
+            params = params.split(" ")
+        except:
+            return
             
-        passage = passage + 'Back to Top 10 Menu - /top10'
-        bot.sendMessage(chat_id, passage, parse_mode='HTML') 
-
+        print("Action: " + action)
+        print("Param: " + str(params))
+    
+        # for top ten categories list
+        if (action=="t"):
+    
+            bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')        
+            industry = command[3:]
+            
+            if (industry == "ETF"):
+                passage = top_yield.get_etf_stat(config.get("aastocks","hy-url-etf"))
+            elif (industry == "Banks"):
+                passage = top_yield.get_hy_stat(config.get("aastocks-hy-industry","hy-url-banks"), "Banks")
+            elif (industry == "REIT"):
+                passage = top_yield.get_hy_stat(config.get("aastocks-hy-industry","hy-url-reits"), "REIT")
+            elif (industry == "Cong"):   
+                passage = top_yield.get_hy_stat(config.get("aastocks-hy-industry","hy-url-conglomerates"), "Conglomerates")
+            else:
+                passage = '<i>Sorry! Top 10 List not found for target [' + industry + '] </i>'
+                
+            passage = passage + 'Back to Top 10 Menu - /top10'
+            bot.sendMessage(chat_id, passage, parse_mode='HTML')
+        
+        elif (action=="l"):
+            bot.sendMessage(chat_id, quick_tracker.list_track(), parse_mode='HTML')   
+            
+        elif (action=="a"):
+            passage = ""
+            for code in params:
+                if (quick_tracker.add_track(code)):
+                    passage = passage + code + " add successfully."
+                else:
+                    passage = passage + code + " add failed."
+                    
+            if (not passage):
+                bot.sendMessage(chat_id, passage, parse_mode='HTML')
+                
+        elif (action=="d"):
+            passage = ""
+            for code in params:
+                if (quick_tracker.remove_track(code)):
+                    passage = passage + code + " remove successfully."
+                else:
+                    passage = passage + code + " remove failed."
+                    
+            if (not passage):
+                bot.sendMessage(chat_id, passage, parse_mode='HTML')
+                
     elif (command.startswith("/q")):
     
         try:            

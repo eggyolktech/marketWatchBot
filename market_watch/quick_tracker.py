@@ -28,21 +28,27 @@ def add_track(code):
     
     print("Code to Add: [" + code + "]")
     
-    if (not code):
-        return
-    elif (is_number(code)):
-        data = load_dict("HK")
-        data[code] = code + ".HK"
-        region = "HK"
-    else:
-        data = load_dict("US")
-        if (not ".US" in code):
-            code = code + ".US"
-        data[code] = code
-        region = "US"
-    
-    if (data and region):
-        dump_dict(data, get_file(region))
+    try:
+        if (not code):
+            return
+        elif (is_number(code)):
+            data = load_dict("HK")
+            data[code] = code + ".HK"
+            region = "HK"
+        else:
+            data = load_dict("US")
+            if (not ".US" in code):
+                code = code + ".US"
+            data[code] = code
+            region = "US"
+        
+        if (data and region):
+            dump_dict(data, get_file(region))
+            
+        return True
+        
+    except:
+        return False
 
 def list_track():
 
@@ -50,15 +56,18 @@ def list_track():
     d2 = load_dict("US")
     m = ""
     if (d1.items):
-        m = "HK Track List" + EL
+        m = "<HK Track List>" + EL
         for key, value in d1.items():
             m = m + (key + " - " + value) + EL
     
     if (d2.items):
-        m = m + "US Track List" + EL
+        m = EL + m + "<US Track List>" + EL
         for key, value in d2.items():
             m = m + (key + " - " + value) + EL
-
+    
+    if (not m):
+        m = "No Data"
+    
     return m
   
 def dump_dict(data, file):
@@ -83,27 +92,36 @@ def remove_track(code):
     
     print("Code to Remove: [" + code + "]")
     
-    if (not code):
-        return
-    elif (is_number(code)):
-        data = load_dict("HK")
-        if code in data:
-            del data[code]
-        else:
-            print("No key found!")
+    try:
+        if (not code):
             return
-        region = "HK"
-    else:
-        data = load_dict("US")
-        if code in data:
-            del data[code]
+        elif (is_number(code)):
+            data = load_dict("HK")
+            if code in data:
+                del data[code]
+            else:
+                print("No key found!")
+                return
+            region = "HK"
         else:
-            print("No key found!")
-            return
-        region = "US"
+            data = load_dict("US")
+            
+            if (not ".US" in code):
+                code = code + ".US"        
+            
+            if code in data:
+                del data[code]
+            else:
+                print("No key found!")
+                return
+            region = "US"
+        
+        if (data and region):
+            dump_dict(data, get_file(region))
     
-    if (data and region):
-        dump_dict(data, get_file(region))
+        return True
+    except:
+        return False
  
 def main():
 
