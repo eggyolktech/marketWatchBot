@@ -21,7 +21,7 @@ def get_shareholding_disclosure(code):
     else:
         return "<i>Usage:</i> " + "/qC" + "[StockCode] (e.g. " + "/qC2899" + ")"   
         
-    url = "http://sdinotice.hkex.com.hk/di/NSSrchCorpList.aspx?sa1=cl&scsd=01/01/2017&sced=06/05/2017&sc=" + code + "&src=MAIN&lang=ZH"
+    url = "http://sdinotice.hkex.com.hk/filing/di/NSSrchCorpList.aspx?sa1=cl&scsd=01/01/2017&sced=06/05/2017&sc=" + code + "&src=MAIN&lang=ZH"
 
     print("Url: [" + url + "]")
     
@@ -38,8 +38,8 @@ def get_shareholding_disclosure(code):
         link = masterTable.findAll('tr')[1].findAll('td')[2].findAll('a')[1]['href']
         
         # detail table
-        print("Detail Url: [" + 'http://sdinotice.hkex.com.hk/di/' + link + "]")
-        r2 = requests.get('http://sdinotice.hkex.com.hk/di/' + link)
+        print("Detail Url: [" + 'http://sdinotice.hkex.com.hk/filing/di/' + link + "]")
+        r2 = requests.get('http://sdinotice.hkex.com.hk/filing/di/' + link)
         print(r2.headers['content-type'])
         html2 = r2.text
         

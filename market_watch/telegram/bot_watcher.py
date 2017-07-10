@@ -97,13 +97,16 @@ def on_chat_message(msg):
         bot.sendMessage(chat_id, passage, parse_mode='HTML')
     
     elif (command.startswith("/t")):
-    
+
+        action = None
+        params = None
+ 
         try:            
-            action = quote[2:3]
-            params = quote[3:]
+            action = command[2:3]
+            params = command[3:]
             params = params.split(" ")
         except:
-            return
+            params = []
             
         print("Action: " + action)
         print("Param: " + str(params))
@@ -129,28 +132,31 @@ def on_chat_message(msg):
             bot.sendMessage(chat_id, passage, parse_mode='HTML')
         
         elif (action=="l"):
+            print(quick_tracker.list_track())
             bot.sendMessage(chat_id, quick_tracker.list_track(), parse_mode='HTML')   
             
         elif (action=="a"):
             passage = ""
             for code in params:
+                code = code.upper()
                 if (quick_tracker.add_track(code)):
-                    passage = passage + code + " add successfully."
+                    passage = passage + code + " add successfully." + EL
                 else:
-                    passage = passage + code + " add failed."
-                    
-            if (not passage):
+                    passage = passage + code + " add failed." + EL
+            print(passage)        
+            if (passage):
                 bot.sendMessage(chat_id, passage, parse_mode='HTML')
                 
         elif (action=="d"):
             passage = ""
             for code in params:
+                code = code.upper()
                 if (quick_tracker.remove_track(code)):
-                    passage = passage + code + " remove successfully."
+                    passage = passage + code + " remove successfully." + EL
                 else:
-                    passage = passage + code + " remove failed."
-                    
-            if (not passage):
+                    passage = passage + code + " remove failed." + EL
+            print(passage)        
+            if (passage):
                 bot.sendMessage(chat_id, passage, parse_mode='HTML')
                 
     elif (command.startswith("/q")):

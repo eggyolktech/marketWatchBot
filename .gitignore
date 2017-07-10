@@ -109,3 +109,7 @@ config.properties
 
 # Log
 *.out
+
+# db
+market_db.dat
+

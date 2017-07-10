@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 import json
+import traceback
+import logging
 
 QT = "/qt"
 EL = "\n"
@@ -30,7 +32,7 @@ def add_track(code):
     
     try:
         if (not code):
-            return
+            return False
         elif (is_number(code)):
             data = load_dict("HK")
             data[code] = code + ".HK"
@@ -39,15 +41,17 @@ def add_track(code):
             data = load_dict("US")
             if (not ".US" in code):
                 code = code + ".US"
-            data[code] = code
+            data[code.upper()] = code.upper()
             region = "US"
         
         if (data and region):
+            print(data)
             dump_dict(data, get_file(region))
             
         return True
         
     except:
+        logging.error(traceback.format_exc())
         return False
 
 def list_track():
@@ -56,14 +60,14 @@ def list_track():
     d2 = load_dict("US")
     m = ""
     if (d1.items):
-        m = "<HK Track List>" + EL
-        for key, value in d1.items():
-            m = m + (key + " - " + value) + EL
+        m = "[HK Track List]" + EL
+        for key, value in sorted(d1.items()):
+            m = m + (key + " - " + "/qd" + value.replace(".HK","")) + EL
     
     if (d2.items):
-        m = EL + m + "<US Track List>" + EL
-        for key, value in d2.items():
-            m = m + (key + " - " + value) + EL
+        m = m + EL + "[US Track List]" + EL
+        for key, value in sorted(d2.items()):
+            m = m + (key.replace(".US","") + " - " + "/qd" + value.replace(".US","")) + EL
     
     if (not m):
         m = "No Data"
@@ -94,14 +98,14 @@ def remove_track(code):
     
     try:
         if (not code):
-            return
+            return False
         elif (is_number(code)):
             data = load_dict("HK")
             if code in data:
                 del data[code]
             else:
                 print("No key found!")
-                return
+                return False
             region = "HK"
         else:
             data = load_dict("US")
@@ -109,11 +113,11 @@ def remove_track(code):
             if (not ".US" in code):
                 code = code + ".US"        
             
-            if code in data:
-                del data[code]
+            if code.upper() in data:
+                del data[code.upper()]
             else:
                 print("No key found!")
-                return
+                return False
             region = "US"
         
         if (data and region):
@@ -121,6 +125,7 @@ def remove_track(code):
     
         return True
     except:
+        logging.error(traceback.format_exc())
         return False
  
 def main():
