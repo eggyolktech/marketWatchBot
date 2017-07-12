@@ -133,7 +133,7 @@ def get_stocks_rs_charts(codelist):
 def main():
 
     try:
-        print(get_stocks_rs_charts("494 293".split()))
+        print(get_stocks_rs_charts("goog fb".split()))
         #print(get_stocks_rs_charts("5 2388111".split()))
         print(get_stocks_rs_charts("2388".split()))
         print(get_stocks_rs_charts("66 2388".split()))
