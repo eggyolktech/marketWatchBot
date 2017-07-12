@@ -45,11 +45,14 @@ def get_columns_alerts(url):
     return passage
 
 def main():
-    passage = get_columns_alerts('http://www.google.com.hk/alerts/feeds/17097742724167324955/851375453331312334')
 
-    # Send a message to a chat room (chat room ID retrieved from getUpdates)
-    if(passage):
-        bot_sender.broadcast(passage, True)
+    columns = ['https://www.google.com.hk/alerts/feeds/17097742724167324955/8551375453331312334', 'https://www.google.com.hk/alerts/feeds/17097742724167324955/12218577883122648771']
+    
+    for colurl in columns:    
+        passage = get_columns_alerts(colurl)
+        # Send a message to a chat room (chat room ID retrieved from getUpdates)
+        if(passage):
+            bot_sender.broadcast(passage, True)
 
 if __name__ == "__main__":
     main()        
