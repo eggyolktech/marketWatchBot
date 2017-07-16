@@ -3,13 +3,13 @@
 from bs4 import BeautifulSoup
 from decimal import Decimal
 import urllib.request
-import urllib.parse
+import urllib.parse as urlparse
 import requests
 import re
 from datetime import datetime
 
 from market_watch.telegram import bot_sender
-from market_watch.db import market_db
+from market_watch.db import profit_warning_db
 
 def get_latest_reports(period, reporttype=1):
 
@@ -46,30 +46,18 @@ def get_latest_reports(period, reporttype=1):
         #newsTags = tag.find_all("p", {"class": "ArticleHdr"})
        
         for idx, tag in enumerate(dateTags):
-            #print(tag.text)
             
-            #a = newsTags[idx].find('a')
-            #print(a['href'])
-            #print(a.text)
- 
-            # Check time difference match with monitoring period
-            # 23/06/2017 08:55
-            #pdate = datetime.strptime(tag.text.strip(), "%d/%m/%Y %H:%M")
-            #pdiff = now - pdate
-            #pdiff_mins = (pdiff.days * 24 * 60) + (pdiff.seconds/60)
-            #print("[Post @" + tag.text + " - " + str(pdiff_mins) + "mins old]")    
-            #if (pdiff_mins > period):
-            #    print("Posts timestemps exceed monitoring period [" + str(period) + "mins], abort now.")
-            #    break
-    
-            if (not market_db.add_warning(tag.text.strip(), str(reporttype))):
-                print("Logtime already reported before: [" + tag.text.strip() + "]")
+            aURL = a['href']
+            aURL = "http://www.etnet.com.hk/www/tc/news/" + aURL
+            parsed = urlparse.urlparse(aURL)
+            key = urlparse.parse_qs(parsed.query)['newsid']
+            #print(str(tag.text.strip()) + " - " + str(key))
+            if (not profit_warning_db.add_warning(tag.text.strip(), key[0], str(reporttype))):
+                print("Logtime already reported before: [" + tag.text.strip() + " - " + key[0] + "]")
                 break
-            if a:
-                aURL = a['href']
-                aURL = "http://www.etnet.com.hk/www/tc/news/" + aURL
-                passage = "<a href='" + aURL + "' target='_blank'>" + a.text + "</a> (" + tag.text + ")" 
-                passages.append(passage)   
+            
+            passage = "<a href='" + aURL + "' target='_blank'>" + a.text + "</a> (" + tag.text + ")" 
+            passages.append(passage)   
 
     return passages 
     

@@ -26,6 +26,8 @@ from market_watch import quick_list, quick_tracker
 from market_watch.common.AastocksEnum import TimeFrame, FxCode, IndexCode
 from market_watch.common.AastocksConstants import *
 
+from hickory.crawler.aastocks import stock_quote
+
 # Load static properties
 config = config_loader.load()
 
@@ -173,7 +175,9 @@ def on_chat_message(msg):
     
         action = quote[2:3]
         code = quote[3:]
-        
+        codes = [code] + cmds[1:]
+        print(codes)       
+ 
         menu = '<b>Quick Quote Command</b> ' + u'\U0001F4C8'
         
         menuitemlist = [{'command': '/qM[code] [option]', 'desc': 'Monthly Chart', 'icon': u'\U0001F4C8'},
@@ -185,7 +189,7 @@ def on_chat_message(msg):
                     {'command': '/qC[code]', 'desc': 'CCASS Top 10 Distribution', 'icon': u'\U0001F42E'},
                     {'command': '/qc', 'desc': 'CBBC Distribution', 'icon': u'\U0001F42E'},
                     {'command': '/qr[code1] [code2]', 'desc': 'Relative Strength', 'icon': u'\U0001F42E'},
-                    {'command': '/qq', 'desc': 'Quick Menu', 'icon': u'\U0001F42E'},
+                    {'command': '/qq', 'desc': 'Quick Quote', 'icon': u'\U0001F42E'},
         ]
         
         fxc = ", ".join(['/qh' + str(x.name) for x in FxCode][:3])
@@ -305,8 +309,21 @@ def on_chat_message(msg):
                 bot.sendPhoto(chat_id, f)                
             return                 
         elif (action.lower() == "q"):
+
+            # Get quick quote from AAStocks
+            simpleMode = True
+            if (action == "Q"):
+                simpleMode = False
+            
+            for stockCd in codes:
+                if (stockCd.strip().isdigit()):
+                    bot.sendMessage(chat_id, stock_quote.get_quote_message(stockCd, simpleMode), parse_mode='HTML')
+                elif (stockCd.strip()):
+                    bot.sendMessage(chat_id, u'\U000026D4' + ' Code Not supported: ' + stockCd, parse_mode='HTML')
+                else:
+                    bot.sendMessage(chat_id, u'\U000026D4' + ' Code Not found!', parse_mode='HTML')
         
-            if (code in QQLIST):
+            '''if (code in QQLIST):
                 bot.sendMessage(chat_id, quick_list.get_qq_command_list(code) , parse_mode='HTML')
                 return
             elif (code[0:5] in QQSUBLIST):
@@ -321,7 +338,7 @@ def on_chat_message(msg):
                     passage = passage + "/qq" + list +  EL + " - List " + list + " codes" + EL
                     
                 bot.sendMessage(chat_id, passage, parse_mode='HTML')
-                return
+                return'''
         else:        
             bot.sendMessage(chat_id, menu, parse_mode='HTML') 
             return
