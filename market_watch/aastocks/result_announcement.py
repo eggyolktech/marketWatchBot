@@ -11,6 +11,48 @@ from datetime import datetime
 
 from market_watch.common.AastocksConstants import *
 from market_watch.telegram import bot_sender
+from market_watch.db import profit_warning_db
+
+def get_latest_result_announcement():
+
+    DEL = "\n\n"
+    EL = "\n"
+
+    url = "http://www.aastocks.com/tc/stocks/news/aafn/result-announcement"
+
+    print("URL: [" + url + "]")
+
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+
+    r = requests.get(url, headers=headers)
+    html = r.text
+    soup = BeautifulSoup(html, "html.parser")
+
+    passages = []
+    passage = ""
+    now = datetime.now()
+
+    print("Timestamp now: [" + str(now) + "]")
+    divs = soup.find_all("div", {"class": "content_box"})
+
+    for div in divs:
+        link = div.find("a", {"class": "h6"},  href=re.compile("/tc/stocks/news/aafn-content/"))
+        divTime = div.find("div", {"class":"newstime2"})
+        if (link and divTime and "業績" in link.text):
+
+            aURL = "http://www.aastocks.com" + link["href"]
+            aNewsID = link["href"].split("/")[5]
+            aDate = divTime.text
+            print(aNewsID)
+            
+            if (not profit_warning_db.add_warning(aDate, aNewsID, 3)):
+                print("Logtime already reported before: [" + aDate + " - " + aNewsID + "]")
+                break
+
+            passage = "<a href='" + aURL + "' target='_blank'>" + link.text + "</a> (" + aDate + ")"
+            passages.append(passage)
+
+    return passages
 
 def get_aastocks_calendar():
 
@@ -54,6 +96,9 @@ def main():
 
     # Send a message to a chat room (chat room ID retrieved from getUpdates)
     bot_sender.broadcast(passage)
+    
+    #for passage in get_latest_result_announcement():
+    #    print(passage)
 
 if __name__ == "__main__":
     main()        

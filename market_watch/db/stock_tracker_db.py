@@ -33,6 +33,15 @@ def list_tracker():
 
     conn.close()
 
+def mark_tracker(logdate, logcode, logdesc):
+
+    conn = sqlite3.connect(DB_FILE)
+    t = (logdesc, logdate, logcode)
+    
+    conn.execute("UPDATE STOCK_TRACKER SET LOG_DESC = ? WHERE LOG_DATE=? AND LOG_CODE=?", t)
+    conn.commit()
+    conn.close()
+    return True
 
 def add_tracker(logdate, logcode, logprice, logperiod, logdesc, region):
 

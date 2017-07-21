@@ -10,6 +10,7 @@ from datetime import datetime
 
 from market_watch.telegram import bot_sender
 from market_watch.db import profit_warning_db
+from market_watch.aastocks import result_announcement
 
 def get_latest_reports(period, reporttype=1):
 
@@ -72,6 +73,11 @@ def main():
     for report in get_latest_reports(40, 2):
         print(report)
         bot_sender.broadcast(report)
+
+    # result annountcement (aastocks)
+    for passage in result_announcement.get_latest_result_announcement():
+        print(passage)
+        bot_sender.broadcast(passage)
    
 if __name__ == "__main__":
     main()                

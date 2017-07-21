@@ -89,6 +89,51 @@ def load_dict(region="HK"):
         data = json.load(fp)
         return data
 
+def mark_track(code):
+
+    data = None
+    region = None
+    
+    print("Code to Mark: [" + code + "]")
+    
+    try:
+        if (not code):
+            return False
+        elif (is_number(code)):
+            data = load_dict("HK")
+            if code in data:
+                if ("HOT" not in data[code]):
+                    data[code] = data[code] + ".HOT"
+                else:
+                    data[code] = data[code].replace(".HOT", "")
+            else:
+                print("No key found!")
+                return False
+            region = "HK"
+        else:
+            data = load_dict("US")
+            
+            if (not ".US" in code):
+                code = code + ".US"        
+            
+            if code.upper() in data:
+                if ("HOT" not in data[code]):
+                    data[code] = data[code] + ".HOT"
+                else:
+                    data[code] = data[code].replace(".HOT", "")
+            else:
+                print("No key found!")
+                return False
+            region = "US"
+        
+        if (data and region):
+            dump_dict(data, get_file(region))
+    
+        return True
+    except:
+        logging.error(traceback.format_exc())
+        return False
+ 
 def remove_track(code):
 
     data = None

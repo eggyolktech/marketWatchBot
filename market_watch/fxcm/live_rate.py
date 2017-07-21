@@ -9,6 +9,9 @@ from market_watch.util import config_loader
 
 config = config_loader.load()
 
+EL = "\n"
+DEL = "\n\n"
+
 def get_fx_live_rate(quote):
 
     url = config.get("fxcm","rates-xml")
@@ -32,12 +35,12 @@ def get_fx_live_rate(quote):
     
     if(rate):
         
-        direction = u'\U000027A1'
+        direction = u'\U0001F539'
         
         if (int(rate.find('Direction').text) > 0):
-            direction = u'\U00002B06'
+            direction = u'\U0001F53A'
         elif (int(rate.find('Direction').text) < 0):
-            direction = u'\U00002B07'
+            direction = u'\U0001F53B'
 
         return "Bid: " + rate.find('Bid').text + " / Ask: " + rate.find('Ask').text + " " + direction
     else:
@@ -58,20 +61,47 @@ def get_dxy_live_rate():
     if last:
         
         if (not change.startswith("-")):
-            direction = u'\U00002B06'
+            direction = u'\U0001F53A'
         else:
-            direction = u'\U00002B07'
+            direction = u'\U0001F53B'
 
-        return "Last: " + last + " / Change: " + change + " " + direction
+        return direction + " L:" + last + " / C:" + change
     else:
         return "No live rate is returned."
+
+def get_full_live_rate():
+
+    passage = ""
+    passage = passage + "<b>DXY: </b> " + get_dxy_live_rate() + EL
+
+    url = config.get("fxcm","rates-xml")
+   
+    r = requests.get(url)
+    xml = r.text
+    soup = BeautifulSoup(xml, 'xml')
+
+    rates = soup.findAll('Rate')
+
+    for rate in rates:
         
+        direction = u'\U0001F539'
+         
+        if (int(rate.find('Direction').text) > 0):
+            direction = u'\U0001F53A'
+        elif (int(rate.find('Direction').text) < 0):
+            direction = u'\U0001F53B'
+
+        passage = passage + "<b>" + rate["Symbol"] + ":</b> " + direction + " B:" + rate.find('Bid').text + " / A:" + rate.find('Ask').text + EL
+
+    passage = passage + EL + rates[0].find('Last').text
+    return passage
         
 def main():
 
-    print(get_fx_live_rate("EURUSD").encode("utf-8"))
+    #print(get_fx_live_rate("EURUSD").encode("utf-8"))
     
-    print(get_dxy_live_rate().encode("utf-8"))
+    #print(get_dxy_live_rate().encode("utf-8"))
+    print(get_full_live_rate())
 
 if __name__ == "__main__":
     main()    

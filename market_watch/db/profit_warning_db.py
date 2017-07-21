@@ -30,6 +30,26 @@ def list_warning():
 
     conn.close()
 
+def delete_warning(news_id):
+
+    conn = sqlite3.connect(DB_FILE)
+
+    t1 = (news_id,)
+    print(t1)
+    cursor = conn.execute('SELECT * FROM PROFIT_WARNING WHERE ID=?', t1)
+    
+    # There is record already
+    if (cursor.fetchone()):
+        conn.execute("DELETE FROM PROFIT_WARNING WHERE ID=?", t1)
+        conn.commit()
+        conn.close()
+        return True
+    # Blank new case
+    else:
+        conn.close()
+        return False 
+
+
 
 def add_warning(logtime, logkey, logtype):
 
@@ -51,13 +71,15 @@ def add_warning(logtime, logkey, logtype):
 
 def main():
 
-    init()
+    #init()
     #print(add_warning('04/07/2017 18:33','XXXXX', '+'))
     #print(add_warning('04/07/2017 18:33','+'))
     #print(add_warning('04/07/2017 19:32','-'))
     #print(add_warning('04/07/2017 19:32','-'))
     list_warning()    
-   
+    print(delete_warning(113))
+    list_warning()
+ 
 if __name__ == "__main__":
     main()        
         

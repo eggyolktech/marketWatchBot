@@ -76,7 +76,10 @@ def on_chat_message(msg):
     
         keyboard = InlineKeyboardMarkup(inline_keyboard=keyboard_list)
         bot.sendMessage(chat_id, 'Please tap on the Commodity to quote', reply_markup=keyboard) 
-  
+
+    elif (command == "/live"):
+        
+        bot.sendMessage(chat_id, live_rate.get_full_live_rate(), parse_mode='HTML')
     elif (command == "/top10"):
     
         menuitemlist = [{'command': '/ttETF', 'desc': 'High Dividends ETF', 'icon': u'\U0001F4B0'},
@@ -157,6 +160,18 @@ def on_chat_message(msg):
                     passage = passage + code + " remove successfully." + EL
                 else:
                     passage = passage + code + " remove failed." + EL
+            print(passage)        
+            if (passage):
+                bot.sendMessage(chat_id, passage, parse_mode='HTML')
+
+        elif (action=="h"):
+            passage = ""
+            for code in params:
+                code = code.upper()
+                if (quick_tracker.mark_track(code)):
+                    passage = passage + code + " mark successfully." + EL
+                else:
+                    passage = passage + code + " mark failed." + EL
             print(passage)        
             if (passage):
                 bot.sendMessage(chat_id, passage, parse_mode='HTML')
