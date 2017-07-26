@@ -26,9 +26,11 @@ class FxCode(Enum):
     CNYHKD = 900225
     USDSGD = 900229
     SGDHKD = 900223
-    HKDKRW = 910186
+    HKDCAD = 910186
     MYRHKD = 910307
     HKDINR = 910200
+    HKDTWD = 910199
+    HKDKRW = 910185
     
 class IndexCode(Enum):
     HSI   = 110000

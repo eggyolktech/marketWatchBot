@@ -17,13 +17,13 @@ def get_hkg_chart_list_by_type(code, action, params):
     url_dict_list = []
     ind_params = []
     
-    if (len(params) > 0 and params[-1].lower() == "bb"):
-        ind_params.append("bb")
+    if (len(params) > 0 and (params[-1].lower() == "bb" or params[-1].lower() == "sma")):
+        ind_params.append(params[-1].lower())
     
     url_dict_list.append({'code': code, 'url': get_hkg_chart_by_type(code, action, ind_params)})
     
     for p in params:
-        if (not p == "bb"):
+        if (not p == "bb" and not p == "sma"):
             url_dict_list.append({'code': p, 'url': get_hkg_chart_by_type(p, action, ind_params)})
     
     return url_dict_list
@@ -32,6 +32,8 @@ def get_hkg_chart_by_type(code, action, params):
 
     url = ""
     is_bb = False
+    is_ema = False
+    is_sma = False
     is_num = False
     is_CN = False
     is_US = False
@@ -39,7 +41,9 @@ def get_hkg_chart_by_type(code, action, params):
     
     for p in params:
         if (p.lower() == "bb"):
-            is_bb = True;
+            is_bb = True
+        elif (p.lower() == "sma"):
+            is_sma = True
     
     # Determine which code type base on input format
     is_num = is_number(code)
@@ -86,10 +90,15 @@ def get_hkg_chart_by_type(code, action, params):
     
     main = "http://charts.aastocks.com/servlet/Charts?fontsize=12&15MinDelay=F&lang=1&titlestyle=1&vol=1&chart=left&type=1"
     
-    indicator = "&Indicator=1&indpara1=4&indpara2=6&indpara3=14&indpara4=27&indpara5=40&indpara6=52"
+    
+    #indicator = "&Indicator=1&indpara1=4&indpara2=6&indpara3=14&indpara4=27&indpara5=40&indpara6=52"
+    indicator= "&Indicator=3&indpara1=10&indpara2=20&indpara3=50&indpara4=100&indpara5=150"
+    
     if (is_bb):
         indicator = "&Indicator=9&indpara1=20&indpara2=2&indpara3=0&indpara4=0&indpara5=0"
-        
+    if (is_sma):
+        indicator = "&Indicator=1&indpara1=4&indpara2=6&indpara3=14&indpara4=27&indpara5=40&indpara6=52"
+
     subchart = "&subChart1=3&ref1para1=12&ref1para2=26&ref1para3=9" + "&subChart2=7&ref2para1=16&ref2para2=8&ref2para3=8" +                     "&subChart3=2&ref3para1=16&ref3para2=0&ref3para3=0" + "&subChart4=2&ref4para1=3&ref4para2=0&ref4para3=0"
     scheme = "&scheme=1&com=100&chartwidth=1073&chartheight=950&stockid=" + code
     period = 6

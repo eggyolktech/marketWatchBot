@@ -213,7 +213,7 @@ def on_chat_message(msg):
         for menuitem in menuitemlist:
             menu = menu + EL + ' ' + menuitem['command'] + ' - ' + menuitem['desc']
         
-        menu = menu + DEL + "[option]: bb - Show Bollinger Bands"
+        menu = menu + DEL + "[option]: bb - Bollinger Band, sma - SMA"
         
         menu = menu + DEL + "<b>Sample</b>"
         menu = menu + EL + "Stock: /qd5, /qm601318, /qMAAPL, /qwMCD"   

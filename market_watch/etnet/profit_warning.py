@@ -11,12 +11,14 @@ from datetime import datetime
 from market_watch.telegram import bot_sender
 from market_watch.db import profit_warning_db
 from market_watch.aastocks import result_announcement
+from hickory.crawler.aastocks import stock_info
 
+DEL = "\n\n"
+EL = "\n"
+ 
 def get_latest_reports(period, reporttype=1):
 
-    DEL = "\n\n"
-    EL = "\n"
-    
+   
     if (reporttype == 1): 
         url = "http://www.etnet.com.hk/www/tc/news/special_news_list.php?category=%E4%BC%81%E6%A5%AD%E7%9B%88%E5%96%9C"
     elif (reporttype == 2):
@@ -56,8 +58,17 @@ def get_latest_reports(period, reporttype=1):
             if (not profit_warning_db.add_warning(tag.text.strip(), key[0], str(reporttype))):
                 print("Logtime already reported before: [" + tag.text.strip() + " - " + key[0] + "]")
                 break
+          
+            industry = None 
+            if (len(a.text.split("（")) > 1):
+                code = a.text.split("（")[1].split("）")[0]
+                code = code.replace("１","1").replace("２","2").replace("３","3").replace("４","4").replace("５","5").replace("６","6").replace("７","7").replace("８","8").replace("９","9").replace("０","0")
+                if (stock_info.get_info(code)):
+                    industry = stock_info.get_info(code)["industry"]
             
-            passage = "<a href='" + aURL + "' target='_blank'>" + a.text + "</a> (" + tag.text + ")" 
+            passage = "<a href='" + aURL + "' target='_blank'>" + a.text + "</a> (" + tag.text + ")" + EL
+            if (industry):
+                passage = passage + "行業版塊: " + industry + " - /qQ" + code
             passages.append(passage)   
 
     return passages 

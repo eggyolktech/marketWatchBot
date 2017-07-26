@@ -148,9 +148,10 @@ def get_stocks_rs_charts(codelist):
     EL = "\n"
     chartpath = ""
     codelist = codelist[:15]
-    
+     
     # We will look at stock prices over the past year, starting at April 1, 2016
-    start = datetime.datetime(2016,4,1)
+    now = datetime.datetime.now()
+    start = datetime.datetime(2016, now.month, 1)
     end = datetime.date.today()
 
     #for code in codelist:
@@ -218,9 +219,9 @@ def get_stocks_rs_charts(codelist):
     print(stocks_return.tail())
     
     plt.style.use('ggplot')
-    
     stocks_return.plot(figsize=(10,6), grid = True, linewidth=1.0, title="Relative Strength since 2016", colormap = plt.cm.Dark2).axhline(y = 1, color = "black", lw = 1) 
     plt.legend(loc='upper left')
+    #stocks.plot()
     
     if not os.name == 'nt':
         chartpath = "/tmp/rscharts/" + 'gchart' + str(int(round(time.time() * 1000))) + '.png'
