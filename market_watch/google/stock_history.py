@@ -139,7 +139,7 @@ def get_historical_price_from_google(code):
     df = pd.DataFrame.from_csv(csvfilename, header=0, sep=',', index_col=0)
     df.sort_index(inplace=True)
     
-    print(df.head())    
+    #print(df.head())    
     return df
     
 def get_stocks_rs_charts(codelist):
@@ -182,11 +182,10 @@ def get_stocks_rs_charts(codelist):
                     break
         
         try:
-            #codedf = web.DataReader(code, "yahoo", start, end)
-            
+            #codedf = web.DataReader(code, "yahoo", start, end)            
             codedf = get_historical_price_from_google(code)
             
-            stockcodelist.append(code)
+            stockcodelist.append(code + "XXX")
             codedflist.append(codedf)
             startdatelist.append(codedf.index[0])
 
@@ -209,18 +208,63 @@ def get_stocks_rs_charts(codelist):
         codedic[codeval] = codedfloclist[idx]["Close"]
     
     stocks = pd.DataFrame(codedic)
-
-    print(stocks.head())
-    print(stocks.tail())
     
     stocks_return = stocks.apply(lambda x: x / x[0])    
+    stocks_return_6_months = stocks.tail(23*6).apply(lambda x: x / x[0])
+    stocks_return_3_months = stocks.tail(23*3).apply(lambda x: x / x[0])
+    stocks_return_1_month = stocks.tail(23).apply(lambda x: x / x[0])
 
-    print(stocks_return.head())
-    print(stocks_return.tail())
+    #print(stocks_return.tail())
     
-    plt.style.use('ggplot')
-    stocks_return.plot(figsize=(10,6), grid = True, linewidth=1.0, title="Relative Strength since 2016", colormap = plt.cm.Dark2).axhline(y = 1, color = "black", lw = 1) 
-    plt.legend(loc='upper left')
+    #plt.style.use('seaborn-white')
+    #plt.style.use('dark_background')
+    plt.style.use('bmh')
+    #plt.style.use('ggplot')
+    #plt.style.use('fivethirtyeight')
+    
+    plt.rcParams['font.family'] = 'serif'
+    plt.rcParams['font.serif'] = 'Ubuntu'
+    plt.rcParams['font.monospace'] = 'Ubuntu Mono'
+    plt.rcParams['font.size'] = 8
+
+    plt.rcParams['axes.labelsize'] = 8
+    plt.rcParams['axes.labelweight'] = 'bold'
+    plt.rcParams['axes.titlesize'] = 9
+    plt.rcParams['axes.titleweight'] = 'bold'
+    plt.rcParams['xtick.labelsize'] = 8
+    plt.rcParams['ytick.labelsize'] = 8
+    plt.rcParams['lines.linewidth'] = 1
+    plt.rcParams['legend.fontsize'] = 8
+    plt.rcParams['figure.facecolor'] = '#fffff9'
+    plt.rcParams['figure.titlesize'] = 8
+    
+    fig = plt.figure(figsize=(10,6))
+    
+    ax1 = fig.add_subplot(221)
+    ax1.xaxis.label.set_visible(False)
+    ax1.set_title("RS (1 Month)")
+    stocks_return_1_month.plot(ax=ax1)
+    
+    ax2 = fig.add_subplot(222)
+    ax2.xaxis.label.set_visible(False)
+    ax2.set_title("RS (3 Months)")
+    stocks_return_3_months.plot(ax=ax2)
+
+    ax3 = fig.add_subplot(223)
+    ax3.xaxis.label.set_visible(False)
+    ax3.set_title("RS (6 Months)")
+    stocks_return_6_months.plot(ax=ax3)
+
+    ax4 = fig.add_subplot(224)
+    ax4.xaxis.label.set_visible(False)
+    ax4.set_title("RS (1 Year)")
+    stocks_return.plot(ax=ax4)    
+    
+    #ax3 = fig.add_subplot(212)
+    #stocks_return.plot(ax=ax3)
+    
+    #stocks_return.plot(figsize=(10,6), grid = True, linewidth=1.0, title="Relative Strength since 2016", colormap = plt.cm.Dark2).axhline(y = 1, color = "black", lw = 1) 
+    #plt.legend(loc='upper left')
     #stocks.plot()
     
     if not os.name == 'nt':
@@ -230,8 +274,9 @@ def get_stocks_rs_charts(codelist):
     
     #print(chartpath)
     
+    plt.tight_layout()
     plt.savefig(chartpath, bbox_inches='tight')
-    #plt.show()
+    plt.show()
     
     result.append(chartpath)
     result.append(invalidcodelist)
@@ -245,8 +290,8 @@ def main():
         #print(get_stocks_rs_charts("2388111 5 11".split()))
         
         #print(get_stocks_rs_charts("HSI HSCEI HSP HSF HSU HSC".split())) 
-        print(get_stocks_rs_charts("HSI 700 941 3988".split())) 
-        
+        #print(get_stocks_rs_charts("HSI 700 941 3988".split())) 
+        print(get_stocks_rs_charts("HSI 700".split()))
         #print(get_stocks_rs_charts("2388".split()))
         #print(get_stocks_rs_charts("66 2388".split()))
         #print(get_stocks_rs_charts(["66", "2828", "2800"]))
