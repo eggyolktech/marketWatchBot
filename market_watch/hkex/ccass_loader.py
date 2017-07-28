@@ -56,8 +56,8 @@ def get_shareholding_disclosure(code):
             for tr in detailTable.findAll('tr')[1:]:
                 cols = tr.findAll('td')
                 passage = passage + "<b>" + cols[0].text + "</b>" + EL
-                passage = passage + "Shares: " + ", ".join(cols[1].strings) + EL
-                passage = passage + "% of Capital: " + (", ".join(cols[2].strings)).replace("(", "%(") + EL + "Date of notice: " + cols[3].text + DEL
+                passage = passage + "Holder: " + ", ".join(cols[1].strings) + EL
+                passage = passage + "Shares: " + (", ".join(cols[2].strings)) + EL + "% of Capital: " + cols[3].text.replace("(","%(") + DEL
    
     if (not passage):
         passage =  u'\U000026D4' + "No matching info is found!"

@@ -331,10 +331,12 @@ def on_chat_message(msg):
                 simpleMode = False
             
             for stockCd in codes:
-                if (stockCd.strip().isdigit()):
-                    bot.sendMessage(chat_id, stock_quote.get_quote_message(stockCd, simpleMode), parse_mode='HTML')
+                if (stockCd.strip().isdigit() and len(stockCd.strip()) == 6):
+                    bot.sendMessage(chat_id, stock_quote.get_quote_message(stockCd, "CN", simpleMode), parse_mode='HTML')
+                elif (stockCd.strip().isdigit()):
+                    bot.sendMessage(chat_id, stock_quote.get_quote_message(stockCd, "HK", simpleMode), parse_mode='HTML')
                 elif (stockCd.strip()):
-                    bot.sendMessage(chat_id, u'\U000026D4' + ' Code Not supported: ' + stockCd, parse_mode='HTML')
+                    bot.sendMessage(chat_id, stock_quote.get_quote_message(stockCd, "US", simpleMode), parse_mode='HTML')
                 else:
                     bot.sendMessage(chat_id, u'\U000026D4' + ' Code Not found!', parse_mode='HTML')
         
