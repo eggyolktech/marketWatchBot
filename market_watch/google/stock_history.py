@@ -185,7 +185,7 @@ def get_stocks_rs_charts(codelist):
             #codedf = web.DataReader(code, "yahoo", start, end)            
             codedf = get_historical_price_from_google(code)
             
-            stockcodelist.append(code + "XXX")
+            stockcodelist.append(code)
             codedflist.append(codedf)
             startdatelist.append(codedf.index[0])
 
