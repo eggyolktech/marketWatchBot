@@ -15,7 +15,8 @@ import random
 import resource
 
 from market_watch.dailyfx import market_calendar
-from market_watch.aastocks import top_yield, charting, company_news
+from market_watch.aastocks import top_yield, charting, company_news, result_announcement, indices, forex
+from market_watch.stockq import commodities
 from market_watch.fxcm import live_rate
 from market_watch.hkex import ccass_loader
 from market_watch.google import stock_history
@@ -80,6 +81,7 @@ def on_chat_message(msg):
     elif (command == "/live"):
         
         bot.sendMessage(chat_id, live_rate.get_full_live_rate(), parse_mode='HTML')
+    
     elif (command == "/top10"):
     
         menuitemlist = [{'command': '/ttETF', 'desc': 'High Dividends ETF', 'icon': u'\U0001F4B0'},
@@ -175,7 +177,43 @@ def on_chat_message(msg):
             print(passage)        
             if (passage):
                 bot.sendMessage(chat_id, passage, parse_mode='HTML')
-                
+    
+    elif (command.startswith("/l")):
+
+        try:
+            action = command[2:]
+        except IndexError:
+            action = ""
+
+        print("Action: [" + action + "]") 
+
+        menu = '<b>Live Command</b> ' + u'\U0001F4C8'
+
+        menuitemlist = [{'command': '/lhk', 'desc': 'HK Indices', 'icon': u'\U0001F4C8'},
+                    {'command': '/lcn', 'desc': 'CN Indices', 'icon': u'\U0001F4C8'},
+                    {'command': '/lw', 'desc': 'World Indices', 'icon': u'\U0001F4C8'},
+                    {'command': '/lm', 'desc': 'Commodities and Metals', 'icon': u'\U0001F4C8'},
+                    {'command': '/lfx', 'desc': 'Forex', 'icon': u'\U0001F4C8'},
+        ]
+
+        for menuitem in menuitemlist:
+            menu = menu + DEL + ' ' + menuitem['command'] + ' - ' + menuitem['desc']
+            
+        if (action == "hk"):
+            bot.sendMessage(chat_id, indices.get_indices("hk"), parse_mode='HTML') 
+        elif (action == "cn"):
+            bot.sendMessage(chat_id, indices.get_indices("cn"), parse_mode='HTML') 
+        elif (action == "w"):
+             bot.sendMessage(chat_id, indices.get_indices("w"), parse_mode='HTML') 
+        elif (action == "fx"):
+            bot.sendMessage(chat_id, forex.get_forex(), parse_mode='HTML') 
+        elif (action == "m"):
+            bot.sendMessage(chat_id, commodities.get_commodities(), parse_mode='HTML') 
+        else:        
+            bot.sendMessage(chat_id, menu, parse_mode='HTML') 
+
+        return   
+         
     elif (command.startswith("/q")):
     
         try:            
@@ -200,11 +238,14 @@ def on_chat_message(msg):
                     {'command': '/qd[code] [option]', 'desc': 'Daily Chart', 'icon': u'\U0001F4C8'},
                     {'command': '/qh[code] [option]', 'desc': 'Hourly Chart', 'icon': u'\U0001F4C8'},
                     {'command': '/qm[code] [option]', 'desc': 'Minutes Chart', 'icon': u'\U0001F4C8'},
+                    {'command': '/qN[code]', 'desc': 'Result Calendar (HK Only)', 'icon': u'\U0001F4C8'},                    
                     {'command': '/qn[code]', 'desc': 'Latest News (HK Only)', 'icon': u'\U0001F4C8'},                    
                     {'command': '/qC[code]', 'desc': 'CCASS Top 10 Distribution', 'icon': u'\U0001F42E'},
                     {'command': '/qc', 'desc': 'CBBC Distribution', 'icon': u'\U0001F42E'},
+                    {'command': '/qR', 'desc': 'Industries List', 'icon': u'\U0001F42E'},
                     {'command': '/qr[code1] [code2]', 'desc': 'Relative Strength', 'icon': u'\U0001F42E'},
                     {'command': '/qq', 'desc': 'Quick Quote', 'icon': u'\U0001F42E'},
+                    {'command': '/qs', 'desc': 'Chicken Sectormap', 'icon': u'\U0001F414'},
         ]
         
         fxc = ", ".join(['/qh' + str(x.name) for x in FxCode][:3])
@@ -247,8 +288,10 @@ def on_chat_message(msg):
                 stockcode = random.choice(["2628", "939", "2800", "8141", "AAPL", "GOOG", "GS"])
                 passage = "<i>Usage:</i> " + command.split(' ')[0] + "[StockCode] (e.g. " + command.split(' ')[0] + stockcode + ")"
                 bot.sendMessage(chat_id, passage, parse_mode='HTML')
-   
-        elif (action.lower() == "n"):
+  
+        elif (action == "N"):
+            bot.sendMessage(chat_id, result_announcement.get_result_calendar(code), parse_mode='HTML') 
+        elif (action == "n"):
             bot.sendMessage(chat_id, company_news.get_latest_news_by_code(code, 8), parse_mode='HTML')
             return    
             
@@ -311,7 +354,18 @@ def on_chat_message(msg):
                     bot.sendMessage(chat_id, u'\U000026D4' + " Stocks with no data: " + str(invalidcodelist) , parse_mode='HTML')
                 bot.sendPhoto(chat_id=chat_id, photo=open(chartpath, 'rb'))      
             return
+        elif (action == "s"):
+
+            bot.sendMessage(chat_id, u'\U0001F414' +  u'\U0001F413' + u'\U0001F4B9', parse_mode='HTML')
             
+            try:
+                f = urllib.request.urlopen("http://www.fafaworld.com/usectors.jpg", timeout=10)
+            except:
+                bot.sendMessage(chat_id, u'\U0001F423' + ' Request Timeout', parse_mode='HTML')
+            else:
+                bot.sendPhoto(chat_id, f)                
+            return                 
+    
         elif (action == "c"):
 
             bot.sendMessage(chat_id, u'\U0001F42E' +  u'\U0001F43B' + u'\U0001F4CA', parse_mode='HTML')
@@ -319,10 +373,11 @@ def on_chat_message(msg):
             try:
                 f = urllib.request.urlopen(config.get("credit-suisse","cbbc-url"), timeout=10)
             except:
-                bot.sendMessage(chat_id, u'\U000026D4' + ' Request Timeout', parse_mode='HTML')
+                bot.sendMessage(chat_id, u'\U0001F428' + ' Request Timeout', parse_mode='HTML')
             else:
                 bot.sendPhoto(chat_id, f)                
             return                 
+        
         elif (action.lower() == "q"):
 
             # Get quick quote from AAStocks
@@ -370,7 +425,7 @@ def on_chat_message(msg):
                         {'command': '/q', 'desc': 'Quick Command', 'icon': u'\U0001F4C8'},
         ]
         
-        menu = '金鑊鏟 Bot v1.1.1'
+        menu = '金鑊鏟 Bot v2.0 '
         
         for menuitem in menuitemlist:
             menu = menu + DEL + ' ' + menuitem['command'] + ' - ' + menuitem['desc'] + ' ' + menuitem['icon']

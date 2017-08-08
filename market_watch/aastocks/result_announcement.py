@@ -13,10 +13,44 @@ from market_watch.common.AastocksConstants import *
 from market_watch.telegram import bot_sender
 from market_watch.db import profit_warning_db
 
-def get_latest_result_announcement():
+DEL = "\n\n"
+EL = "\n"
 
-    DEL = "\n\n"
-    EL = "\n"
+def get_result_calendar(code):
+
+    url = "http://www.aastocks.com/tc/stocks/market/calendar.aspx?type=1&s=0&searchsymbol=%s" % code
+
+    print("URL: [" + url + "]")
+
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+
+    r = requests.get(url, headers=headers)
+    html = r.text
+    soup = BeautifulSoup(html, "html.parser")
+
+    passage = ""
+    now = datetime.now()
+
+    print("Timestamp now: [" + str(now) + "]")
+    rows = soup.find_all("tr", {"class": "CalRABorder"})
+
+    if (len(rows) >= 3):
+        rdate = rows[1].text.strip()
+        rcode = rows[2].findAll("td")[0].text.strip()
+        rname = rows[2].findAll("td")[1].text.strip()
+        rind = rows[2].findAll("td")[2].text.strip()
+        rdetail = rows[2].findAll("td")[3].text.strip()
+
+        passage = "<b>" + rcode + "</b>" + EL + rname + " (" + rind + ")" + EL + rdate + " - " + rdetail
+
+    else:
+        passage = soup.find("div", {"id": "cp_pCalErrMsg"}).text.strip()
+
+    return passage
+
+
+
+def get_latest_result_announcement():
 
     url = "http://www.aastocks.com/tc/stocks/news/aafn/result-announcement"
 
@@ -96,7 +130,10 @@ def main():
 
     # Send a message to a chat room (chat room ID retrieved from getUpdates)
     bot_sender.broadcast(passage)
-    
+   
+    #print(get_result_calendar("700"))
+    #print(get_result_calendar("3993"))
+ 
     #for passage in get_latest_result_announcement():
     #    print(passage)
 

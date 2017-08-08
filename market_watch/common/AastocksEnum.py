@@ -42,7 +42,7 @@ class IndexCode(Enum):
     HSIP  = 110003
     HSIC  = 110004
     VHSI  = 110041
-    DJIA = 111000
+    DJI = 111000
     NASDAQ = 111100
     SSE = 2000001
     #SS300 = 2000300
