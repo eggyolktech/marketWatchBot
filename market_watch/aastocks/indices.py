@@ -43,7 +43,7 @@ def get_indices(region):
         name = tr.findAll("td")[0].text
         last = tr.findAll("td")[1].text
         change = tr.findAll("td")[2].text  
-        change = change.replace("+", u'\U0001F53A').replace("-", u'\U0001F53B')
+        change = change.replace("+", u'\U0001F332').replace("-", u'\U0001F53B')
 
         passage = passage + name + ": " + last + " " + change + "" + EL
    

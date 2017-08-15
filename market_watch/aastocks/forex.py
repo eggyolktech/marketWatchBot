@@ -37,9 +37,9 @@ def get_forex():
         name = tr.findAll("td")[0].text.strip()
         last = tr.findAll("td")[1].text.strip()
         change = tr.findAll("td")[2].text.strip()
-        change = change.replace("+", u'\U0001F53A').replace("-", u'\U0001F53B')
+        change = change.replace("+", u'\U0001F332').replace("-", u'\U0001F53B')
         change_pct = tr.findAll("td")[3].text.strip()
-        change_pct = change_pct.replace("+", u'\U0001F53A').replace("-", u'\U0001F53B')
+        change_pct = change_pct.replace("+", u'\U0001F332').replace("-", u'\U0001F53B')
         hlrange = tr.findAll("td")[4].text.strip()
 
         passage = passage + name + ": " + last + " " + change + "(" + change_pct + ")" + EL

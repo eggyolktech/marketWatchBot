@@ -15,7 +15,7 @@ import random
 import resource
 
 from market_watch.dailyfx import market_calendar
-from market_watch.aastocks import top_yield, charting, company_news, result_announcement, indices, forex
+from market_watch.aastocks import top_yield, charting, company_news, result_announcement, indices, forex, futures
 from market_watch.stockq import commodities
 from market_watch.fxcm import live_rate
 from market_watch.hkex import ccass_loader
@@ -246,6 +246,8 @@ def on_chat_message(msg):
                     {'command': '/qr[code1] [code2]', 'desc': 'Relative Strength', 'icon': u'\U0001F42E'},
                     {'command': '/qq', 'desc': 'Quick Quote', 'icon': u'\U0001F42E'},
                     {'command': '/qs', 'desc': 'Chicken Sectormap', 'icon': u'\U0001F414'},
+                    {'command': '/qf', 'desc': 'Quote HSI Mini Futures', 'icon': u'\U0001F414'},
+                    {'command': '/qF', 'desc': 'Quote HSI Futures', 'icon': u'\U0001F414'},
         ]
         
         fxc = ", ".join(['/qh' + str(x.name) for x in FxCode][:3])
@@ -299,6 +301,14 @@ def on_chat_message(msg):
             bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')         
             bot.sendMessage(chat_id, ccass_loader.get_latest_ccass_info(code, 20) , parse_mode='HTML')
             bot.sendMessage(chat_id, ccass_loader.get_shareholding_disclosure(code) , parse_mode='HTML')
+            return
+
+        elif (action == "f"):
+            bot.sendMessage(chat_id, futures.get_futures("M"), parse_mode='HTML')
+            return
+
+        elif (action == "F"):
+            bot.sendMessage(chat_id, futures.get_futures("N"), parse_mode='HTML')
             return
 
         elif (action == "R"):

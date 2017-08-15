@@ -39,12 +39,12 @@ def get_commodities():
         if ("-" in change):
             change = change.replace("-", u'\U0001F53B')
         else:
-            change = u'\U0001F53A' + change
+            change = u'\U0001F332' + change
         change_pct = tr.findAll("td")[3].text.strip()
         if ("-" in change_pct):
             change_pct = change_pct.replace("-", u'\U0001F53B')
         else:
-            change_pct = u'\U0001F53A' + change_pct
+            change_pct = u'\U0001F332' + change_pct
 
         passage = passage + name + ": " + last + " " + change + "(" + change_pct + ")" + EL
    

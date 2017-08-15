@@ -38,7 +38,7 @@ def get_fx_live_rate(quote):
         direction = u'\U0001F539'
         
         if (int(rate.find('Direction').text) > 0):
-            direction = u'\U0001F53A'
+            direction = u'\U0001F332'
         elif (int(rate.find('Direction').text) < 0):
             direction = u'\U0001F53B'
 
@@ -61,9 +61,9 @@ def get_dxy_live_rate():
     if last:
         
         if (not change.startswith("-")):
-            direction = u'\U0001F53A'
+            direction = u'\U0001F332'
         else:
-            direction = u'\U0001F53B'
+            direction = u'\U0001F53A'
 
         return direction + " L:" + last + " / C:" + change
     else:
@@ -87,7 +87,7 @@ def get_full_live_rate():
         direction = u'\U0001F539'
          
         if (int(rate.find('Direction').text) > 0):
-            direction = u'\U0001F53A'
+            direction = u'\U0001F332'
         elif (int(rate.find('Direction').text) < 0):
             direction = u'\U0001F53B'
 
