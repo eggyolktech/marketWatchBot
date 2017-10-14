@@ -28,6 +28,17 @@ def get_hkg_chart_list_by_type(code, action, params):
     
     return url_dict_list
 
+def get_finvinz_chart(code, period):
+
+    if (period == "M"):
+        p = "m1"
+    elif (period == "m"):
+        p = "m5"
+    else:
+        p = period + "1"
+
+    return "https://finviz.com/fut_chart.ashx?t=DX&cot=098662&p=%s" % p
+
 def get_hkg_chart_by_type(code, action, params):
 
     url = ""
@@ -57,6 +68,10 @@ def get_hkg_chart_by_type(code, action, params):
     elif (is_num):
         code = code + ".HK"    
     elif (code.isalpha()):
+
+        if ("USD" == code.upper()):
+            return get_finvinz_chart(code, action)
+
         code = get_aastocks_alpha_code(code)
         if (".US" in code):
             is_US = True

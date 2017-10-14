@@ -11,15 +11,28 @@ from datetime import datetime
 from market_watch.fxcm import live_rate
 
 
-def get_futures(contract="N"):
+def get_futures(contract, params):
 
     DEL = "\n\n"
     EL = "\n"
 
-    if (contract == "N"):
-        url = "http://www.aastocks.com/tc/stocks/market/bmpfutures.aspx?future=200000"
-    elif (contract == "M"):
-        url = "http://www.aastocks.com/tc/stocks/market/bmpfutures.aspx?future=200100"
+    if ("hscei" in params):
+        if (contract == "N"):
+            fut = "20020"
+        else:
+            fut = "20030"
+    else:
+        if (contract == "N"):
+            fut = "20000"
+        else:
+            fut = "20010"
+
+    if ("next" in params):
+        ure = "1"
+    else:
+        ure = "0"
+
+    url = "http://www.aastocks.com/tc/stocks/market/bmpfutures.aspx?future=%s%s" % (fut, ure)
     
     print("URL: [" + url + "]")  
     
@@ -90,8 +103,11 @@ def get_futures(contract="N"):
     
 def main():
 
-    print(get_futures("N"))
-    print(get_futures("M"))
+    print(get_futures("M", [""]))
+    print(get_futures("N", ["next"]))
+    print(get_futures("M", ["hscei"]))
+    print(get_futures("N", ["next", "hscei"]))
+    print(get_futures("M", ["hscei", "next"]))
 
 def is_number(s):
     try:

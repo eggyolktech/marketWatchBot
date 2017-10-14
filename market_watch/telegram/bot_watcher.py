@@ -15,8 +15,9 @@ import random
 import resource
 
 from market_watch.dailyfx import market_calendar
-from market_watch.aastocks import top_yield, charting, company_news, result_announcement, indices, forex, futures
+from market_watch.aastocks import top_yield, charting, company_news, result_announcement, indices, forex, futures, company_profile
 from market_watch.stockq import commodities
+from market_watch.sina import commodities as sina_commodities
 from market_watch.fxcm import live_rate
 from market_watch.hkex import ccass_loader
 from market_watch.google import stock_history
@@ -209,6 +210,14 @@ def on_chat_message(msg):
             bot.sendMessage(chat_id, forex.get_forex(), parse_mode='HTML') 
         elif (action == "m"):
             bot.sendMessage(chat_id, commodities.get_commodities(), parse_mode='HTML') 
+            bot.sendMessage(chat_id, sina_commodities.get_commodities(), parse_mode='HTML') 
+        elif (action == "l"):
+            msg = "<a href='http://eggyolk.tech/heatmap.html' target='_blank'>Chicken Heatmap (HK)</a>" + DEL
+            msg = msg + "<a href='http://eggyolk.tech/heatmap_us.html' target='_blank'>Chicken Heatmap (US)</a>" + DEL
+            msg = msg + "<a href='http://eggyolk.tech/y8.html' target='_blank'>Y8 List (HK)</a>" + DEL
+            msg = msg + "<a href='http://eggyolk.tech/y8_us.html' target='_blank'>Y8 List (US)</a>" + DEL
+
+            bot.sendMessage(chat_id, msg, parse_mode='HTML')
         else:        
             bot.sendMessage(chat_id, menu, parse_mode='HTML') 
 
@@ -246,8 +255,10 @@ def on_chat_message(msg):
                     {'command': '/qr[code1] [code2]', 'desc': 'Relative Strength', 'icon': u'\U0001F42E'},
                     {'command': '/qq', 'desc': 'Quick Quote', 'icon': u'\U0001F42E'},
                     {'command': '/qs', 'desc': 'Chicken Sectormap', 'icon': u'\U0001F414'},
-                    {'command': '/qf', 'desc': 'Quote HSI Mini Futures', 'icon': u'\U0001F414'},
-                    {'command': '/qF', 'desc': 'Quote HSI Futures', 'icon': u'\U0001F414'},
+                    {'command': '/qf [next] [hscei]', 'desc': 'Quote HSI Mini Futures', 'icon': u'\U0001F414'},
+                    {'command': '/qF [next] [hscei]', 'desc': 'Quote HSI Futures', 'icon': u'\U0001F414'},
+                    {'command': '/l', 'desc': 'Live Quote Commands', 'icon': u'\U0001F414'},
+                    {'command': '/qS[code]', 'desc': 'Get Company Profile', 'icon': u'\U0001F414'},
         ]
         
         fxc = ", ".join(['/qh' + str(x.name) for x in FxCode][:3])
@@ -304,11 +315,11 @@ def on_chat_message(msg):
             return
 
         elif (action == "f"):
-            bot.sendMessage(chat_id, futures.get_futures("M"), parse_mode='HTML')
+            bot.sendMessage(chat_id, futures.get_futures("M", params), parse_mode='HTML')
             return
 
         elif (action == "F"):
-            bot.sendMessage(chat_id, futures.get_futures("N"), parse_mode='HTML')
+            bot.sendMessage(chat_id, futures.get_futures("N", params), parse_mode='HTML')
             return
 
         elif (action == "R"):
@@ -364,6 +375,14 @@ def on_chat_message(msg):
                     bot.sendMessage(chat_id, u'\U000026D4' + " Stocks with no data: " + str(invalidcodelist) , parse_mode='HTML')
                 bot.sendPhoto(chat_id=chat_id, photo=open(chartpath, 'rb'))      
             return
+        elif (action == "S"):
+            passage = company_profile.get_profile(code)
+
+            MAX_MSG_SIZE = 4096
+            results = [passage[i:i+MAX_MSG_SIZE] for i in range(0, len(passage), MAX_MSG_SIZE)]
+
+            for result in results:
+                bot.sendMessage(chat_id, result, parse_mode='HTML')
         elif (action == "s"):
 
             bot.sendMessage(chat_id, u'\U0001F414' +  u'\U0001F413' + u'\U0001F4B9', parse_mode='HTML')
@@ -402,8 +421,8 @@ def on_chat_message(msg):
                     bot.sendMessage(chat_id, stock_quote.get_quote_message(stockCd, "HK", simpleMode), parse_mode='HTML')
                 elif (stockCd.strip()):
                     bot.sendMessage(chat_id, stock_quote.get_quote_message(stockCd, "US", simpleMode), parse_mode='HTML')
-                else:
-                    bot.sendMessage(chat_id, u'\U000026D4' + ' Code Not found!', parse_mode='HTML')
+                #else:
+                #    bot.sendMessage(chat_id, u'\U000026D4' + ' Code Not found!', parse_mode='HTML')
         
             '''if (code in QQLIST):
                 bot.sendMessage(chat_id, quick_list.get_qq_command_list(code) , parse_mode='HTML')
@@ -447,7 +466,7 @@ def on_chat_message(msg):
 
 def is_white_listed(in_chat_id):
     
-    chat_list = config.items("telegram-chat")
+    chat_list = config.items("telegram-chart")
     
     for key, chat_id in chat_list:
         #print("Compare: " + str(chat_id) + " <=> " + str(in_chat_id));
@@ -480,7 +499,7 @@ rsrc = resource.RLIMIT_DATA
 soft, hard = resource.getrlimit(rsrc)
 print('Soft limit start as :' + str(soft))
 
-resource.setrlimit(rsrc, (300 * 1024, hard))
+resource.setrlimit(rsrc, (220 * 1024, hard))
 soft, hard = resource.getrlimit(rsrc)
 
 print('Soft limit start as :' + str(soft))
