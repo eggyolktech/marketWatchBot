@@ -17,10 +17,11 @@ import resource
 from market_watch.dailyfx import market_calendar
 from market_watch.aastocks import top_yield, charting, company_news, result_announcement, indices, forex, futures, company_profile
 from market_watch.stockq import commodities
-from market_watch.sina import commodities as sina_commodities
+from market_watch.eastmoney import commodities as sina_commodities
 from market_watch.fxcm import live_rate
 from market_watch.hkex import ccass_loader
 from market_watch.google import stock_history
+from market_watch.sl886 import hkadr
 
 from market_watch.util import config_loader
 from market_watch import quick_list, quick_tracker
@@ -29,6 +30,7 @@ from market_watch.common.AastocksEnum import TimeFrame, FxCode, IndexCode
 from market_watch.common.AastocksConstants import *
 
 from hickory.crawler.aastocks import stock_quote
+from hickory.crawler.hkex import mutual_market
 
 # Load static properties
 config = config_loader.load()
@@ -207,7 +209,9 @@ def on_chat_message(msg):
         elif (action == "w"):
              bot.sendMessage(chat_id, indices.get_indices("w"), parse_mode='HTML') 
         elif (action == "fx"):
-            bot.sendMessage(chat_id, forex.get_forex(), parse_mode='HTML') 
+            bot.sendMessage(chat_id, forex.get_forex(), parse_mode='HTML')
+        elif (action == "adr"):
+            bot.sendMessage(chat_id, hkadr.get_hkadr(), parse_mode='HTML') 
         elif (action == "m"):
             bot.sendMessage(chat_id, commodities.get_commodities(), parse_mode='HTML') 
             bot.sendMessage(chat_id, sina_commodities.get_commodities(), parse_mode='HTML') 
@@ -216,6 +220,7 @@ def on_chat_message(msg):
             msg = msg + "<a href='http://eggyolk.tech/heatmap_us.html' target='_blank'>Chicken Heatmap (US)</a>" + DEL
             msg = msg + "<a href='http://eggyolk.tech/y8.html' target='_blank'>Y8 List (HK)</a>" + DEL
             msg = msg + "<a href='http://eggyolk.tech/y8_us.html' target='_blank'>Y8 List (US)</a>" + DEL
+            msg = msg + "<a href='http://eggyolk.tech/moneyflow.html' target='_blank'>Southbound Moneyflow Track</a>" + DEL
 
             bot.sendMessage(chat_id, msg, parse_mode='HTML')
         else:        
@@ -251,10 +256,12 @@ def on_chat_message(msg):
                     {'command': '/qn[code]', 'desc': 'Latest News (HK Only)', 'icon': u'\U0001F4C8'},                    
                     {'command': '/qC[code]', 'desc': 'CCASS Top 10 Distribution', 'icon': u'\U0001F42E'},
                     {'command': '/qc', 'desc': 'CBBC Distribution', 'icon': u'\U0001F42E'},
+                    {'command': '/qe[oode]', 'desc': 'Southbound Moneyflow Trend', 'icon': u'\U0001F42E'},
                     {'command': '/qR', 'desc': 'Industries List', 'icon': u'\U0001F42E'},
                     {'command': '/qr[code1] [code2]', 'desc': 'Relative Strength', 'icon': u'\U0001F42E'},
                     {'command': '/qq', 'desc': 'Quick Quote', 'icon': u'\U0001F42E'},
                     {'command': '/qs', 'desc': 'Chicken Sectormap', 'icon': u'\U0001F414'},
+                    {'command': '/qS', 'desc': 'Stock Profile', 'icon': u'\U0001F414'},
                     {'command': '/qf [next] [hscei]', 'desc': 'Quote HSI Mini Futures', 'icon': u'\U0001F414'},
                     {'command': '/qF [next] [hscei]', 'desc': 'Quote HSI Futures', 'icon': u'\U0001F414'},
                     {'command': '/l', 'desc': 'Live Quote Commands', 'icon': u'\U0001F414'},
@@ -274,6 +281,8 @@ def on_chat_message(msg):
         menu = menu + EL + "FX: " + fxc
         menu = menu + EL + "Index: " + idxc  
         menu = menu + EL + "News / CCASS: /qn5, /qn3333, /qC606"     
+        menu = menu + EL + "Profile (HK): /qS5, /qS981"     
+        menu = menu + EL + "Southbound Moneyflow: /qe5, /qe581"     
         menu = menu + EL + "Rel Strength: /qr5 2388 3988, /qR (by sectors)"           
         
         if (action in ["M", "w", "W", "d", "D", "h", "H", "m"]):
@@ -322,6 +331,12 @@ def on_chat_message(msg):
             bot.sendMessage(chat_id, futures.get_futures("N", params), parse_mode='HTML')
             return
 
+        elif (action == "e"):
+            bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')         
+        
+            for stockCd in codes:
+                bot.sendMessage(chat_id, mutual_market.get_moneyflow_by_code(stockCd), parse_mode='HTML')
+            return
         elif (action == "R"):
             
             if (not code):

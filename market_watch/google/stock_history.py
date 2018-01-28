@@ -1,9 +1,9 @@
 #!/usr/bin/python
 
 import pandas as pd
-import pandas_datareader.data as web  # Package and modules for importing data; this code may change depending on pandas version
+#import pandas_datareader.data as web  # Package and modules for importing data; this code may change depending on pandas version
 import time
-import datetime
+from datetime import tzinfo, timedelta, datetime
 import json
 
 import os
@@ -23,6 +23,7 @@ import traceback
 import logging
 
 from market_watch.common.AastocksConstants import *
+from hickory.data import webdata
 
 def get_stocks_rs_industry_list():
 
@@ -150,9 +151,11 @@ def get_stocks_rs_charts(codelist):
     codelist = codelist[:15]
      
     # We will look at stock prices over the past year, starting at April 1, 2016
-    now = datetime.datetime.now()
-    start = datetime.datetime(2016, now.month, 1)
-    end = datetime.date.today()
+    #now = datetime.datetime.now()
+    #start = datetime.datetime(2016, now.month, 1)
+    #end = datetime.date.today()
+    end = datetime.today()
+    start = end - timedelta(days=(1*420))
 
     #for code in codelist:
     #    if (not is_number(code)):
@@ -164,15 +167,18 @@ def get_stocks_rs_charts(codelist):
     invalidcodelist = []
     result = []    
     
-    INDEX_LIST = [('HSI', 'INDEXHANGSENG:HSI'), ('HSCEI', 'INDEXHANGSENG:HSCEI'), ('HSP', 'INDEXHANGSENG:HSI.P'), ('HSF', 'INDEXHANGSENG:HSI.F'), ('HSU', 'INDEXHANGSENG:HSI.U'), ('HSC', 'INDEXHANGSENG:HSI.C'), ('DAX', 'INDEXDB:DAX'), ('SPX', 'INDEXCBOE:SPX'), ('NASDAQ', 'INDEXNASDAQ:NDX'), ('DJI', 'INDEXDJX:.DJI'), ('NIKKEI', 'INDEXNIKKEI:NI225'), ('FTSE', 'INDEXFTSE:UKX'), ('CAC', 'INDEXEURO:PX1'),('Vanguard Developed Market', 'VEA'), ('Vanguard Emerging Market', 'VWO'),  ('Vanguard REIT', 'VNQ'), ('Technology SPRD', 'XLK'), ('Financial SPRD', 'XLF'), ('Energy SPRD', 'XLE'), ('Industrial SPRD', 'XLI'), ('Utilities SPRD', 'XLU'), ('Health Care SPRD', 'XLV'), ('Consumer Staples SPRD', 'XLP'), ('Consumer Discretionary SPRD', 'XLY'), ('Materials SPRD', 'XLB'), ('Gold SPRD', 'GLD'), ('20Y TBond', 'TLT'), ('S&P', 'INDEXCBOE:SPX'), ('SHA', 'SHA:000001') ]
-            
+    #INDEX_LIST = [('HSI', 'INDEXHANGSENG:HSI'), ('HSCEI', 'INDEXHANGSENG:HSCEI'), ('HSP', 'INDEXHANGSENG:HSI.P'), ('HSF', 'INDEXHANGSENG:HSI.F'), ('HSU', 'INDEXHANGSENG:HSI.U'), ('HSC', 'INDEXHANGSENG:HSI.C'), ('DAX', 'INDEXDB:DAX'), ('SPX', 'INDEXCBOE:SPX'), ('NASDAQ', 'INDEXNASDAQ:NDX'), ('DJI', 'INDEXDJX:.DJI'), ('NIKKEI', 'INDEXNIKKEI:NI225'), ('FTSE', 'INDEXFTSE:UKX'), ('CAC', 'INDEXEURO:PX1'),('Vanguard Developed Market', 'VEA'), ('Vanguard Emerging Market', 'VWO'),  ('Vanguard REIT', 'VNQ'), ('Technology SPRD', 'XLK'), ('Financial SPRD', 'XLF'), ('Energy SPRD', 'XLE'), ('Industrial SPRD', 'XLI'), ('Utilities SPRD', 'XLU'), ('Health Care SPRD', 'XLV'), ('Consumer Staples SPRD', 'XLP'), ('Consumer Discretionary SPRD', 'XLY'), ('Materials SPRD', 'XLB'), ('Gold SPRD', 'GLD'), ('20Y TBond', 'TLT'), ('S&P', 'INDEXCBOE:SPX'), ('SHA', 'SHA:000001') ]
+    
+    INDEX_LIST = [('HSI', '%5EHSI'), ('HSCEI', '%5EHSCE'), ('HSP', '%5EHSNP'), ('HSF', '%5EHSNF'), ('HSU', '%5EHSNU'), ('HSC', '%5EHSNC'), ('DAX', '%5EGDAXI'), ('SPX', '%5EGSPC'), ('NASDAQ', '%5EGSPC'), ('DJI', '%5EDJI'), ('NIKKEI', '%5EN225'), ('FTSE', '%5EFTSE'), ('CAC', '%5EFCHI'),('SSE', '000001.SS'), ('SS300', '000300.SS'),  ('Vanguard REIT', 'VNQ'), ('Technology SPRD', 'XLK'), ('Financial SPRD', 'XLF'), ('Energy SPRD', 'XLE'), ('Industrial SPRD', 'XLI'), ('Utilities SPRD', 'XLU'), ('Health Care SPRD', 'XLV'), ('Consumer Staples SPRD', 'XLP'), ('Consumer Discretionary SPRD', 'XLY'), ('Materials SPRD', 'XLB'), ('Gold SPRD', 'GLD'), ('20Y TBond', 'TLT')]
+       
     for code in codelist:
         
         if (code[0] == "0"):
             code = code[1:]
         
         if (is_number(code)):
-            code = "HKG:" + code.rjust(4, '0')
+            #code = "HKG:" + code.rjust(4, '0')
+            code = code.rjust(4, '0') + ".HK"
         else:
             code = code.upper()
             
@@ -183,8 +189,9 @@ def get_stocks_rs_charts(codelist):
         
         try:
             #codedf = web.DataReader(code, "yahoo", start, end)            
-            codedf = get_historical_price_from_google(code)
-            
+            #codedf = get_historical_price_from_google(code)
+            codedf = webdata.DataReader(code, "yahoo_direct", start, end)            
+
             stockcodelist.append(code)
             codedflist.append(codedf)
             startdatelist.append(codedf.index[0])

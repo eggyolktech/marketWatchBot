@@ -64,7 +64,7 @@ def get_shareholding_disclosure(code):
 
     return passage
         
-def get_latest_ccass_info(code, number):
+def get_latest_ccass_info(code, number, is_simple=False):
 
     DEL = "\n\n"
     EL = "\n"
@@ -113,6 +113,7 @@ def get_latest_ccass_info(code, number):
     div = soup.find('div', id="pnlResultHeader")    
     tables = div.findAll('table')
     title = ""
+    simple_result = []
     
     # Stock code exists
     if (tables[3]):
@@ -121,8 +122,11 @@ def get_latest_ccass_info(code, number):
         num_intermediates = masterTable.findAll('tr')[1].findAll('td')[2].text.strip()
         shares_percentage = masterTable.findAll('tr')[1].findAll('td')[3].text.strip()
         
-        passage = "Number of Participants: " + num_intermediates + " (" + shares_percentage + ")" + DEL
-        
+        passage = "Number of Participants: " + num_intermediates + " (" + shares_percentage + ")"
+        simple_result.append(num_intermediates)
+        simple_result.append(shares_percentage)
+
+        passage = passage + DEL
         cols = tables[3].findAll('td')
         title = cols[3].text.strip("/r/n").strip() + " (" + cols[1].text.strip("/r/n").strip() + ")"
 
@@ -140,12 +144,17 @@ def get_latest_ccass_info(code, number):
             pname = cols[1].text.strip("/r/n").strip()
             pshares = cols[3].text.strip("/r/n").strip()
             ppercentage = cols[4].text.strip("/r/n").strip()
+
+            simple_result.append([pid, pname, pshares, ppercentage])
             
             #passage = passage + str(count) + ": " + pid + " - " + pname + " (" + pshares + ", " + ppercentage + ")" + EL
             passage = passage + str(count) + ". " + pname + "" + EL + "Shares: " + pshares + " (" + ppercentage + ")" + DEL
             
             count = count + 1
     
+    if (is_simple):
+        return simple_result
+
     if (not passage):
         passage =  u'\U000026D4' + "No matching info is found!"
     else:
@@ -155,11 +164,13 @@ def get_latest_ccass_info(code, number):
     
 def main():
 
-    print(get_latest_ccass_info("939", 5).encode("utf-8"))
-    
+    print(get_latest_ccass_info("8091", 5).encode("utf-8"))
+ 
+    print(get_latest_ccass_info("939", 5, True))
+   
     #print(get_latest_ccass_info("99999", 5).encode("utf-8"))
     
-    print(get_shareholding_disclosure("1980").encode("utf-8"))
+    #print(get_shareholding_disclosure("1980").encode("utf-8"))
 
     
 def is_number(s):

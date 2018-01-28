@@ -20,7 +20,7 @@ def get_commodities():
     
     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
 
-    r = requests.get(url, headers=headers)
+    r = requests.get(url, headers=headers, timeout=10)
     r.encoding = "gb2312"
     html = r.text
     soup = BeautifulSoup(html, "html.parser")
