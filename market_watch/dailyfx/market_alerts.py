@@ -45,7 +45,8 @@ def main():
 
     # Send a message to a chat room (chat room ID retrieved from getUpdates)
     if(passage):
-        bot_sender.broadcast(passage)
+        #bot_sender.broadcast(passage)
+        bot_sender.broadcast_list(passage, "telegram-fx")
 
 if __name__ == "__main__":
     main()        

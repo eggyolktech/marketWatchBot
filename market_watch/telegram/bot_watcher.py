@@ -22,7 +22,7 @@ from market_watch.fxcm import live_rate
 from market_watch.hkex import ccass_loader
 from market_watch.google import stock_history
 from market_watch.sl886 import hkadr
-
+from market_watch.qq import us_company_news
 from market_watch.util import config_loader
 from market_watch import quick_list, quick_tracker
 
@@ -314,7 +314,11 @@ def on_chat_message(msg):
         elif (action == "N"):
             bot.sendMessage(chat_id, result_announcement.get_result_calendar(code), parse_mode='HTML') 
         elif (action == "n"):
-            bot.sendMessage(chat_id, company_news.get_latest_news_by_code(code, 8), parse_mode='HTML')
+
+            if (is_number(code)):
+                bot.sendMessage(chat_id, company_news.get_latest_news_by_code(code, 8), parse_mode='HTML')
+            else:
+                bot.sendMessage(chat_id, us_company_news.get_latest_news_by_code(code, 10), parse_mode='HTML')
             return    
             
         elif (action == "C"):
@@ -506,6 +510,13 @@ def on_callback_query(msg):
             result = query_data + ": " + live_rate.get_fx_live_rate(query_data)
         
         bot.answerCallbackQuery(query_id, text=result)
+
+def is_number(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
     
 TOKEN = config.get("telegram","bot-id") # get token from command-line
 

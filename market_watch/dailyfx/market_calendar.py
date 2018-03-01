@@ -149,7 +149,7 @@ def main(args):
 
             if (passage):
                 passage = u'\U0001F514' + "Market Events Alerts" + u'\U0001F514' +  "\n\n" + passage
-                bot_sender.broadcast_list(passage, "telegram-chart")
+                bot_sender.broadcast_list(passage, "telegram-fx")
     else:
         print("OPTS: gen_daily | gen_hourly")
  
