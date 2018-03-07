@@ -34,26 +34,23 @@ def get_latest_news_by_code(code, number):
     passage = ""
     count = 0
 
-    for div in soup.findAll('div', id=re.compile("^cp_ucAAFNSearch_repIndNews")):
-    
-            a = div.find('a', {"class", "h6"})
-            t = div.find('div', {"class", "newstime2"})
-            
-            if a:
-                aURL = a['href']
-                aTitle = a['title']
-                if aURL.startswith("/"):
-                     aURL = "http://www.aastocks.com" + aURL
-                
-                if not any(x in aTitle for x in ["窩輪", "牛熊證", "輪證"]):
-                    count = count + 1
-                    passage = passage + DEL + "<a href='" + aURL + "' target='_blank'>" + a['title'] + "</a> (" + t.getText()[-11:] + ")" 
-                    
-            if count >= number:
-                break
-    
-    if (not passage):
-        passage = "No news is good news!"
+    for a in soup.findAll('a', id=re.compile("^cp_ucAAFNSearch_repNews")):
+        #print(link)
+        t = a.parent.find_next_sibling("div")
+        aURL = a['href']
+        aTitle = a['title']
+        if aURL.startswith("/"):
+             aURL = "http://www.aastocks.com" + aURL
+
+        if not any(x in aTitle for x in ["窩輪", "牛熊證", "輪證"]):
+            count = count + 1
+            passage = passage + DEL + "<a href='" + aURL + "' target='_blank'>" + a['title'] + "</a> (" + t.getText()[-11:] + ")"
+
+        if count >= number:
+            break
+
+   if (not passage):
+        passage = "Oops...something wrong for the new feed!"
     else:
         passage = "<i>Latest News Feed for " + code + ".HK</i>" + passage
     

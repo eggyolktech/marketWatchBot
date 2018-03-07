@@ -72,7 +72,7 @@ def get_fx_calendar_notice():
             #_rdatetime = datetime.strptime("2017-10-17 17:15:05", '%Y-%m-%d %H:%M:%S')
             _hd = (_rdatetime - _cdatetime).total_seconds()/60
 
-            if (_hd > 0 and _hd < 20):
+            if (_hd > 0 and _hd < 15):
                 #print(_date + _time + " - " + _event + " (" + _actual + "," + _forecast + "," + _previous + ")")        
                 passage = passage + "<b>" + u'\U0001F525' + " Event</b>" + " <i>@" + _time + "</i>" + "\n" + _event + "\n" + "(Actual: " + _actual + ", Forecast: " + _forecast + ", Previous: " + _previous + ")" + "\n\n"
             elif (_hd <= 0 and _hd > -20):

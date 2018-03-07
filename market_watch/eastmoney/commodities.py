@@ -17,8 +17,8 @@ def get_commodities():
 
     browser = webdriver.PhantomJS()
 
-    url = "http://quote.eastmoney.com/center/futurelist.html#11_5_0?sortType=(Volume)&sortRule=-1"
-    
+    #url = "http://quote.eastmoney.com/center/futurelist.html#11_5_0?sortType=(Volume)&sortRule=-1"
+    url = "http://quote.eastmoney.com/centerv2/qhsc/sqs?sortType=(Volume)&sortRule=-1"    
     print("URL: [" + url + "]")
 
     browser.get(url)
@@ -39,7 +39,7 @@ def get_commodities():
     browser.close()
     #print(html)
     soup = BeautifulSoup(html, "html.parser")
-    cTables = soup.findAll("table", {"class": "table-data"})
+    cTables = soup.findAll("table", {"id": "common_table"})
     passage = "<b>商品價格 (Eastmoney Finance)</b>" + DEL
 
     for table in cTables:
