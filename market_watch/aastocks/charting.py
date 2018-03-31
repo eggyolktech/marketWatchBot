@@ -76,7 +76,7 @@ def get_hkg_chart_by_type(code, action, params):
         if ("USD" == code.upper()):
             return get_finvinz_chart(code, action)
 
-        if (code in ["HSIF", "HSIFN", "MHSIF", "MHSIFN"] and is_night):
+        if (code.upper() in ["HSIF", "HSIFN", "MHSIF", "MHSIFN"] and is_night):
             is_ahft = True
             
         code = get_aastocks_alpha_code(code)
