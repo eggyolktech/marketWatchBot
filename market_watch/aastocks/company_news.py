@@ -49,7 +49,7 @@ def get_latest_news_by_code(code, number):
         if count >= number:
             break
 
-   if (not passage):
+    if (not passage):
         passage = "Oops...something wrong for the new feed!"
     else:
         passage = "<i>Latest News Feed for " + code + ".HK</i>" + passage
