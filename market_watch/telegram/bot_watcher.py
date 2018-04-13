@@ -30,6 +30,7 @@ from market_watch.common.AastocksEnum import TimeFrame, FxCode, IndexCode
 from market_watch.common.AastocksConstants import *
 
 from hickory.crawler.aastocks import stock_quote
+from hickory.crawler.iextrading import stock_quote as iex_stock_quote
 from hickory.crawler.hkex import mutual_market
 
 # Load static properties
@@ -439,7 +440,7 @@ def on_chat_message(msg):
                 elif (stockCd.strip().isdigit()):
                     bot.sendMessage(chat_id, stock_quote.get_quote_message(stockCd, "HK", simpleMode), parse_mode='HTML')
                 elif (stockCd.strip()):
-                    bot.sendMessage(chat_id, stock_quote.get_quote_message(stockCd, "US", simpleMode), parse_mode='HTML')
+                    bot.sendMessage(chat_id, iex_stock_quote.get_quote_message(stockCd, "US", simpleMode), parse_mode='HTML')
                 #else:
                 #    bot.sendMessage(chat_id, u'\U000026D4' + ' Code Not found!', parse_mode='HTML')
         
