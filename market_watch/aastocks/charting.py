@@ -17,9 +17,11 @@ def get_hkg_chart_list_by_type(code, action, params):
     url_dict_list = []
     ind_params = []
     
-    if (len(params) > 0 and (params[-1].lower() == "bb" or params[-1].lower() == "sma" or params[-1].lower() == "night")):
-        ind_params.append(params[-1].lower())
-    
+    for p in params:
+        pl = p.lower()
+        if (pl == "bb" or pl == "sma" or pl == "night"):
+            ind_params.append(pl)
+
     url_dict_list.append({'code': code, 'url': get_hkg_chart_by_type(code, action, ind_params)})
     
     for p in params:
@@ -162,10 +164,10 @@ def get_aastocks_alpha_code(code):
 def main():
 
     tf = "m"
-    print(get_hkg_chart_list_by_type("MHSIF", tf, ["bb", "night"]))
-    print(get_hkg_chart_list_by_type("939", tf, ["night"]))
-    print(get_hkg_chart_list_by_type("939", tf, ["3988", "2388", "BABA"]))
-    print(get_hkg_chart_list_by_type("939", tf, ["HSIFN", "2388", "BABA", "bb", "night"]))
+    print(get_hkg_chart_list_by_type("MHSIF", tf, ["sma", "night"]))
+    #print(get_hkg_chart_list_by_type("939", tf, ["night"]))
+    #print(get_hkg_chart_list_by_type("939", tf, ["3988", "2388", "BABA"]))
+    #print(get_hkg_chart_list_by_type("939", tf, ["HSIFN", "2388", "BABA", "bb", "night"]))
     
 def is_number(s):
     try:
