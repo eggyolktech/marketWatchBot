@@ -21,16 +21,17 @@ def trump(tcount=1):
     
     messages_list = []
     
-    for s in statuses:        
+    for s in statuses:    
         url = ('https://twitter.com/i/web/status/%s' % s.id)
         created = (s.created_at)
         text = (s.full_text)        
-        message = "%s (%s) - <a href='%s'>Open</a>" % (text, created, url)
+        message = "%s\n(<a href='%s'>%s</a>)" % (text, url, created)
         messages_list.append(message)
     
     full_message = "You are Fired!! (No tweets)"
     
     if messages_list:
+        messages_list.insert(0, "<b>@realDonaldTrump Latest Tweets</b>")
         full_message = DEL.join(messages_list)
     
     print("Trump Message: [%s]" % full_message)
@@ -38,7 +39,7 @@ def trump(tcount=1):
 
 def main():
 
-    trump(10)
+    trump(5)
     
 if __name__ == "__main__":
     main() 

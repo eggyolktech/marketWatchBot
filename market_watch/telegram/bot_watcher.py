@@ -89,7 +89,7 @@ def on_chat_message(msg):
     
     elif (command == "/trump"):
     
-        bot.sendMessage(chat_id, tweet.trump(10), parse_mode='HTML')
+        bot.sendMessage(chat_id, tweet.trump(5), parse_mode='HTML')
     
     elif (command == "/top10"):
     
