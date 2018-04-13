@@ -28,6 +28,7 @@ from market_watch import quick_list, quick_tracker
 
 from market_watch.common.AastocksEnum import TimeFrame, FxCode, IndexCode
 from market_watch.common.AastocksConstants import *
+from market_watch.twitter import tweet
 
 from hickory.crawler.aastocks import stock_quote
 from hickory.crawler.iextrading import stock_quote as iex_stock_quote
@@ -85,6 +86,10 @@ def on_chat_message(msg):
     elif (command == "/live"):
         
         bot.sendMessage(chat_id, live_rate.get_full_live_rate(), parse_mode='HTML')
+    
+    elif (command == "/trump"):
+    
+        bot.sendMessage(chat_id, tweet.trump(10), parse_mode='HTML')
     
     elif (command == "/top10"):
     
@@ -471,6 +476,7 @@ def on_chat_message(msg):
                         {'command': '/cmd', 'desc': 'Commodities Quote', 'icon': u'\U0001F30E'},
                         {'command': '/cal', 'desc': 'Coming Market Events', 'icon': u'\U0001F4C5'},
                         {'command': '/top10', 'desc': 'Top 10 List', 'icon': u'\U0001F51F'},
+                        {'command': '/trump', 'desc': 'Trump Trump tweet', 'icon': u'\U0001F51F'},
                         {'command': '/q', 'desc': 'Quick Command', 'icon': u'\U0001F4C8'},
         ]
         
