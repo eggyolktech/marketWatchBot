@@ -39,17 +39,29 @@ def push_tweet(name, tcount=1):
         json_arr = json_arr.decode()        
         tweet_list = json.loads(json_arr)
         print("Loaded Tweet List %s" % tweet_list)
-       
+    
+    messages_list = []
+    
     for s in statuses:
         if (str(s.id) in tweet_list):
             print("%s created at %s is OLD! Skip sending...." % (s.id, s.created_at))
         else:
             print("%s created at %s is NEW! Prepare for sending...." % (s.id, s.created_at))
             tweet_list.insert(0, str(s.id))
+            url = ('https://mobile.twitter.com/i/web/status/%s' % s.id)
+            created = (s.created_at)
+            text = (s.full_text)        
+            message = "%s\n(<a href='%s'>%s</a>)" % (text, url, created)
+            messages_list.append(message)
 
     print("Full Tweet List %s" % tweet_list[:10])
     new_json_arr = json.dumps(tweet_list[:10])
     redis_pool.setV(rkey, new_json_arr)    
+
+    if messages_list:
+        messages_list.insert(0, u'\U0001F30F' + "<b>@%s is Tweeting..</b>" % name)
+        full_message = DEL.join(messages_list)
+        bot_sender.broadcast_list(full_message)
     
 def get_tweet(name, tcount=1):
 
@@ -85,8 +97,8 @@ def main():
 
     #print("Hello")
     #trump(5)
-    get_tweet('usstockcaptain',10)
-    #push_tweet('realDonaldTrump')
+    #get_tweet('usstockcaptain',10)
+    push_tweet('realDonaldTrump')
     
 if __name__ == "__main__":
     main() 
