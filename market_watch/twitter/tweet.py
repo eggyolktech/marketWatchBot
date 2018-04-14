@@ -59,7 +59,7 @@ def push_tweet(name, tcount=1):
     redis_pool.setV(rkey, new_json_arr)    
 
     if messages_list:
-        messages_list.insert(0, u'\U0001F30F' + "<b>@%s is Tweeting..</b>" % name)
+        messages_list.insert(0, u'\U0001F30F' + "<b>@%s is Tweeting...</b>" % name)
         full_message = DEL.join(messages_list)
         bot_sender.broadcast_list(full_message)
     
@@ -90,15 +90,18 @@ def get_tweet(name, tcount=1):
     return full_message
 
 def trump(tcount=1):
-
     return get_tweet('realDonaldTrump', tcount)
 
 def main():
 
+    WATCHER = ['realDonaldTrump','usstockcaptain','EmbassyofRussia']
+
     #print("Hello")
     #trump(5)
     #get_tweet('usstockcaptain',10)
-    push_tweet('realDonaldTrump')
+    
+    for w in WATCHER:
+        push_tweet(w)
     
 if __name__ == "__main__":
     main() 
