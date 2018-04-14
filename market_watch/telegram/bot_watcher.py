@@ -90,7 +90,25 @@ def on_chat_message(msg):
     elif (command == "/trump"):
     
         bot.sendMessage(chat_id, tweet.trump(5), parse_mode='HTML')
+
+    elif (command.startswith("/twt")):
     
+        action = None
+        params = None
+ 
+        try:            
+            action = command[2:3]
+            params = command[3:]
+            params = params.split(" ")
+        except:
+            params = []
+            
+        print("Action: " + action)
+        print("Param: " + str(params))
+    
+        if (params):
+            bot.sendMessage(chat_id, tweet.get_tweet(params[0], 5), parse_mode='HTML')
+        
     elif (command == "/top10"):
     
         menuitemlist = [{'command': '/ttETF', 'desc': 'High Dividends ETF', 'icon': u'\U0001F4B0'},
@@ -477,6 +495,7 @@ def on_chat_message(msg):
                         {'command': '/cal', 'desc': 'Coming Market Events', 'icon': u'\U0001F4C5'},
                         {'command': '/top10', 'desc': 'Top 10 List', 'icon': u'\U0001F51F'},
                         {'command': '/trump', 'desc': 'Trump Trump tweet', 'icon': u'\U0001F51F'},
+                        {'command': '/twt [screen_name]', 'desc': 'Get Twitter Tweets', 'icon': u'\U0001F51F'},                        
                         {'command': '/q', 'desc': 'Quick Command', 'icon': u'\U0001F4C8'},
         ]
         
