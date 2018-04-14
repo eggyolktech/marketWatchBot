@@ -97,13 +97,11 @@ def on_chat_message(msg):
         params = None
  
         try:            
-            action = command[2:3]
-            params = command[3:]
+            params = command[4:]
             params = params.split(" ")
         except:
             params = []
             
-        print("Action: " + action)
         print("Param: " + str(params))
     
         if (params):

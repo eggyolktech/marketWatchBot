@@ -83,7 +83,7 @@ def get_tweet(name, tcount=1):
     full_message = "No tweets were found!"
     
     if messages_list:
-        messages_list.insert(0, "u'\U0001F30F <b>@%s Latest Tweets</b>" % name)
+        messages_list.insert(0, u'\U0001F30F' + "<b>Latest Tweets for @%s</b>" % name)
         full_message = DEL.join(messages_list)
     
     print("Message: [%s]" % full_message)
