@@ -38,7 +38,7 @@ def push_tweet(name, tcount=1):
         get_count = NEW_TWEET_COUNT
       
     try:
-        statuses = API.GetUserTimeline(screen_name=sname, count=get_count)
+        statuses = API.GetUserTimeline(screen_name=sname, include_rts=True, exclude_replies=True, count=get_count)
     except:
         print("User Timeline Error: [%s]" % name)
         return
@@ -75,7 +75,7 @@ def get_tweet(name, tcount=1):
     #print("UserImg %s" % user.profile_image_url)
     
     sname = '@%s' % name
-    statuses = API.GetUserTimeline(screen_name=sname, count=tcount)    
+    statuses = API.GetUserTimeline(screen_name=sname, include_rts=True, exclude_replies=True, count=tcount)    
     messages_list = []
 
     for s in statuses:    
@@ -102,7 +102,7 @@ def main(args):
     start_time = time.time()
 
     if (len(args) > 1 and args[1] == "push_tweet"):
-        WATCHER = ['realDonaldTrump','usstockcaptain','RayDalio', 'webbhk', 'muddywatersre', 'stocktwits']
+        WATCHER = ['realDonaldTrump','usstockcaptain','RayDalio', 'webbhk', 'muddywatersre', 'stocktwits', 'dividenddotcom', 'citronresearch', 'cathiedwood', 'bbands', 'sjosephburns', 'RRGresearch', 'RyanDetrick']
         #WATCHER = ['realDonaldTrump']
         for w in WATCHER:
             push_tweet(w)
