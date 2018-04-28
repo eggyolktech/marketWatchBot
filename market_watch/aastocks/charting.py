@@ -163,8 +163,8 @@ def get_aastocks_alpha_code(code):
     
 def main():
 
-    tf = "m"
-    print(get_hkg_chart_list_by_type("MHSIF", tf, ["sma", "night"]))
+    tf = "h"
+    print(get_hkg_chart_list_by_type("MHSIF", tf, []))
     #print(get_hkg_chart_list_by_type("939", tf, ["night"]))
     #print(get_hkg_chart_list_by_type("939", tf, ["3988", "2388", "BABA"]))
     #print(get_hkg_chart_list_by_type("939", tf, ["HSIFN", "2388", "BABA", "bb", "night"]))

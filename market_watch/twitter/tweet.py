@@ -63,7 +63,7 @@ def push_tweet(name, tcount=1):
     redis_pool.setV(rkey, new_json_arr)    
 
     if messages_list:
-        messages_list.insert(0, u'\U0001F30F' + "<b>@%s is Tweeting...</b>" % name)
+        messages_list.insert(0, "<pre>\n</pre>" + u'\U0001F30F' + "<b>@%s is Tweeting...</b>" % name)
         full_message = DEL.join(messages_list)
         #bot_sender.broadcast_list(full_message)
         bot_sender.broadcast_list(full_message, "telegram-notice")
@@ -88,7 +88,7 @@ def get_tweet(name, tcount=1):
     full_message = "No tweets were found!"
     
     if messages_list:
-        messages_list.insert(0, u'\U0001F30F' + "<b>Latest Tweets for @%s</b>" % name)
+        messages_list.insert(0, "<pre>\n</pre>" + u'\U0001F30F' + "<b>Latest Tweets for @%s</b>" % name)
         full_message = DEL.join(messages_list)
     
     print("Message: [%s]" % full_message)
@@ -102,7 +102,7 @@ def main(args):
     start_time = time.time()
 
     if (len(args) > 1 and args[1] == "push_tweet"):
-        WATCHER = ['realDonaldTrump','usstockcaptain','RayDalio', 'webbhk', 'muddywatersre', 'stocktwits', 'dividenddotcom', 'citronresearch', 'cathiedwood', 'bbands', 'sjosephburns', 'RRGresearch', 'RyanDetrick']
+        WATCHER = ['realDonaldTrump','usstockcaptain','RayDalio', 'webbhk', 'muddywatersre', 'stocktwits', 'dividenddotcom', 'citronresearch', 'cathiedwood', 'sjosephburns', 'RRGresearch', 'RyanDetrick']
         #WATCHER = ['realDonaldTrump']
         for w in WATCHER:
             push_tweet(w)

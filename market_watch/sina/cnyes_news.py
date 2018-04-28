@@ -67,7 +67,8 @@ def main():
     # us stock news
     for report in get_latest_reports():
         print(report)
-        bot_sender.broadcast(report)
+        bot_sender.broadcast_list(report, "telegram-notice")
+        #bot_sender.broadcast(report)
 
 if __name__ == "__main__":
     main()                

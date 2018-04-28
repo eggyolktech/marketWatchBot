@@ -51,7 +51,7 @@ def main():
         if(passage):
             print(passage)
             #bot_sender.broadcast_list(passage)
-            bot_sender.broadcast_list(full_message, "telegram-notice")
+            bot_sender.broadcast_list(passage, "telegram-notice")
 
 if __name__ == "__main__":
     main()        
