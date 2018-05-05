@@ -45,7 +45,8 @@ def get_columns_alerts(url):
 
 def main():
 
-    columns = ['https://www.google.com.hk/alerts/feeds/17097742724167324955/8551375453331312334', 'https://www.google.com.hk/alerts/feeds/17097742724167324955/12218577883122648771','https://www.google.com.hk/alerts/feeds/17097742724167324955/14866853673326524888']
+    #columns = ['https://www.google.com.hk/alerts/feeds/17097742724167324955/8551375453331312334', 'https://www.google.com.hk/alerts/feeds/17097742724167324955/12218577883122648771','https://www.google.com.hk/alerts/feeds/17097742724167324955/14866853673326524888']
+    columns = ['https://www.google.com.hk/alerts/feeds/17097742724167324955/12218577883122648771']
     
     for colurl in columns:    
         passage = get_columns_alerts(colurl)

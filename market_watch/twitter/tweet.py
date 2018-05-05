@@ -65,8 +65,8 @@ def push_tweet(name, tcount=1):
     if messages_list:
         messages_list.insert(0, "<pre>\n</pre>" + u'\U0001F30F' + "<b>@%s is Tweeting...</b>" % name)
         full_message = DEL.join(messages_list)
-        #bot_sender.broadcast_list(full_message)
-        bot_sender.broadcast_list(full_message, "telegram-notice")
+        bot_sender.broadcast_list(full_message)
+        #bot_sender.broadcast_list(full_message, "telegram-notice")
     
 def get_tweet(name, tcount=1):
 
@@ -102,7 +102,16 @@ def main(args):
     start_time = time.time()
 
     if (len(args) > 1 and args[1] == "push_tweet"):
-        WATCHER = ['realDonaldTrump','usstockcaptain','RayDalio', 'webbhk', 'muddywatersre', 'stocktwits', 'dividenddotcom', 'citronresearch', 'cathiedwood', 'sjosephburns', 'RRGresearch', 'RyanDetrick']
+        WATCHER = ['realDonaldTrump',
+                    'usstockcaptain', 
+                    'webbhk', 
+                    'muddywatersre', 
+                    'stocktwits', 
+                    'citronresearch', 
+                    'jwangARK', 
+                    'sjosephburns', 
+                    'RRGresearch', 
+                    'RyanDetrick']
         #WATCHER = ['realDonaldTrump']
         for w in WATCHER:
             push_tweet(w)
