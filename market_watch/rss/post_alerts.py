@@ -4,10 +4,63 @@ import feedparser
 from time import gmtime
 from datetime import datetime
 import time
+import hashlib
+import json
 
 from market_watch.telegram import bot_sender
+from market_watch.redis import redis_pool
 
-CHECK_PERIOD = 70 
+CHECK_PERIOD = 70
+NEW_POSTS_COUNT = 20
+GET_POSTS_COUNT = 10 
+DEL = "\n\n"
+
+def get_rss_alerts_with_redis(url):
+    
+    print("Url: [" + url + "]")
+    full_message = ""
+    messages_list = []
+
+    posts = feedparser.parse(url)
+    url_hash = int(hashlib.md5(url.encode()).hexdigest(), 16)
+    ftitle = posts['feed']['title']
+    
+    rkey = "RSS:" + str(url_hash)
+    json_arr = redis_pool.getV(rkey)
+    posts_list = []    
+
+    if (json_arr):
+        print("Posts Redis Cache exists for [%s]" % url)
+        json_arr = json_arr.decode()        
+        posts_list = json.loads(json_arr)
+        print("Loaded Posts List %s" % posts_list)
+        get_count = GET_POSTS_COUNT  
+    else:
+        get_count = NEW_POSTS_COUNT
+       
+    for post in posts.entries[:get_count]:
+    
+        stime = str(time.mktime(post.published_parsed))
+        
+        if (str(stime) in posts_list):
+            print("Post created at %s is OLD! Skip sending...." % (stime))
+        else:
+            print("Post created at %s is NEW! Prepare for sending...." % (stime))
+            posts_list.append(stime)
+            message = post.link
+            messages_list.append(message)
+
+    posts_list.sort(reverse=True)
+    print("Full Posts List %s" % posts_list[:NEW_POSTS_COUNT])
+    new_json_arr = json.dumps(posts_list[:NEW_POSTS_COUNT])
+    redis_pool.setV(rkey, new_json_arr)    
+
+    if messages_list:
+        messages_list.insert(0, "<pre>\n</pre>" + u'\U0001F4F0' + " <b>Latest Posts Updates</b>")
+        full_message = DEL.join(messages_list)
+
+    #print("Passage: [" + full_message + "]")
+    return full_message
 
 def get_rss_alerts(url):
     
@@ -36,7 +89,7 @@ def get_rss_alerts(url):
 
     print("Total # of posts processed: %s" % (count-1))
     
-    print("Passage: [" + passage + "]")
+    #print("Passage: [" + passage + "]")
     #passage = ""
     return passage
 
@@ -54,10 +107,10 @@ def main():
                 'http://fb2rss.altervista.org/?id=112243028856273', #英之見 - 基金經理黃國英Alex Wong
                 'http://fb2rss.altervista.org/?id=767813843325038', #Eddie Team
                 ]
-    #RSS_REPO = ['https://medium.com/feed/@ivansyli', 'http://feeds.feedburner.com/bituzi']
+    #RSS_REPO = ['http://fb2rss.altervista.org/?id=2022323384452365', ]
     
     for rss in RSS_REPO:
-        passage = get_rss_alerts(rss)
+        passage = get_rss_alerts_with_redis(rss)
 
         if(passage):
             print(passage)
