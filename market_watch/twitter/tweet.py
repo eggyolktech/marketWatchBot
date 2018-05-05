@@ -66,8 +66,8 @@ def push_tweet(name, tcount=1):
     if messages_list:
         messages_list.insert(0, "<pre>\n</pre>" + u'\U0001F30F' + "<b>@%s is Tweeting...</b>" % name)
         full_message = DEL.join(messages_list)
-        bot_sender.broadcast_list(full_message)
-        #bot_sender.broadcast_list(full_message, "telegram-notice")
+        #bot_sender.broadcast_list(full_message)
+        bot_sender.broadcast_list(full_message, "telegram-twitter")
     
 def get_tweet(name, tcount=1):
 
