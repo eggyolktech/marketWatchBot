@@ -4,6 +4,7 @@ import twitter
 import time
 import sys
 import os
+import re
 from market_watch.util import config_loader
 from market_watch.telegram import bot_sender
 from market_watch.redis import redis_pool
@@ -52,9 +53,9 @@ def push_tweet(name, tcount=1):
             print("%s created at %s is NEW! Prepare for sending...." % (s.id, s.created_at))
             tweet_list.append(str(s.id))
             url = ('https://mobile.twitter.com/i/web/status/%s' % s.id)
-            created = (s.created_at)
-            text = (s.full_text)        
-            message = "%s\n(<a href='%s'>%s</a>)" % (text, url, created)
+            created = str(s.created_at)
+            text = re.sub(r"\$([A-Za-z]+)",r"/qd\1", s.full_text)
+            message = "%s\n(<a href='%s'>%s</a>)" % (text, url, "Post@ " + created.split('+')[0] + "GMT")
             messages_list.append(message)
 
     tweet_list.sort(reverse=True)
@@ -80,9 +81,9 @@ def get_tweet(name, tcount=1):
 
     for s in statuses:    
         url = ('https://mobile.twitter.com/i/web/status/%s' % s.id)
-        created = (s.created_at)
-        text = (s.full_text)        
-        message = "%s\n(<a href='%s'>%s</a>)" % (text, url, created)
+        created = str(s.created_at)
+        text = re.sub(r"\$([A-Za-z]+)",r"/qd\1", s.full_text)
+        message = "%s\n(<a href='%s'>%s</a>)" % (text, url, "Post@ " + created.split('+')[0] + "GMT")
         messages_list.append(message)
     
     full_message = "No tweets were found!"
@@ -116,7 +117,7 @@ def main(args):
         for w in WATCHER:
             push_tweet(w)
     else:
-        trump(5)
+        get_tweet('sjosephburns', 15)
     
     print("Time elapsed: " + "%.3f" % (time.time() - start_time) + "s")    
 
