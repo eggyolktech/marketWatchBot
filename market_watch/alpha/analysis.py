@@ -7,84 +7,32 @@ import time
 import hashlib
 import json
 
-from market_watch.telegram import bot_sender
-from market_watch.redis import redis_pool
-
 CHECK_PERIOD = 70
 NEW_POSTS_COUNT = 20
 GET_POSTS_COUNT = 10 
 DEL = "\n\n"
 
-def get_rss_alerts_with_redis(url):
+def get_alpha_analytics(code):
     
-    print("Url: [" + url + "]")
-    full_message = ""
-    messages_list = []
+    url = "https://seekingalpha.com/api/sa/combined/%s.xml" % code.strip()
 
-    posts = feedparser.parse(url)
-    url_hash = int(hashlib.md5(url.encode()).hexdigest(), 16)
-    ftitle = posts['feed']['title']
-    
-    rkey = "RSS:" + str(url_hash)
-    json_arr = redis_pool.getV(rkey)
-    posts_list = []    
-
-    if (json_arr):
-        print("Posts Redis Cache exists for [%s]" % url)
-        json_arr = json_arr.decode()        
-        posts_list = json.loads(json_arr)
-        print("Loaded Posts List %s" % posts_list)
-        get_count = GET_POSTS_COUNT  
-    else:
-        get_count = NEW_POSTS_COUNT
-       
-    for post in posts.entries[:get_count]:
-    
-        stime = str(time.mktime(post.published_parsed))
-        
-        if (str(stime) in posts_list):
-            print("Post created at %s is OLD! Skip sending...." % (stime))
-        else:
-            print("Post created at %s is NEW! Prepare for sending...." % (stime))
-            posts_list.append(stime)
-            message = post.link
-            messages_list.append(message)
-
-    posts_list.sort(reverse=True)
-    print("Full Posts List %s" % posts_list[:NEW_POSTS_COUNT])
-    new_json_arr = json.dumps(posts_list[:NEW_POSTS_COUNT])
-    redis_pool.setV(rkey, new_json_arr)    
-
-    if messages_list:
-        messages_list.insert(0, "<pre>\n</pre>" + u'\U0001F4F0' + " <b>Latest Posts Updates</b>")
-        full_message = DEL.join(messages_list)
-
-    #print("Passage: [" + full_message + "]")
-    return full_message
-
-def get_rss_alerts(url):
-    
     print("Url: [" + url + "]")
     passage = ""
 
     d = feedparser.parse(url)
     ftitle = d['feed']['title']
 
-	# print all posts
+    # print all posts
     count = 1
 
     print("\n" + str(datetime.fromtimestamp(time.mktime(gmtime()))))
        	
-    for post in d.entries[:10]:
-       # get the difference in seconds        
-        elapse = time.mktime(gmtime()) - time.mktime(post.published_parsed)
-        print("Post #" + str(count) + " - " + post.published + " - " + str(elapse/60) + " mins ago")
-        if(elapse/60 <= CHECK_PERIOD):
-            #passage = passage + "<b>" + post.title + "</b> (" + ftitle + ")\n"
-            #passage = passage + post.description + "\n"
-            #passage = passage + "Published @ " + post.published + "\n\n"
-            passage = passage + post.link + "\n\n"
- 
+    for post in d.entries:
+        passage = passage + "<b>" + post.title + "</b> (" + ftitle + ")\n"
+        passage = passage + post.description + "\n"
+        passage = passage + "Published @ " + post.published + "\n\n"
+        passage = passage + post.link + "\n\n"
+ 	print(post.link)
         count += 1
 
     print("Total # of posts processed: %s" % (count-1))
@@ -95,27 +43,7 @@ def get_rss_alerts(url):
 
 def main():
 
-    RSS_REPO = ['http://oldjimpacific.blogspot.com/feeds/posts/default', 
-                'https://medium.com/feed/@ivansyli', 
-                'http://feeds.feedburner.com/bituzi', 
-                'http://fb2rss.altervista.org/?id=193368377704187', #平行時空：沈旭暉國際學術新聞台 
-                'http://fb2rss.altervista.org/?id=1744632715750914', #Ivan Li 李聲揚 - 華麗后台
-                'http://fb2rss.altervista.org/?id=223783954322429', #堅離地城：沈旭暉國際生活台 Simon's Glocal World
-                'http://fb2rss.altervista.org/?id=393581457698786', #萬國郵政 Simon's Stamps International
-                'http://fb2rss.altervista.org/?id=128674903851093', #Dr Lam
-                'http://fb2rss.altervista.org/?id=247333838767466', #張士佳 - Sky Sir
-                'http://fb2rss.altervista.org/?id=112243028856273', #英之見 - 基金經理黃國英Alex Wong
-                'http://fb2rss.altervista.org/?id=767813843325038', #Eddie Team
-                ]
-    #RSS_REPO = ['http://fb2rss.altervista.org/?id=2022323384452365', ]
-    
-    for rss in RSS_REPO:
-        passage = get_rss_alerts_with_redis(rss)
-
-        if(passage):
-            print(passage)
-            #bot_sender.broadcast_list(passage)
-            bot_sender.broadcast_list(passage, "telegram-notice")
+    get_alpha_analytics("BABA")
 
 if __name__ == "__main__":
     main()        
