@@ -6,6 +6,7 @@ from datetime import datetime
 import time
 import hashlib
 import json
+from market_watch.telegram import bot_sender
 
 DEL = "\n\n"
 
@@ -31,14 +32,14 @@ def get_analysis(code):
     for post in d.entries:
 
         if ("article" in post.link):
-            passage = passage + "<b>" + "<a href='"+ post.link + "'>" + post.title + "</a>" + "</b> (" + post.published + ")" + DEL
+            passage = passage + "<a href='"+ post.link + "'>" + post.title + "</a> (" + post.published + ")" + DEL
 
         count += 1
 
     print("Total # of posts processed: %s" % (count-1))
    
     if (passage):
-        passage = passage + u'\U0001F170' + " " + ftitle + DEL
+        passage = u'\U0001F170' + " " + ftitle + DEL + passage
  
     #print("Passage: [" + passage + "]")
     #passage = ""
@@ -46,8 +47,11 @@ def get_analysis(code):
 
 def main():
 
-    print(get_analysis("BABA"))
+    passage = get_analysis("BABA")
+    print(passage)
     print(get_analysis("BA1BA"))
+    
+    bot_sender.broadcast_list(passage)
 
 if __name__ == "__main__":
     main()        
