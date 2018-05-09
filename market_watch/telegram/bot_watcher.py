@@ -343,7 +343,9 @@ def on_chat_message(msg):
             if (is_number(code)):
                 bot.sendMessage(chat_id, "Only US Stock is supported", parse_mode='HTML')
             else:
-                bot.sendMessage(chat_id, analysis_loader.get_analysis(code), parse_mode='HTML')
+                rhtml = analysis_loader.get_analysis(code)
+                print(rhtml)
+                bot.sendMessage(chat_id, rhtml, parse_mode='HTML')
             return
 
         elif (action == "n"):
