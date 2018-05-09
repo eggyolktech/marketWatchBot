@@ -7,12 +7,9 @@ import time
 import hashlib
 import json
 
-CHECK_PERIOD = 70
-NEW_POSTS_COUNT = 20
-GET_POSTS_COUNT = 10 
 DEL = "\n\n"
 
-def get_alpha_analytics(code):
+def get_analysis(code):
     
     url = "https://seekingalpha.com/api/sa/combined/%s.xml" % code.strip()
 
@@ -49,8 +46,8 @@ def get_alpha_analytics(code):
 
 def main():
 
-    print(get_alpha_analytics("BABA"))
-    print(get_alpha_analytics("BA1BA"))
+    print(get_analysis("BABA"))
+    print(get_analysis("BA1BA"))
 
 if __name__ == "__main__":
     main()        
