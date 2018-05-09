@@ -106,10 +106,9 @@ def main(args):
         WATCHER = ['realDonaldTrump',
                     'usstockcaptain', 
                     'webbhk', 
-                    'muddywatersre', 
+                    #'muddywatersre', 
                     'stocktwits', 
                     'citronresearch', 
-                    'jwangARK', 
                     'sjosephburns', 
                     'RRGresearch', 
                     'RyanDetrick']

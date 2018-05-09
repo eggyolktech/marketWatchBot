@@ -20,7 +20,11 @@ def get_alpha_analytics(code):
     passage = ""
 
     d = feedparser.parse(url)
-    ftitle = d['feed']['title']
+    
+    try:
+        ftitle = d['feed']['title']
+    except:
+        return "No SA analysis found for %s" % code
 
     # print all posts
     count = 1
@@ -28,22 +32,25 @@ def get_alpha_analytics(code):
     print("\n" + str(datetime.fromtimestamp(time.mktime(gmtime()))))
        	
     for post in d.entries:
-        passage = passage + "<b>" + post.title + "</b> (" + ftitle + ")\n"
-        passage = passage + post.description + "\n"
-        passage = passage + "Published @ " + post.published + "\n\n"
-        passage = passage + post.link + "\n\n"
- 	print(post.link)
+
+        if ("article" in post.link):
+            passage = passage + "<b>" + "<a href='"+ post.link + "'>" + post.title + "</a>" + "</b> (" + post.published + ")" + DEL
+
         count += 1
 
     print("Total # of posts processed: %s" % (count-1))
-    
+   
+    if (passage):
+        passage = passage + u'\U0001F170' + " " + ftitle + DEL
+ 
     #print("Passage: [" + passage + "]")
     #passage = ""
     return passage
 
 def main():
 
-    get_alpha_analytics("BABA")
+    print(get_alpha_analytics("BABA"))
+    print(get_alpha_analytics("BA1BA"))
 
 if __name__ == "__main__":
     main()        
