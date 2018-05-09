@@ -14,6 +14,9 @@ from socket import timeout
 import random
 import resource
 
+from market_watch.common.AastocksEnum import TimeFrame, FxCode, IndexCode
+from market_watch.common.AastocksConstants import *
+
 from market_watch.dailyfx import market_calendar
 from market_watch.aastocks import top_yield, charting, company_news, result_announcement, indices, forex, futures, company_profile
 from market_watch.stockq import commodities
@@ -22,13 +25,12 @@ from market_watch.fxcm import live_rate
 from market_watch.hkex import ccass_loader
 from market_watch.google import stock_history
 from market_watch.sl886 import hkadr
+from market_watch.alpha import analysis_loader
 from market_watch.qq import us_company_news
+from market_watch.twitter import tweet
+
 from market_watch.util import config_loader
 from market_watch import quick_list, quick_tracker
-
-from market_watch.common.AastocksEnum import TimeFrame, FxCode, IndexCode
-from market_watch.common.AastocksConstants import *
-from market_watch.twitter import tweet
 
 from hickory.crawler.aastocks import stock_quote
 from hickory.crawler.iextrading import stock_quote as iex_stock_quote
@@ -278,16 +280,17 @@ def on_chat_message(msg):
                     {'command': '/qn[code]', 'desc': 'Latest News (HK Only)', 'icon': u'\U0001F4C8'},                    
                     {'command': '/qC[code]', 'desc': 'CCASS Top 10 Distribution', 'icon': u'\U0001F42E'},
                     {'command': '/qc', 'desc': 'CBBC Distribution', 'icon': u'\U0001F42E'},
-                    {'command': '/qe[oode]', 'desc': 'Southbound Moneyflow Trend', 'icon': u'\U0001F42E'},
+                    {'command': '/qe[code]', 'desc': 'Southbound Moneyflow Trend', 'icon': u'\U0001F42E'},
                     {'command': '/qR', 'desc': 'Industries List', 'icon': u'\U0001F42E'},
                     {'command': '/qr[code1] [code2]', 'desc': 'Relative Strength', 'icon': u'\U0001F42E'},
                     {'command': '/qq', 'desc': 'Quick Quote', 'icon': u'\U0001F42E'},
                     {'command': '/qs', 'desc': 'Chicken Sectormap', 'icon': u'\U0001F414'},
                     {'command': '/qS', 'desc': 'Stock Profile', 'icon': u'\U0001F414'},
-                    {'command': '/qf [next] [hscei]', 'desc': 'Quote HSI Mini Futures', 'icon': u'\U0001F414'},
-                    {'command': '/qF [next] [hscei]', 'desc': 'Quote HSI Futures', 'icon': u'\U0001F414'},
+                    {'command': '/qf [next] [hscei] [night]', 'desc': 'Quote HSI Mini Futures', 'icon': u'\U0001F414'},
+                    {'command': '/qF [next] [hscei] [night]', 'desc': 'Quote HSI Futures', 'icon': u'\U0001F414'},
                     {'command': '/l', 'desc': 'Live Quote Commands', 'icon': u'\U0001F414'},
                     {'command': '/qS[code]', 'desc': 'Get Company Profile', 'icon': u'\U0001F414'},
+                    {'command': '/qa[us_code]', 'desc': 'Get Analysis from Seeking Alpha (US only)', 'icon': u'\U0001F414'},                        
         ]
         
         fxc = ", ".join(['/qh' + str(x.name) for x in FxCode][:3])
@@ -335,6 +338,14 @@ def on_chat_message(msg):
   
         elif (action == "N"):
             bot.sendMessage(chat_id, result_announcement.get_result_calendar(code), parse_mode='HTML') 
+        elif (action == "a"):
+
+            if (is_number(code)):
+                bot.sendMessage(chat_id, "Only US Stock is supported", parse_mode='HTML')
+            else:
+                bot.sendMessage(chat_id, analysis_loader.get_analysis(code), parse_mode='HTML')
+            return
+
         elif (action == "n"):
 
             if (is_number(code)):
