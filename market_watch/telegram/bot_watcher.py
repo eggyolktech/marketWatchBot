@@ -35,6 +35,7 @@ from market_watch import quick_list, quick_tracker
 from hickory.crawler.aastocks import stock_quote
 from hickory.crawler.iextrading import stock_quote as iex_stock_quote
 from hickory.crawler.hkex import mutual_market
+from hickory.crawler.wsj import jp_stock_quote
 
 # Load static properties
 config = config_loader.load()
@@ -290,7 +291,8 @@ def on_chat_message(msg):
                     {'command': '/qF [next] [hscei] [night]', 'desc': 'Quote HSI Futures', 'icon': u'\U0001F414'},
                     {'command': '/l', 'desc': 'Live Quote Commands', 'icon': u'\U0001F414'},
                     {'command': '/qS[code]', 'desc': 'Get Company Profile', 'icon': u'\U0001F414'},
-                    {'command': '/qa[us_code]', 'desc': 'Get Analysis from Seeking Alpha (US only)', 'icon': u'\U0001F414'},                        
+                    {'command': '/qa[us_code]', 'desc': 'Get Analysis from Seeking Alpha (US only)', 'icon': u'\U0001F414'},   
+                    {'command': '/qj[jp_code]', 'desc': 'Get Stock Quote from Tokyo Stock Exchange', 'icon': u'\U0001F414'}, 
         ]
         
         fxc = ", ".join(['/qh' + str(x.name) for x in FxCode][:3])
@@ -347,7 +349,20 @@ def on_chat_message(msg):
                 print(rhtml)
                 bot.sendMessage(chat_id, rhtml, parse_mode='HTML')
             return
+        
+        elif (action.lower() == "j"):
 
+            # Get quick quote from WSJ
+            simpleMode = True
+            if (action == "J"):
+                simpleMode = False
+            
+            for stockCd in codes:
+                if (stockCd.strip().isdigit() and len(stockCd.strip()) == 4):
+                    bot.sendMessage(chat_id, jp_stock_quote.get_quote_message(stockCd, simpleMode), parse_mode='HTML')
+                else:
+                    bot.sendMessage(chat_id, "Invalid JP Stock Code: [%s]" % stockCd, parse_mode='HTML')
+                    
         elif (action == "n"):
 
             if (is_number(code)):
