@@ -10,7 +10,7 @@ from datetime import date
 from datetime import datetime
 
 from market_watch.common.AastocksEnum import TimeFrame, FxCode, IndexCode
-
+from market_watch.finviz import charting as finviz_charting
 
 def get_hkg_chart_list_by_type(code, action, params):
     
@@ -29,17 +29,6 @@ def get_hkg_chart_list_by_type(code, action, params):
             url_dict_list.append({'code': p, 'url': get_hkg_chart_by_type(p, action, ind_params)})
     
     return url_dict_list
-
-def get_finvinz_chart(code, period):
-
-    if (period == "M"):
-        p = "m1"
-    elif (period == "m"):
-        p = "m5"
-    else:
-        p = period + "1"
-
-    return "https://finviz.com/fut_chart.ashx?t=DX&cot=098662&p=%s" % p
 
 def get_hkg_chart_by_type(code, action, params):
 
@@ -73,10 +62,12 @@ def get_hkg_chart_by_type(code, action, params):
         is_CN = True
     elif (is_num):
         code = code + ".HK"    
+    elif (finviz_charting.is_finviz_code(code)):
+        return finviz_charting.get_finviz_chart(code, action)
     elif (code.isalpha()):
 
-        if ("USD" == code.upper()):
-            return get_finvinz_chart(code, action)
+        #if ("USD" == code.upper()):
+        #    return get_finvinz_chart(code, action)
 
         if (code.upper() in ["HSIF", "HSIFN", "MHSIF", "MHSIFN"] and is_night):
             is_ahft = True
@@ -165,6 +156,8 @@ def main():
 
     tf = "h"
     print(get_hkg_chart_list_by_type("MHSIF", tf, []))
+    print(get_hkg_chart_list_by_type("NIKKEI", tf, []))
+    print(get_hkg_chart_list_by_type("BTC", tf, []))
     #print(get_hkg_chart_list_by_type("939", tf, ["night"]))
     #print(get_hkg_chart_list_by_type("939", tf, ["3988", "2388", "BABA"]))
     #print(get_hkg_chart_list_by_type("939", tf, ["HSIFN", "2388", "BABA", "bb", "night"]))

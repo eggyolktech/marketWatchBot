@@ -28,12 +28,14 @@ from market_watch.sl886 import hkadr
 from market_watch.alpha import analysis_loader
 from market_watch.qq import us_company_news
 from market_watch.twitter import tweet
+from market_watch.finviz import charting as fcharting
 
 from market_watch.util import config_loader
 from market_watch import quick_list, quick_tracker
 
 from hickory.crawler.aastocks import stock_quote
 from hickory.crawler.iextrading import stock_quote as iex_stock_quote
+from hickory.crawler.alphavantage import fx_quote
 from hickory.crawler.hkex import mutual_market
 from hickory.crawler.wsj import jp_stock_quote
 
@@ -43,6 +45,14 @@ config = config_loader.load()
 # Redirect stdout to file
 #old_stdout = sys.stdout
 #sys.stdout = open("xxxx.log", 'w')
+
+DICT_CURRENCY = {'BTC':'BTCUSD', 'ETH':'ETHUSD', 'XRP':'XRPUSD',
+                 'LTC':'LTCUSD', 'EUR':'EURUSD', 'GBP':'GBPUSD',
+                 'AUD':'AUDUSD', 'NZD':'NZDUSD', 'JPY':'USDJPY',
+                 'CAD':'USDCAD', 'HKD':'USDHKD', 'CHF':'USDCHF',
+                 'SGD':'USDSGD', 'CNY':'USDCNY', 'CNYHKD':'CNYHKD',
+                 'EURGBP':'EURGBP','HKDJPY':'HKDJPY', 'EURHKD':'EURHKD',
+                 'GBPHKD':'GBPHKD', 'AUDHKD':'AUDHKD'}
 
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
@@ -334,8 +344,19 @@ def on_chat_message(msg):
                     print("Not in White List: [" + str(chat_id) + "]")
                     bot.sendMessage(chat_id, u'\U000026D4' + ' Request Timeout', parse_mode='HTML')
             else:
+
                 stockcode = random.choice(["2628", "939", "2800", "8141", "AAPL", "GOOG", "GS"])
-                passage = "<i>Usage:</i> " + command.split(' ')[0] + "[StockCode] (e.g. " + command.split(' ')[0] + stockcode + ")"
+                p1 = "<i>Usage:</i> " + command.split(' ')[0] + "[StockCode] (e.g. " + command.split(' ')[0] + stockcode + ")"
+
+                p2 = "<i>Sample (Futures):</i>" + EL
+                for fCode in fcharting.DICT_FINVIZ_FUTURES:
+                    p2 = p2 + command.split(' ')[0] + fCode + " - " + fcharting.DICT_FINVIZ_FUTURES[fCode][1] + EL
+
+                p3 = "<i>Sample (Crypto):</i>" + EL
+                for fCode in fcharting.DICT_FINVIZ_CRYPTO:
+                    p3 = p3 + command.split(' ')[0] + fCode + " - " + fcharting.DICT_FINVIZ_CRYPTO[fCode][1] + EL
+
+                passage = random.choice([p1, p2, p3])
                 bot.sendMessage(chat_id, passage, parse_mode='HTML')
   
         elif (action == "N"):
@@ -346,7 +367,6 @@ def on_chat_message(msg):
                 bot.sendMessage(chat_id, "Only US Stock is supported", parse_mode='HTML')
             else:
                 rhtml = analysis_loader.get_analysis(code)
-                print(rhtml)
                 bot.sendMessage(chat_id, rhtml, parse_mode='HTML')
             return
         
@@ -489,7 +509,13 @@ def on_chat_message(msg):
                 elif (stockCd.strip().isdigit()):
                     bot.sendMessage(chat_id, stock_quote.get_quote_message(stockCd, "HK", simpleMode), parse_mode='HTML')
                 elif (stockCd.strip()):
-                    bot.sendMessage(chat_id, iex_stock_quote.get_quote_message(stockCd, "US", simpleMode), parse_mode='HTML')
+
+                    if (stockCd.upper() in DICT_CURRENCY):
+                        fromCur = DICT_CURRENCY[stockCd.upper()][0:3]
+                        toCur = DICT_CURRENCY[stockCd.upper()][3:6]
+                        bot.sendMessage(chat_id, fx_quote.get_fx_quote_message(fromCur, toCur), parse_mode='HTML')
+                    else:
+                        bot.sendMessage(chat_id, iex_stock_quote.get_quote_message(stockCd, "US", simpleMode), parse_mode='HTML')
                 #else:
                 #    bot.sendMessage(chat_id, u'\U000026D4' + ' Code Not found!', parse_mode='HTML')
         

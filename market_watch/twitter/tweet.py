@@ -105,13 +105,14 @@ def main(args):
     if (len(args) > 1 and args[1] == "push_tweet"):
         WATCHER = ['realDonaldTrump',
                     'usstockcaptain', 
-                    'webbhk', 
+                    #'webbhk', 
                     #'muddywatersre', 
                     'stocktwits', 
                     'citronresearch', 
                     'sjosephburns', 
                     'RRGresearch', 
-                    'RyanDetrick']
+                    'RyanDetrick'
+                    ]
         #WATCHER = ['realDonaldTrump']
         for w in WATCHER:
             push_tweet(w)

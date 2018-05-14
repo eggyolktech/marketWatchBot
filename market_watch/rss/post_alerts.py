@@ -11,7 +11,7 @@ from market_watch.telegram import bot_sender
 from market_watch.redis import redis_pool
 
 CHECK_PERIOD = 70
-NEW_POSTS_COUNT = 20
+NEW_POSTS_COUNT = 25
 GET_POSTS_COUNT = 10 
 DEL = "\n\n"
 
@@ -50,6 +50,7 @@ def get_rss_alerts_with_redis(url):
             message = post.link
             messages_list.append(message)
 
+    #print("New Posts List %s" % posts_list)
     posts_list.sort(reverse=True)
     print("Full Posts List %s" % posts_list[:NEW_POSTS_COUNT])
     new_json_arr = json.dumps(posts_list[:NEW_POSTS_COUNT])
@@ -106,16 +107,24 @@ def main():
                 'http://fb2rss.altervista.org/?id=247333838767466', #張士佳 - Sky Sir
                 'http://fb2rss.altervista.org/?id=112243028856273', #英之見 - 基金經理黃國英Alex Wong
                 'http://fb2rss.altervista.org/?id=767813843325038', #Eddie Team
+                'http://hkstockinvestment.blogspot.com/feeds/posts/default', #偉哥投資手札
+                'https://parisvalueinvesting.blogspot.com/feeds/posts/default', #巴黎的價值投資
                 ]
-    #RSS_REPO = ['http://fb2rss.altervista.org/?id=2022323384452365', ]
+    
+    isTest = False
+    
+    if (isTest):
+        RSS_REPO = ['https://parisvalueinvesting.blogspot.com/feeds/posts/default', ]
     
     for rss in RSS_REPO:
         passage = get_rss_alerts_with_redis(rss)
 
         if(passage):
             print(passage)
-            #bot_sender.broadcast_list(passage)
-            bot_sender.broadcast_list(passage, "telegram-notice")
+            if (isTest):
+                bot_sender.broadcast_list(passage)
+            else: 
+                bot_sender.broadcast_list(passage, "telegram-notice")
 
 if __name__ == "__main__":
     main()        
