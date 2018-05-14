@@ -15,6 +15,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from market_watch.telegram import bot_sender
 
 def get_map():
 
@@ -76,7 +77,9 @@ def get_map():
     
 def main():
 
-    print(get_map())
+    url = get_map()
+    if (url):
+        bot_sender.send_remote_image(url, "telegram-notice")
     
 def is_number(s):
     try:
