@@ -33,7 +33,6 @@ def get_map():
     url = "https://finviz.com/map.ashx?t=sec"    
     print("URL: [" + url + "]")
 
-    browser.implicitly_wait(3) # seconds
     browser.get(url)
    
     try:
@@ -44,12 +43,20 @@ def get_map():
         
     print("Start dummy pass...") 
     try:
+        browser.implicitly_wait(3) # seconds
+        myDynamicElement = browser.find_element_by_id("dummyid")
+    except:
+        pass
+
+    print("Start dummy pass 2...") 
+    try:
+        browser.implicitly_wait(3) # seconds
         myDynamicElement = browser.find_element_by_id("dummyid")
     except:
         pass
    
     try:
-        browser.implicitly_wait(3) # seconds
+        browser.implicitly_wait(5) # seconds
         alert = browser.switch_to_alert()
         error = alert.text
         alert.accept()
@@ -63,6 +70,7 @@ def get_map():
     #print(html)
     soup = BeautifulSoup(html, "html.parser")
     divOverlay = soup.find("div", {"class": "overlay"})
+    #print(divOverlay)
     imgurl = divOverlay.find("img")['src']
     return imgurl
     
