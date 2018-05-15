@@ -130,7 +130,7 @@ def get_hkadr():
     
 def main():
 
-    print(get_hkadr_m())
+    print(get_hkadr())
     
 def is_number(s):
     try:
