@@ -46,7 +46,7 @@ def get_hkadr_m():
     html = r.text
     soup = BeautifulSoup(html, "html.parser")
     passage = ""
-
+    print(html)
     lists = soup.findAll("li", {"class":"ui-li-static"})
     
     if (lists):
