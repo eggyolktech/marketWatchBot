@@ -30,6 +30,49 @@ def add_sign(change):
 
     return change
 
+def get_hkadr_m():
+
+    DEL = "\n\n"
+    EL = "\n"
+
+    url = "http://m.hkadr.com/3.php"
+    
+    print("URL: [" + url + "]")  
+    
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+
+    r = requests.get(url, headers=headers, timeout=10)
+    #r.encoding = "gb2312"
+    html = r.text
+    soup = BeautifulSoup(html, "html.parser")
+    passage = ""
+
+    lists = soup.findAll("li", {"class":"ui-li-static"})
+    
+    if (lists):
+        passage = "<b>HKADR 環球即市資訊 (m.hkadr.com)</b>" + DEL
+    
+    for list in lists:
+        
+        for cells in list.findAll("td"):
+            
+            symbol = cells[0].text
+            adr = cells[2].text
+            changept = cells[4].strip().split()[0]
+            changepx = cells[4].strip().split()[1]
+            
+            if "-" in changept:
+                is_pos = False
+            else:
+                is_pos = True
+            
+            txttmpl = "%s: %s %s (%s)"
+            passage = passage + txttmpl % (symbol, add_sign_flag(adrs, is_pos), add_sign(changept), add_sign(change_px)) + DEL
+
+    if (not passage):
+        passage = "No adr info found."
+    
+    return passage   
 
 def get_hkadr():
 
@@ -87,7 +130,7 @@ def get_hkadr():
     
 def main():
 
-    print(get_hkadr())
+    print(get_hkadr_m)
     
 def is_number(s):
     try:
