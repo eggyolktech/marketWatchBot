@@ -35,7 +35,7 @@ def get_ust_yield():
     
     for row in rows:
         cols = row.findAll("td")
-        passage = passage + "<b>%s</b> - Last Yield: %s, Previous Yield: %s" % (cols[0].text, cols[1].text, cols[2].text) + DEL
+        passage = passage + "<b>%s</b> - Last: %s, Prev: %s" % (cols[0].text, cols[1].text, cols[2].text) + DEL
     
     if (passage):
         passage = passage + updatetime
