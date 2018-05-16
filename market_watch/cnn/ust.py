@@ -4,13 +4,10 @@ from time import gmtime
 from datetime import datetime
 import json
 import time
-import hashlib
 import requests
 from bs4 import BeautifulSoup
-from market_watch.redis import redis_pool
 
 DEL = "\n\n"
-KEY = "OPTIONS:List"
 
 def get_ust_yield():
 

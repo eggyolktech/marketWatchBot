@@ -30,6 +30,7 @@ from market_watch.qq import us_company_news
 from market_watch.twitter import tweet
 from market_watch.finviz import charting as fcharting
 from market_watch.cnn import ust
+from market_watch.quantum import tickersearch
 
 from market_watch.util import config_loader
 from market_watch import quick_list, quick_tracker
@@ -288,23 +289,23 @@ def on_chat_message(msg):
                     {'command': '/qd[code] [option]', 'desc': 'Daily Chart', 'icon': u'\U0001F4C8'},
                     {'command': '/qh[code] [option]', 'desc': 'Hourly Chart', 'icon': u'\U0001F4C8'},
                     {'command': '/qm[code] [option]', 'desc': 'Minutes Chart', 'icon': u'\U0001F4C8'},
-                    {'command': '/qN[code]', 'desc': 'Result Calendar (HK Only)', 'icon': u'\U0001F4C8'},                    
-                    {'command': '/qn[code]', 'desc': 'Latest News (HK Only)', 'icon': u'\U0001F4C8'},                    
+                    {'command': '/qa[us_code]', 'desc': 'Get Analysis from Seeking Alpha (US only)', 'icon': u'\U0001F414'},   
+                    {'command': '/qB[us_code]', 'desc': 'Get Available Bond Securities List (US only)', 'icon': u'\U0001F414'},   
                     {'command': '/qC[code]', 'desc': 'CCASS Top 10 Distribution', 'icon': u'\U0001F42E'},
                     {'command': '/qc', 'desc': 'CBBC Distribution', 'icon': u'\U0001F42E'},
-                    {'command': '/qe[code]', 'desc': 'Southbound Moneyflow Trend', 'icon': u'\U0001F42E'},
+                    {'command': '/qe[code]', 'desc': 'Southbound Moneyflow Trend', 'icon': u'\U0001F42E'},            
+                    {'command': '/qf [next] [hscei] [night]', 'desc': 'Quote HSI Mini Futures', 'icon': u'\U0001F414'},
+                    {'command': '/qF [next] [hscei] [night]', 'desc': 'Quote HSI Futures', 'icon': u'\U0001F414'},                   
+                    {'command': '/qj[jp_code]', 'desc': 'Get Stock Quote from Tokyo Stock Exchange', 'icon': u'\U0001F414'}, 
+                    {'command': '/qN[code]', 'desc': 'Result Calendar (HK Only)', 'icon': u'\U0001F4C8'},                    
+                    {'command': '/qn[code]', 'desc': 'Latest News (HK Only)', 'icon': u'\U0001F4C8'},                    
+                    {'command': '/qq', 'desc': 'Quick Quote', 'icon': u'\U0001F42E'},
                     {'command': '/qR', 'desc': 'Industries List', 'icon': u'\U0001F42E'},
                     {'command': '/qr[code1] [code2]', 'desc': 'Relative Strength', 'icon': u'\U0001F42E'},
-                    {'command': '/qq', 'desc': 'Quick Quote', 'icon': u'\U0001F42E'},
                     {'command': '/qs', 'desc': 'Chicken Sectormap', 'icon': u'\U0001F414'},
-                    {'command': '/qS', 'desc': 'Stock Profile', 'icon': u'\U0001F414'},
-                    {'command': '/qf [next] [hscei] [night]', 'desc': 'Quote HSI Mini Futures', 'icon': u'\U0001F414'},
-                    {'command': '/qF [next] [hscei] [night]', 'desc': 'Quote HSI Futures', 'icon': u'\U0001F414'},
-                    {'command': '/l', 'desc': 'Live Quote Commands', 'icon': u'\U0001F414'},
                     {'command': '/qS[code]', 'desc': 'Get Company Profile', 'icon': u'\U0001F414'},
-                    {'command': '/qa[us_code]', 'desc': 'Get Analysis from Seeking Alpha (US only)', 'icon': u'\U0001F414'},   
-                    {'command': '/qj[jp_code]', 'desc': 'Get Stock Quote from Tokyo Stock Exchange', 'icon': u'\U0001F414'}, 
                     {'command': '/qY', 'desc': 'Get US Treasury Yield Information', 'icon': u'\U0001F414'}, 
+                    {'command': '/l', 'desc': 'Live Quote Commands', 'icon': u'\U0001F414'},
         ]
         
         fxc = ", ".join(['/qh' + str(x.name) for x in FxCode][:3])
@@ -370,6 +371,15 @@ def on_chat_message(msg):
                 bot.sendMessage(chat_id, rhtml, parse_mode='HTML')
             return
 
+        elif (action == "B"):
+
+            if (is_number(code)):
+                bot.sendMessage(chat_id, "Only US Stock is supported", parse_mode='HTML')
+            else:
+                message = tickersearch.get_sec_list(code)
+                bot.sendMessage(chat_id, rhtml, parse_mode='HTML')
+            return            
+            
         elif (action == "c"):
 
             bot.sendMessage(chat_id, u'\U0001F42E' +  u'\U0001F43B' + u'\U0001F4CA', parse_mode='HTML')
