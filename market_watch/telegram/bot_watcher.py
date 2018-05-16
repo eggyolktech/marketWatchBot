@@ -29,6 +29,7 @@ from market_watch.alpha import analysis_loader
 from market_watch.qq import us_company_news
 from market_watch.twitter import tweet
 from market_watch.finviz import charting as fcharting
+from market_watch.cnn import ust
 
 from market_watch.util import config_loader
 from market_watch import quick_list, quick_tracker
@@ -303,6 +304,7 @@ def on_chat_message(msg):
                     {'command': '/qS[code]', 'desc': 'Get Company Profile', 'icon': u'\U0001F414'},
                     {'command': '/qa[us_code]', 'desc': 'Get Analysis from Seeking Alpha (US only)', 'icon': u'\U0001F414'},   
                     {'command': '/qj[jp_code]', 'desc': 'Get Stock Quote from Tokyo Stock Exchange', 'icon': u'\U0001F414'}, 
+                    {'command': '/qY', 'desc': 'Get US Treasury Yield Information', 'icon': u'\U0001F414'}, 
         ]
         
         fxc = ", ".join(['/qh' + str(x.name) for x in FxCode][:3])
@@ -358,9 +360,7 @@ def on_chat_message(msg):
 
                 passage = random.choice([p1, p2, p3])
                 bot.sendMessage(chat_id, passage, parse_mode='HTML')
-  
-        elif (action == "N"):
-            bot.sendMessage(chat_id, result_announcement.get_result_calendar(code), parse_mode='HTML') 
+
         elif (action == "a"):
 
             if (is_number(code)):
@@ -368,6 +368,39 @@ def on_chat_message(msg):
             else:
                 rhtml = analysis_loader.get_analysis(code)
                 bot.sendMessage(chat_id, rhtml, parse_mode='HTML')
+            return
+
+        elif (action == "c"):
+
+            bot.sendMessage(chat_id, u'\U0001F42E' +  u'\U0001F43B' + u'\U0001F4CA', parse_mode='HTML')
+            
+            try:
+                f = urllib.request.urlopen(config.get("credit-suisse","cbbc-url"), timeout=10)
+            except:
+                bot.sendMessage(chat_id, u'\U0001F428' + ' Request Timeout', parse_mode='HTML')
+            else:
+                bot.sendPhoto(chat_id, f)                
+            return    
+            
+        elif (action == "C"):
+            bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')         
+            bot.sendMessage(chat_id, ccass_loader.get_latest_ccass_info(code, 20) , parse_mode='HTML')
+            bot.sendMessage(chat_id, ccass_loader.get_shareholding_disclosure(code) , parse_mode='HTML')
+            return
+
+        elif (action == "e"):
+            bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')         
+        
+            for stockCd in codes:
+                bot.sendMessage(chat_id, mutual_market.get_moneyflow_by_code(stockCd), parse_mode='HTML')
+            return            
+            
+        elif (action == "f"):
+            bot.sendMessage(chat_id, futures.get_futures("M", params), parse_mode='HTML')
+            return
+
+        elif (action == "F"):
+            bot.sendMessage(chat_id, futures.get_futures("N", params), parse_mode='HTML')
             return
         
         elif (action.lower() == "j"):
@@ -383,6 +416,9 @@ def on_chat_message(msg):
                 else:
                     bot.sendMessage(chat_id, "Invalid JP Stock Code: [%s]" % stockCd, parse_mode='HTML')
                     
+        elif (action == "N"):
+            bot.sendMessage(chat_id, result_announcement.get_result_calendar(code), parse_mode='HTML')                    
+
         elif (action == "n"):
 
             if (is_number(code)):
@@ -390,27 +426,30 @@ def on_chat_message(msg):
             else:
                 bot.sendMessage(chat_id, us_company_news.get_latest_news_by_code(code, 10), parse_mode='HTML')
             return    
+ 
+        elif (action.lower() == "q"):
+
+            # Get quick quote from AAStocks
+            simpleMode = True
+            if (action == "Q"):
+                simpleMode = False
             
-        elif (action == "C"):
-            bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')         
-            bot.sendMessage(chat_id, ccass_loader.get_latest_ccass_info(code, 20) , parse_mode='HTML')
-            bot.sendMessage(chat_id, ccass_loader.get_shareholding_disclosure(code) , parse_mode='HTML')
-            return
-
-        elif (action == "f"):
-            bot.sendMessage(chat_id, futures.get_futures("M", params), parse_mode='HTML')
-            return
-
-        elif (action == "F"):
-            bot.sendMessage(chat_id, futures.get_futures("N", params), parse_mode='HTML')
-            return
-
-        elif (action == "e"):
-            bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')         
-        
             for stockCd in codes:
-                bot.sendMessage(chat_id, mutual_market.get_moneyflow_by_code(stockCd), parse_mode='HTML')
-            return
+                if (stockCd.strip().isdigit() and len(stockCd.strip()) == 6):
+                    bot.sendMessage(chat_id, stock_quote.get_quote_message(stockCd, "CN", simpleMode), parse_mode='HTML')
+                elif (stockCd.strip().isdigit()):
+                    bot.sendMessage(chat_id, stock_quote.get_quote_message(stockCd, "HK", simpleMode), parse_mode='HTML')
+                elif (stockCd.strip()):
+
+                    if (stockCd.upper() in DICT_CURRENCY):
+                        fromCur = DICT_CURRENCY[stockCd.upper()][0:3]
+                        toCur = DICT_CURRENCY[stockCd.upper()][3:6]
+                        bot.sendMessage(chat_id, fx_quote.get_fx_quote_message(fromCur, toCur), parse_mode='HTML')
+                    else:
+                        bot.sendMessage(chat_id, iex_stock_quote.get_quote_message(stockCd, "US", simpleMode), parse_mode='HTML')
+                #else:
+                #    bot.sendMessage(chat_id, u'\U000026D4' + ' Code Not found!', parse_mode='HTML')
+ 
         elif (action == "R"):
             
             if (not code):
@@ -464,6 +503,7 @@ def on_chat_message(msg):
                     bot.sendMessage(chat_id, u'\U000026D4' + " Stocks with no data: " + str(invalidcodelist) , parse_mode='HTML')
                 bot.sendPhoto(chat_id=chat_id, photo=open(chartpath, 'rb'))      
             return
+            
         elif (action == "S"):
             passage = company_profile.get_profile(code)
 
@@ -484,57 +524,21 @@ def on_chat_message(msg):
                 bot.sendPhoto(chat_id, f)                
             return                 
     
-        elif (action == "c"):
-
-            bot.sendMessage(chat_id, u'\U0001F42E' +  u'\U0001F43B' + u'\U0001F4CA', parse_mode='HTML')
+        elif (action == "Y"):
+            result = ust.get_ust_yield()
             
-            try:
-                f = urllib.request.urlopen(config.get("credit-suisse","cbbc-url"), timeout=10)
-            except:
-                bot.sendMessage(chat_id, u'\U0001F428' + ' Request Timeout', parse_mode='HTML')
-            else:
-                bot.sendPhoto(chat_id, f)                
-            return                 
-        
-        elif (action.lower() == "q"):
+            if (result):
+                bot.sendMessage(chat_id, result[0], parse_mode='HTML')
 
-            # Get quick quote from AAStocks
-            simpleMode = True
-            if (action == "Q"):
-                simpleMode = False
-            
-            for stockCd in codes:
-                if (stockCd.strip().isdigit() and len(stockCd.strip()) == 6):
-                    bot.sendMessage(chat_id, stock_quote.get_quote_message(stockCd, "CN", simpleMode), parse_mode='HTML')
-                elif (stockCd.strip().isdigit()):
-                    bot.sendMessage(chat_id, stock_quote.get_quote_message(stockCd, "HK", simpleMode), parse_mode='HTML')
-                elif (stockCd.strip()):
-
-                    if (stockCd.upper() in DICT_CURRENCY):
-                        fromCur = DICT_CURRENCY[stockCd.upper()][0:3]
-                        toCur = DICT_CURRENCY[stockCd.upper()][3:6]
-                        bot.sendMessage(chat_id, fx_quote.get_fx_quote_message(fromCur, toCur), parse_mode='HTML')
-                    else:
-                        bot.sendMessage(chat_id, iex_stock_quote.get_quote_message(stockCd, "US", simpleMode), parse_mode='HTML')
-                #else:
-                #    bot.sendMessage(chat_id, u'\U000026D4' + ' Code Not found!', parse_mode='HTML')
-        
-            '''if (code in QQLIST):
-                bot.sendMessage(chat_id, quick_list.get_qq_command_list(code) , parse_mode='HTML')
-                return
-            elif (code[0:5] in QQSUBLIST):
-                bot.sendMessage(chat_id, quick_list.get_qq_command_detail_list(code) , parse_mode='HTML')
-                return
-            elif (code):
-                bot.sendMessage(chat_id, quick_list.get_qq_command_tf_list(code) , parse_mode='HTML')
-                return
+                try:
+                    f = urllib.request.urlopen(result[1], timeout=10)
+                except:
+                    pass
+                else:
+                    bot.sendPhoto(chat_id, f)
             else:
-                passage = "<i>Use the following shortcuts to list quote items:</i> " + DEL
-                for list in QQLIST:
-                    passage = passage + "/qq" + list +  EL + " - List " + list + " codes" + EL
-                    
-                bot.sendMessage(chat_id, passage, parse_mode='HTML')
-                return'''
+                bot.sendMessage(chat_id, u'\U0001F423' + ' Request Error', parse_mode='HTML')
+        
         else:        
             bot.sendMessage(chat_id, menu, parse_mode='HTML') 
             return
