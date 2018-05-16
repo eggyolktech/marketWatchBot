@@ -79,7 +79,7 @@ def main():
 
     url = get_map()
     if (url):
-        bot_sender.send_remote_image(url, "telegram-notice")
+        bot_sender.send_remote_image(url, "telegram-twitter")
     
 def is_number(s):
     try:
