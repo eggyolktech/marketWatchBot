@@ -87,8 +87,8 @@ def get_sec_list(symbol):
         AskYTM = cols[9].text.strip()
         
         if (not last_issuer == issuer):
-            passage = passage + "Issuer: %s\nIssuer Rating: %s (S&P/Fitch)" % (issuer, issuerRating) + DEL 
-        passage = passage + "<a href ='%s'>%s</a>\nLotSize $%s, Rating %s, YearsToMat: %s, Cpn: %s%%\nAskPx: $%s, BidYTM: %s%%, AskYTM: %s%%" % (secLink, secName, lotSize, bondRating, yearsLeft, coupon, askPrice, BidYTM, AskYTM) + DEL
+            passage = passage + "Issuer: %s\nIssuer Rating: %s (S&P|Fitch)" % (issuer, issuerRating) + DEL 
+        passage = passage + "<a href='%s'>%s</a>\nLotSize: $%s, Rating(S&P|Fitch): %s\nYearsToMat: %s, Cpn: %s%%\nAskPx: $%s, BidYTM: %s%%, AskYTM: %s%%" % (secLink, secName, lotSize, bondRating, yearsLeft, coupon, askPrice, BidYTM, AskYTM) + DEL
         
         last_issuer = issuer
         
@@ -104,6 +104,7 @@ def urlify(s):
 
      # Replace all runs of whitespace with a single dash
      s = re.sub(r"\s+", '', s)
+     s = re.sub(r"\/", '|', s)
 
      return s
     
