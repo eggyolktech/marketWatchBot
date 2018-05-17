@@ -72,7 +72,7 @@ def get_sec_list(symbol):
     last_issuer = ""
     issuerRating = ""
     
-    for row in rows:
+    for row in rows[:8]:
         cols = row.findAll("td")
         issuer = cols[0].find_all(text=True, recursive=False)[0].strip()
         secName = cols[0].find('a').text.strip()
