@@ -57,6 +57,8 @@ DICT_CURRENCY = {'BTC':'BTCUSD', 'ETH':'ETHUSD', 'XRP':'XRPUSD',
                  'EURGBP':'EURGBP','HKDJPY':'HKDJPY', 'EURHKD':'EURHKD',
                  'GBPHKD':'GBPHKD', 'AUDHKD':'AUDHKD'}
 
+MAX_MSG_SIZE = 4096
+                 
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
     
@@ -388,7 +390,11 @@ def on_chat_message(msg):
                 bot.sendMessage(chat_id, "Only Ticker Symbol is supported", parse_mode='HTML')
             else:
                 message = super_tickersearch.get_sec_list(code)
-                bot.sendMessage(chat_id, message, parse_mode='HTML')
+
+                results = [message[i:i+MAX_MSG_SIZE] for i in range(0, len(message), MAX_MSG_SIZE)]
+
+                for result in results:
+                    bot.sendMessage(chat_id, result, parse_mode='HTML')
             return            
             
         elif (action == "c"):
@@ -528,7 +534,6 @@ def on_chat_message(msg):
         elif (action == "S"):
             passage = company_profile.get_profile(code)
 
-            MAX_MSG_SIZE = 4096
             results = [passage[i:i+MAX_MSG_SIZE] for i in range(0, len(passage), MAX_MSG_SIZE)]
 
             for result in results:
