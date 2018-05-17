@@ -377,7 +377,7 @@ def on_chat_message(msg):
                 bot.sendMessage(chat_id, "Only US Stock is supported", parse_mode='HTML')
             else:
                 message = tickersearch.get_sec_list(code)
-                bot.sendMessage(chat_id, rhtml, parse_mode='HTML')
+                bot.sendMessage(chat_id, message, parse_mode='HTML')
             return            
             
         elif (action == "c"):

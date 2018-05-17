@@ -41,8 +41,8 @@ def get_sec_list(symbol):
             texchange = cols[2].text.strip()
         
             if (not "*" in tsymbol) and (not symbol == tsymbol):
-                msgtmpl = "<a href='http://quantumonline.com/%s'>%s</a>\n - %s (%s)"
-                passage = passage + (msgtmpl % (thref, tsymbol, tdesc , texchange)) + DEL
+                msgtmpl = "<a href='http://quantumonline.com/%s'>%s</a> /qq%s\n - %s (%s)"
+                passage = passage + (msgtmpl % (thref, tsymbol, tsymbol, tdesc , texchange)) + DEL
     
     if (passage):
         passage = u'\U0001F514' + " Related Securities for Parent Company: %s" % symbol + DEL + passage
@@ -53,6 +53,7 @@ def get_sec_list(symbol):
 def main():
 
     list = ["ssw", "ge", "tencnt", "jpm", "tesla", "amzn"]
+    list = ["ssw"]
     for ticker in list:
         print(get_sec_list(ticker))
 
