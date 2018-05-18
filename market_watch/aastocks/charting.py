@@ -11,6 +11,7 @@ from datetime import datetime
 
 from market_watch.common.AastocksEnum import TimeFrame, FxCode, IndexCode
 from market_watch.finviz import charting as finviz_charting
+from market_watch.yahoo import charting as yahoo_charting
 
 def get_hkg_chart_list_by_type(code, action, params):
     
@@ -64,6 +65,8 @@ def get_hkg_chart_by_type(code, action, params):
         code = code + ".HK"    
     elif (finviz_charting.is_finviz_code(code)):
         return finviz_charting.get_finviz_chart(code, action)
+    elif (yahoo_charting.is_tes_code(code)):
+        return yahoo_charting.get_tse_chart(code, action)    
     elif (code.isalpha()):
 
         #if ("USD" == code.upper()):
