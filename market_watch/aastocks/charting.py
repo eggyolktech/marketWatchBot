@@ -158,9 +158,14 @@ def get_aastocks_alpha_code(code):
 def main():
 
     tf = "h"
-    print(get_hkg_chart_list_by_type("MHSIF", tf, []))
-    print(get_hkg_chart_list_by_type("NIKKEI", tf, []))
-    print(get_hkg_chart_list_by_type("BTC", tf, []))
+    print(get_hkg_chart_list_by_type("4911j", "m", []))
+    print(get_hkg_chart_list_by_type("4911J", "h", []))
+    print(get_hkg_chart_list_by_type("49111", "m", []))
+    print(get_hkg_chart_list_by_type("4922k", "m", []))
+    print(get_hkg_chart_list_by_type("4933J", "M", []))
+    #print(get_hkg_chart_list_by_type("MHSIF", tf, []))
+    #print(get_hkg_chart_list_by_type("NIKKEI", tf, []))
+    #print(get_hkg_chart_list_by_type("BTC", tf, []))
     #print(get_hkg_chart_list_by_type("939", tf, ["night"]))
     #print(get_hkg_chart_list_by_type("939", tf, ["3988", "2388", "BABA"]))
     #print(get_hkg_chart_list_by_type("939", tf, ["HSIFN", "2388", "BABA", "bb", "night"]))
