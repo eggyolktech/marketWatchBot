@@ -65,7 +65,7 @@ def get_hkg_chart_by_type(code, action, params):
         code = code + ".HK"    
     elif (finviz_charting.is_finviz_code(code)):
         return finviz_charting.get_finviz_chart(code, action)
-    elif (yahoo_charting.is_tes_code(code)):
+    elif (yahoo_charting.is_tse_code(code)):
         return yahoo_charting.get_tse_chart(code, action)    
     elif (code.isalpha()):
 
