@@ -44,7 +44,7 @@ def get_analysis(code):
     print("Total # of links processed: %s" % (count))
    
     if (passage):
-        passage = u'\U0001F170' + " " + ftitle + DEL + passage
+        passage = u'\U000024C2' + " " + ftitle + DEL + passage
     else:
         passage = "No Fool.com analysis found for %s" % code.strip()
  
