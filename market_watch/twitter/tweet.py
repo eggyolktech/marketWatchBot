@@ -5,6 +5,7 @@ import time
 import sys
 import os
 import re
+import random
 from market_watch.util import config_loader
 from market_watch.telegram import bot_sender
 from market_watch.redis import redis_pool
@@ -15,6 +16,8 @@ config = config_loader.load()
 DEL = '\n\n'
 NEW_TWEET_COUNT = 30
 GET_TWEET_COUNT = 10
+
+LOADING = [u'\U0000231B', u'\U0001F6AC', u'\U0001F37B', u'\U0001F377', u'\U000023F3', u'\U0000231A', u'\U0001F30F']
 
 API = twitter.Api(consumer_key=config.get("twitter","consumer_key"),
                     consumer_secret=config.get("twitter","consumer_secret"),
@@ -64,7 +67,7 @@ def push_tweet(name, tcount=1):
     redis_pool.setV(rkey, new_json_arr)    
 
     if messages_list:
-        messages_list.insert(0, "<pre>\n</pre>" + u'\U0001F30F' + "<b>@%s is Tweeting...</b>" % name)
+        messages_list.insert(0, "<pre>\n</pre>" + random.choice(LOADING) + "<b>@%s is Tweeting...</b>" % name)
         full_message = DEL.join(messages_list)
         #bot_sender.broadcast_list(full_message)
         bot_sender.broadcast_list(full_message, "telegram-twitter")
@@ -89,7 +92,7 @@ def get_tweet(name, tcount=1):
     full_message = "No tweets were found!"
     
     if messages_list:
-        messages_list.insert(0, "<pre>\n</pre>" + u'\U0001F30F' + "<b>Latest Tweets for @%s</b>" % name)
+        messages_list.insert(0, "<pre>\n</pre>" + random.choice(LOADING) + "<b>Latest Tweets for @%s</b>" % name)
         full_message = DEL.join(messages_list)
     
     print("Message: [%s]" % full_message)
@@ -110,8 +113,10 @@ def main(args):
                     'stocktwits', 
                     'citronresearch', 
                     'sjosephburns', 
-                    'RRGresearch', 
-                    'RyanDetrick'
+                    #'RRGresearch', 
+                    #'RyanDetrick'
+                    'LoneStockTrader',
+                    'zerohedge'
                     ]
         #WATCHER = ['realDonaldTrump']
         for w in WATCHER:

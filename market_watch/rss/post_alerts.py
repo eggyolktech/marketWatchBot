@@ -116,13 +116,14 @@ def main():
                 'http://hkstockinvestment.blogspot.com/feeds/posts/default', #偉哥投資手札
                 'https://parisvalueinvesting.blogspot.com/feeds/posts/default', #巴黎的價值投資
                 'http://www.justacafe.com/feeds/posts/default', #Just a Cafe
+                'http://fb2rss.altervista.org/?id=974946689232967' #Starman 資本攻略
                 ]
     
     isTest = False 
     tg_group = "telegram-notice" 
     
     if (isTest):
-        repoList = ['http://www.justacafe.com/feeds/posts/default', ]
+        repoList = ['http://fb2rss.altervista.org/?id=974946689232967', ]
         tg_group = "telegram-chat-test"   
 
     push_rss(repoList, tg_group)
@@ -133,6 +134,7 @@ def main():
     repoList = ['http://fb2rss.altervista.org/?id=193368377704187', #平行時空：沈旭暉國際學術新聞台
                 'http://fb2rss.altervista.org/?id=223783954322429', #堅離地城：沈旭暉國際生活台 Simon's Glocal World
                 'http://fb2rss.altervista.org/?id=393581457698786', #萬國郵政 Simon's Stamps International
+                'https://www.finlab.tw/atom.xml', #回測與選股教學部落格
                 ]
 
     tg_group = "telegram-itdog"
