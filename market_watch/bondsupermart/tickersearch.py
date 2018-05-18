@@ -88,7 +88,7 @@ def get_sec_list(symbol):
         
         if (not last_issuer == issuer):
             passage = passage + "Issuer: %s\nIssuer Rating: %s (S&P|Fitch)" % (issuer, issuerRating) + DEL 
-        passage = passage + "<a href='%s'>%s</a>\nLotSize: $%s, Rating(S&P|Fitch): %s\nYearsToMat: %s, Cpn: %s%%\nAskPx: $%s, BidYTM: %s%%, AskYTM: %s%%" % (secLink, secName, lotSize, bondRating, yearsLeft, coupon, askPrice, BidYTM, AskYTM) + DEL
+        passage = passage + "<a href='%s'>%s</a>\nLotSize: $%s, Rating(S&P|Fitch): %s\nYearsToMat: %s, Cpn: %s%%\nAskPx: $%s\nBidYTM: %s%%, AskYTM: %s%%" % (secLink, secName, lotSize, bondRating, yearsLeft, coupon, askPrice, BidYTM, AskYTM) + DEL
         
         last_issuer = issuer
         

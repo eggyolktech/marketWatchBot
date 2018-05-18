@@ -380,6 +380,7 @@ def on_chat_message(msg):
             if (is_number(code)):
                 bot.sendMessage(chat_id, "Only US Stock is supported", parse_mode='HTML')
             else:
+                bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML') 
                 message = tickersearch.get_sec_list(code)
                 bot.sendMessage(chat_id, message, parse_mode='HTML')
             return            
@@ -389,6 +390,7 @@ def on_chat_message(msg):
             if (is_number(code)):
                 bot.sendMessage(chat_id, "Only Ticker Symbol is supported", parse_mode='HTML')
             else:
+                bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML') 
                 message = super_tickersearch.get_sec_list(code)
                 bot.sendMessage(chat_id, message, parse_mode='HTML')
             return            
