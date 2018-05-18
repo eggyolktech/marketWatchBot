@@ -9,92 +9,24 @@ import re
 from datetime import date
 from datetime import datetime
 
-DICT_FINVIZ_FUTURES = {'DJI':['YM', 'Dow Jones Index'], 
-                'SPX':['ES', 'S&P 500'],
-                'NQ':['NQ', 'Nasdaq 100'],
-                'RUSSELL':['ER2', 'Russell 2000'],
-                'NIKKEI':['NKD', 'Nikkei 225'],
-                'EX':['EX', 'Euro Stoxx 50'],
-                'DAX':['DY', 'DAX'],
-                'VIX':['VX', 'VIX'],
-                'WTI':['CL', 'Crude Oil WTI'],
-                'BRENT':['QA', 'Crude Oil Brent'],
-                'RBOB':['RB', 'Gasoline RBOB'],
-                'HO':['HO', 'Heating Oil'],
-                'NGAS':['NG', 'Natural Gas'],
-                'ETHANOL':['ZK', 'Ethanol'],
-                'GOLD':['GC', 'Gold'],
-                'SILVER':['SI', 'Silver'],
-                'PLATINUM':['PL', 'Platinum'],
-                'COPPER':['HG', 'Copper'],
-                'PALLADIUM':['PA', 'Palladium'],
-                'OATS':['ZO', 'Oats'],
-                'SOYBEANS':['ZS', 'Soybeans'],
-                'WHEAT':['ZW', 'Wheat'],
-                'COCOA':['CC', 'Cocoa'],
-                'COTTON':['CT', 'Cotton'],
-                'COFFEE':['KC', 'Coffee'],
-                'LUMBER':['LB', 'Lumber'],
-                'SUGAR':['SB', 'Sugar'],
-                '30YB':['ZB', '30 Year Bond'],
-                '10YN':['ZN', '10 Year Note'],
-                '5YN':['ZF', '5 Year Note'],
-                '2YN':['ZT', '2 Year Note'],       
-                'USD':['DX', 'USD'],                   
-                }
+def get_tse_chart(code, period):
 
-DICT_FINVIZ_CRYPTO = {
-                'BTC':['BTCUSD', 'BTC/USD'],   
-                'LTC':['LTCUSD', 'LTC/USD'],   
-                'ETH':['ETHUSD', 'ETH/USD'],   
-                'XRP':['XRPUSD', 'XRP/USD'],                
-                }
+    url_dict = {"m": "https://chart.yahoo.co.jp/?code=%s.T&tm=1d&vip=off", "h": "https://chart.yahoo.co.jp/?code=%s.T&tm=5d&vip=off" ,"d": "https://chart.yahoo.co.jp/?code=%s.T&tm=6m&type=c&log=off&size=n&over=s,e25,e75,v&add=m,r,ss&comp=" ,"w": "https://chart.yahoo.co.jp/?code=%s.T&tm=2y&type=c&log=off&size=n&over=s,v,e130,e260,e65&add=m,r&comp=" ,"M": "https://chart.yahoo.co.jp/?code=%s.T&tm=ay&type=c&log=off&size=n&over=s,v,e130,e260,e65&add=&comp="}
+    url = url_dict[period] % (code[:4])    
+    return url
 
-def get_futures_chart(code, period):
-
-    if (period == "M"):
-        p = "m1"
-    elif (period == "m"):
-        p = "m5"
-    else:
-        p = period + "1"
-
-    return "https://finviz.com/fut_chart.ashx?t=%s&p=%s" % (code.upper(),  p)
-
-def get_crypto_chart(code, period):
-
-    if (period == "M"):
-        p = "m1"
-    elif (period == "m"):
-        p = "m5"
-    else:
-        p = period + "1"
-
-    return "https://finviz.com/fx_image.ashx?%s_%s_l.png" % (code.lower(),  p)
-
-def is_finviz_code(code):
-
-    if (code.upper() in DICT_FINVIZ_FUTURES or code.upper() in DICT_FINVIZ_CRYPTO):
+def is_tse_code(code):
+    
+    pattern = r"\d{4}[jJ]$"
+    if (re.match(pattern, code)):
         return True
     else:
         return False
 
-def get_finviz_chart(code, period):
-
-    code = code.upper()
-    if code in DICT_FINVIZ_FUTURES:
-        return get_futures_chart(DICT_FINVIZ_FUTURES[code][0], period)
-    elif code in DICT_FINVIZ_CRYPTO:
-        return get_crypto_chart(DICT_FINVIZ_CRYPTO[code][0], period)
-
-    return None    
-
 def main():
 
-    for code in ["BTC","NIKKEI","LTC","30YB"]:
-        print(get_finviz_chart(code, "d"))
-    #print(get_futures_chart("YM", "d"))
-    #print(get_crypto_chart("BTCUSD", "d"))
+    for code in ["4911J","4922j"]:
+        print(get_tse_chart(code, "d"))
 
 def is_number(s):
     try:
