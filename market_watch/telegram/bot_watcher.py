@@ -26,6 +26,7 @@ from market_watch.hkex import ccass_loader
 from market_watch.google import stock_history
 from market_watch.sl886 import hkadr
 from market_watch.alpha import analysis_loader
+from market_watch.fool import fool_loader
 from market_watch.qq import us_company_news
 from market_watch.twitter import tweet
 from market_watch.finviz import charting as fcharting
@@ -292,8 +293,9 @@ def on_chat_message(msg):
                     {'command': '/qd[code] [option]', 'desc': 'Daily Chart', 'icon': u'\U0001F4C8'},
                     {'command': '/qh[code] [option]', 'desc': 'Hourly Chart', 'icon': u'\U0001F4C8'},
                     {'command': '/qm[code] [option]', 'desc': 'Minutes Chart', 'icon': u'\U0001F4C8'},
-                    {'command': '/qa[us_code]', 'desc': 'Seeking Alpha (US only)', 'icon': u'\U0001F414'},   
-                    {'command': '/qB[ticker]', 'desc': 'bondsupermart Search', 'icon': u'\U0001F414'},   
+                    {'command': '/qa[us_code]', 'desc': 'Seeking Alpha (US only)', 'icon': u'\U0001F414'},    
+                    {'command': '/qA[us_code]', 'desc': 'Motley Fool (US only)', 'icon': u'\U0001F414'},   
+                    {'command': '/qb[ticker]', 'desc': 'bondsupermart Search', 'icon': u'\U0001F414'},   
                     {'command': '/qB[us_ticker]', 'desc': 'XTBs List (US only)', 'icon': u'\U0001F414'},   
                     {'command': '/qC[code]', 'desc': 'CCASS Top 10 Distribution', 'icon': u'\U0001F42E'},
                     {'command': '/qc', 'desc': 'CBBC Distribution', 'icon': u'\U0001F42E'},
@@ -366,6 +368,15 @@ def on_chat_message(msg):
                 passage = random.choice([p1, p2, p3])
                 bot.sendMessage(chat_id, passage, parse_mode='HTML')
 
+        elif (action == "A"):
+
+            if (is_number(code)):
+                bot.sendMessage(chat_id, "Only US Stock is supported", parse_mode='HTML')
+            else:
+                rhtml = fool_loader.get_analysis(code)
+                bot.sendMessage(chat_id, rhtml, parse_mode='HTML')
+            return
+                
         elif (action == "a"):
 
             if (is_number(code)):
