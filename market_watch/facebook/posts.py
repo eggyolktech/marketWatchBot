@@ -77,13 +77,13 @@ def push_posts_list(group, plist, tg_group):
             msg  = u'\U0001F4F0' + " <b>Latest Posts Updates</b>" + DEL + msg
         
         print("Msg sent: [%s]" % msg)
-        #bot_sender.broadcast_list(msg, tg_group)
+        bot_sender.broadcast_list(msg, tg_group)
         
         send_count = send_count + 1
     
 def main():
 
-    isTest = True 
+    isTest = False 
         
     grpList = ['ivanliresearch', #Ivan Li 李聲揚 - 華麗后台
                 'DrLamInv', #Dr Lam

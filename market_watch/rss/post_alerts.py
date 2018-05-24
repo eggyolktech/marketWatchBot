@@ -41,6 +41,10 @@ def get_rss_alerts_with_redis(url):
     for post in posts.entries[:get_count]:
     
         stime = str(time.mktime(post.published_parsed))
+        stitle = post.title
+        if "ERROR WHILE FETCHING" in stitle:
+            print(stitle)
+            return
         
         if (str(stime) in posts_list):
             print("Post created at %s is OLD! Skip sending...." % (stime))
@@ -108,15 +112,15 @@ def main():
     repoList = ['http://oldjimpacific.blogspot.com/feeds/posts/default', 
                 'https://medium.com/feed/@ivansyli', 
                 'http://feeds.feedburner.com/bituzi', 
-                'http://fb2rss.altervista.org/?id=1744632715750914', #Ivan Li 李聲揚 - 華麗后台
-                'http://fb2rss.altervista.org/?id=128674903851093', #Dr Lam
-                'http://fb2rss.altervista.org/?id=247333838767466', #張士佳 - Sky Sir
-                'http://fb2rss.altervista.org/?id=112243028856273', #英之見 - 基金經理黃國英Alex Wong
-                'http://fb2rss.altervista.org/?id=767813843325038', #Eddie Team
+                #'http://fb2rss.altervista.org/?id=1744632715750914', #Ivan Li 李聲揚 - 華麗后台
+                #'http://fb2rss.altervista.org/?id=128674903851093', #Dr Lam
+                #'http://fb2rss.altervista.org/?id=247333838767466', #張士佳 - Sky Sir
+                #'http://fb2rss.altervista.org/?id=112243028856273', #英之見 - 基金經理黃國英Alex Wong
+                #'http://fb2rss.altervista.org/?id=767813843325038', #Eddie Team
                 'http://hkstockinvestment.blogspot.com/feeds/posts/default', #偉哥投資手札
                 'https://parisvalueinvesting.blogspot.com/feeds/posts/default', #巴黎的價值投資
                 'http://www.justacafe.com/feeds/posts/default', #Just a Cafe
-                'http://fb2rss.altervista.org/?id=974946689232967' #Starman 資本攻略
+                #'http://fb2rss.altervista.org/?id=974946689232967' #Starman 資本攻略
                 ]
     
     isTest = False 
@@ -131,10 +135,12 @@ def main():
     if isTest:
         return
 
-    repoList = ['http://fb2rss.altervista.org/?id=193368377704187', #平行時空：沈旭暉國際學術新聞台
-                'http://fb2rss.altervista.org/?id=223783954322429', #堅離地城：沈旭暉國際生活台 Simon's Glocal World
-                'http://fb2rss.altervista.org/?id=393581457698786', #萬國郵政 Simon's Stamps International
+    repoList = [#'http://fb2rss.altervista.org/?id=193368377704187', #平行時空：沈旭暉國際學術新聞台
+                #'http://fb2rss.altervista.org/?id=223783954322429', #堅離地城：沈旭暉國際生活台 Simon's Glocal World
+                #'http://fb2rss.altervista.org/?id=393581457698786', #萬國郵政 Simon's Stamps International
+                #'http://fb2rss.altervista.org/?id=713511925511617', #Glollege放眼
                 'https://www.finlab.tw/atom.xml', #回測與選股教學部落格
+                #'http://fb2rss.altervista.org/?id=246310051900', #Microsoft HK Technical Community
                 ]
 
     tg_group = "telegram-itdog"
