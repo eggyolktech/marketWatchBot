@@ -112,7 +112,7 @@ def get_ocf(code):
     if (not passage):
         return ("No ocf history for [%s]" % code)
     else:
-        passage = "<a href='%s'>Net Operation Cashflow for %s.HK</a>" % (url, code)) + DEL + passage
+        passage = ("<a href='%s'>Net Operation Cashflow for %s.HK</a>" % (url, code)) + DEL + passage
     
     return passage   
  
