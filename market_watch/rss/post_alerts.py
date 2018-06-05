@@ -20,6 +20,7 @@ def get_rss_alerts_with_redis(url):
     print("Url: [" + url + "]")
     full_message = ""
     messages_list = []
+    new_posts_list = []
 
     posts = feedparser.parse(url)
     url_hash = int(hashlib.md5(url.encode()).hexdigest(), 16)
@@ -50,12 +51,12 @@ def get_rss_alerts_with_redis(url):
             print("Post created at %s is OLD! Skip sending...." % (stime))
         else:
             print("Post created at %s is NEW! Prepare for sending...." % (stime))
-            posts_list.append(stime)
+            new_posts_list.append(stime)
             message = post.link
             messages_list.append(message)
 
     #print("New Posts List %s" % posts_list)
-    posts_list.sort(reverse=True)
+    posts_list = new_posts_list + posts_list
     print("Full Posts List %s" % posts_list[:NEW_POSTS_COUNT])
     new_json_arr = json.dumps(posts_list[:NEW_POSTS_COUNT])
     redis_pool.setV(rkey, new_json_arr)    
@@ -119,6 +120,7 @@ def main():
                 #'http://fb2rss.altervista.org/?id=767813843325038', #Eddie Team
                 'http://hkstockinvestment.blogspot.com/feeds/posts/default', #偉哥投資手札
                 'https://parisvalueinvesting.blogspot.com/feeds/posts/default', #巴黎的價值投資
+                'https://happyvalleyjockey.blogspot.com/feeds/posts/default', #巴黎的價值投資
                 'http://www.justacafe.com/feeds/posts/default', #Just a Cafe
                 #'http://fb2rss.altervista.org/?id=974946689232967' #Starman 資本攻略
                 ]

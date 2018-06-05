@@ -14,7 +14,7 @@ import json
 config = config_loader.load()
 
 DEL = '\n\n'
-NEW_TWEET_COUNT = 30
+NEW_TWEET_COUNT = 30 
 GET_TWEET_COUNT = 10
 
 LOADING = [u'\U0000231B', u'\U0001F6AC', u'\U0001F37B', u'\U0001F377', u'\U000023F3', u'\U0000231A', u'\U0001F30F']
@@ -25,7 +25,7 @@ API = twitter.Api(consumer_key=config.get("twitter","consumer_key"),
                     access_token_secret=config.get("twitter","access_token_secret"),
                     tweet_mode='extended')
 
-def push_tweet(name, tcount=1):
+def push_tweet(name, tcount=1, test=False):
 
     sname = '@%s' % name
     rkey = "Twitter:" + name.lower()
@@ -48,29 +48,35 @@ def push_tweet(name, tcount=1):
         return
 
     messages_list = []
-    
+    new_tweet_list = []
     for s in statuses:
         if (str(s.id) in tweet_list):
             print("%s created at %s is OLD! Skip sending...." % (s.id, s.created_at))
         else:
             print("%s created at %s is NEW! Prepare for sending...." % (s.id, s.created_at))
-            tweet_list.append(str(s.id))
+            new_tweet_list.append(str(s.id))
             url = ('https://mobile.twitter.com/i/web/status/%s' % s.id)
             created = str(s.created_at)
             text = re.sub(r"\$([A-Za-z]+)",r"/qd\1", s.full_text)
             message = "%s\n(<a href='%s'>%s</a>)" % (text, url, "Post@ " + created.split('+')[0] + "GMT")
             messages_list.append(message)
 
-    tweet_list.sort(reverse=True)
-    print("Full Tweet List %s" % tweet_list[:NEW_TWEET_COUNT])
+    
+    print("BEFORE Tweet List %s" % tweet_list)
+    tweet_list = new_tweet_list + tweet_list
+    print("AFTER Tweet List %s" % tweet_list)
+    print("AFTER Tweet List (LIMIT) %s" % tweet_list[:NEW_TWEET_COUNT])
     new_json_arr = json.dumps(tweet_list[:NEW_TWEET_COUNT])
     redis_pool.setV(rkey, new_json_arr)    
 
     if messages_list:
         messages_list.insert(0, "<pre>\n</pre>" + random.choice(LOADING) + "<b>@%s is Tweeting...</b>" % name)
         full_message = DEL.join(messages_list)
-        #bot_sender.broadcast_list(full_message)
-        bot_sender.broadcast_list(full_message, "telegram-twitter")
+
+        if (test):
+            bot_sender.broadcast_list(full_message)
+        else:
+            bot_sender.broadcast_list(full_message, "telegram-twitter")
     
 def get_tweet(name, tcount=1):
 
@@ -104,6 +110,7 @@ def trump(tcount=1):
 def main(args):
     
     start_time = time.time()
+    isTest = False 
 
     if (len(args) > 1 and args[1] == "push_tweet"):
         WATCHER = ['realDonaldTrump',
@@ -115,12 +122,20 @@ def main(args):
                     'sjosephburns', 
                     #'RRGresearch', 
                     #'RyanDetrick'
-                    'LoneStockTrader',
-                    'zerohedge'
+                    'alsabogal',
+                    'tradeciety',
+                    'sunrisetrader',
+                    'rayner_teo',
+                    'AsennaWealth',
+                    'topdowncharts',
+                    'AmyAtrade',
+                    'zerohedge',
                     ]
-        #WATCHER = ['realDonaldTrump']
+        if isTest:
+            WATCHER = ['AmyAtrade']
+
         for w in WATCHER:
-            push_tweet(w)
+            push_tweet(w, test=isTest)
     else:
         get_tweet('sjosephburns', 15)
     

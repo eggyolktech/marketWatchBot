@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 from market_watch.telegram import bot_sender
 from market_watch.redis import redis_pool
 
-NEW_POSTS_COUNT = 20
+NEW_POSTS_COUNT = 25
 GET_POSTS_COUNT = 10 
 DEL = "\n\n"
 
@@ -45,7 +45,8 @@ def push_posts_list(group, plist, tg_group):
     json_arr = redis_pool.getV(rkey)
     posts_list = []    
     messages_list = []
-    
+    new_posts_list = []   
+ 
     if (json_arr):
         print("Posts Redis Cache exists for [%s]" % rkey)
         json_arr = json_arr.decode()        
@@ -61,12 +62,14 @@ def push_posts_list(group, plist, tg_group):
             print("Post ID [%s] is OLD! Skip sending...." % (pid))
         else:
             print("Post ID [%s] is NEW! Prepare for sending...." % (pid))
-            posts_list.append(pid)
+            new_posts_list.append(pid)
             message = "https://www.facebook.com/%s/posts/%s" % (group, pid)
             messages_list.append(message)
-     
-    posts_list.sort(reverse=True)
-    print("Full Posts List %s" % posts_list[:NEW_POSTS_COUNT])
+    
+    print("BEFORE Post List %s" % posts_list)
+    posts_list = new_posts_list + posts_list
+    print("AFTER Posts List %s" % posts_list)
+    print("AFTER Posts List (Limited) %s" % posts_list[:NEW_POSTS_COUNT])
     new_json_arr = json.dumps(posts_list[:NEW_POSTS_COUNT])
     redis_pool.setV(rkey, new_json_arr)         
     send_count = 1
@@ -90,10 +93,12 @@ def main():
                 'sky788', #張士佳 - Sky Sir
                 '112243028856273', #英之見 - 基金經理黃國英Alex Wong
                 'eddietamcai', #Eddie Team
+                'thinkingweb',
                 'Starmancapital', #Starman 資本攻略
                 ]
     
     if (isTest):
+        grpList = []
         tg_group = "telegram-chat-test"
     else:
         tg_group = "telegram-notice"
@@ -102,14 +107,15 @@ def main():
         plist = get_posts_list(group)
         push_posts_list(group, plist, tg_group)          
 
-    grpList = ['SimonIRBasilica', #平行時空：沈旭暉國際學術新聞台
+    grpList = [
+                'SimonIRBasilica', #平行時空：沈旭暉國際學術新聞台
                 'shensimon', #堅離地城：沈旭暉國際生活台 Simon's Glocal World
                 'SimonStamps', #萬國郵政 Simon's Stamps International
-                'glollege', #Glollege 放眼
                 'mshktech', #Microsoft HK Technical Community
                 ]
 
     if (isTest):
+        grpList = ['SimonStamps',]
         tg_group = "telegram-chat-test"
     else:
         tg_group = "telegram-itdog"

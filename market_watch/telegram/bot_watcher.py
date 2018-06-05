@@ -17,6 +17,7 @@ import resource
 from market_watch.common.AastocksEnum import TimeFrame, FxCode, IndexCode
 from market_watch.common.AastocksConstants import *
 
+from market_watch.yahoo import worldindices
 from market_watch.dailyfx import market_calendar
 from market_watch.aastocks import top_yield, charting, company_news, result_announcement, indices, forex, futures, company_profile
 from market_watch.stockq import commodities
@@ -248,7 +249,7 @@ def on_chat_message(msg):
         elif (action == "cn"):
             bot.sendMessage(chat_id, indices.get_indices("cn"), parse_mode='HTML') 
         elif (action == "w"):
-             bot.sendMessage(chat_id, indices.get_indices("w"), parse_mode='HTML') 
+             bot.sendMessage(chat_id, worldindices.get_indices(), parse_mode='HTML') 
         elif (action == "fx"):
             bot.sendMessage(chat_id, forex.get_forex(), parse_mode='HTML')
         elif (action == "adr"):
@@ -306,6 +307,7 @@ def on_chat_message(msg):
                     {'command': '/qN[code]', 'desc': 'Result Calendar (HK Only)', 'icon': u'\U0001F4C8'},                    
                     {'command': '/qn[code]', 'desc': 'Latest News (HK Only)', 'icon': u'\U0001F4C8'},                    
                     {'command': '/qq', 'desc': 'Quick Quote', 'icon': u'\U0001F42E'},
+                    {'command': '/qp', 'desc': 'Dividenc & OCF History', 'icon': u'\U0001F42E'},
                     {'command': '/qR', 'desc': 'Industries List', 'icon': u'\U0001F42E'},
                     {'command': '/qr[code1] [code2]', 'desc': 'Relative Strength', 'icon': u'\U0001F42E'},
                     {'command': '/qs', 'desc': 'Chicken Sectormap', 'icon': u'\U0001F414'},
@@ -461,6 +463,15 @@ def on_chat_message(msg):
                 bot.sendMessage(chat_id, company_news.get_latest_news_by_code(code, 8), parse_mode='HTML')
             else:
                 bot.sendMessage(chat_id, us_company_news.get_latest_news_by_code(code, 10), parse_mode='HTML')
+            return    
+        
+        elif (action == "p"):
+
+            if (is_number(code)):
+                bot.sendMessage(chat_id, company_profile.get_dividend(code), parse_mode='HTML')
+                bot.sendMessage(chat_id, company_profile.get_ocf(code), parse_mode='HTML')
+            else:
+                bot.sendMessage(chat_id, "Only HK Stock is supported", parse_mode='HTML')
             return    
  
         elif (action.lower() == "q"):
