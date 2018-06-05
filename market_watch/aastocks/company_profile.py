@@ -138,13 +138,13 @@ def get_cashflow(code):
     if (div and div.find("script")):
         
         toc = div.findAll("script")[0].text.strip().replace("drawBarChart", "").replace(";","")
-        toc = ast.literal_eval(t)
+        toc = ast.literal_eval(toc)
         dates = [date.strip() for date in toc[3]]
         ocfs = [cf for cf in toc[4]]
         curr_cfs = toc[6].strip()
 
         tnc = div.findAll("script")[1].text.strip().replace("drawBarChart", "").replace(";","")
-        tnc = ast.literal_eval(t)
+        tnc = ast.literal_eval(tnc)
         oncs = [nc for nc in tnc[4]]
         curr_ncs = tnc[6].strip()
         
