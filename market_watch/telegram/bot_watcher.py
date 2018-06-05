@@ -469,7 +469,7 @@ def on_chat_message(msg):
 
             if (is_number(code)):
                 bot.sendMessage(chat_id, company_profile.get_dividend(code), parse_mode='HTML')
-                bot.sendMessage(chat_id, company_profile.get_ocf(code), parse_mode='HTML')
+                bot.sendMessage(chat_id, company_profile.get_cashflow(code), parse_mode='HTML')
             else:
                 bot.sendMessage(chat_id, "Only HK Stock is supported", parse_mode='HTML')
             return    
