@@ -116,6 +116,84 @@ def get_ocf(code):
     
     return passage   
  
+def get_cashflow(code):
+
+    if (is_number(code)):
+        print("Code to Quote: [" + code + "]")
+    else:
+        return "<i>Usage:</i> " + "/qp" + "[StockCode] (e.g. " + "/qp1660" + ")"   
+    url = "https://www.etnet.com.hk/www/eng/stocks/realtime/quote_ci_cashflow.php?code=%s" % (code)
+     
+    print("URL: [" + url + "]")  
+    
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+
+    r = requests.get(url, headers=headers)
+    html = r.text
+    soup = BeautifulSoup(html, "html5lib")
+    passage = ""
+    
+    div = soup.find("div", {"class": "DivFigureContent"})
+    
+    if (div and div.find("script")):
+        
+        toc = div.findAll("script")[0].text.strip().replace("drawBarChart", "").replace(";","")
+        toc = ast.literal_eval(t)
+        dates = [date.strip() for date in toc[3]]
+        ocfs = [cf for cf in toc[4]]
+        curr_cfs = toc[6].strip()
+
+        tnc = div.findAll("script")[1].text.strip().replace("drawBarChart", "").replace(";","")
+        tnc = ast.literal_eval(t)
+        oncs = [nc for nc in tnc[4]]
+        curr_ncs = tnc[6].strip()
+        
+    else:
+        return ("No Cashflow Info found for [%s]" % code)
+
+    for idx, val in enumerate(dates):
+
+        if idx > 0:
+            print("%s / %s" % (ocfs[idx], ocfs[idx-1]))
+            change_pct = (int(ocfs[idx]) - int(ocfs[idx-1])) / abs(int(ocfs[idx-1]))
+            if change_pct > 0:
+                change_pct = u'\U0001F332' + ("%.2f" % (change_pct*100))
+            elif change_pct < 0:
+                change_pct = u'\U0001F53B' + ("%.2f" % (change_pct*100)).replace("-","")
+        else:
+            change_pct = "-"
+        
+        passage = passage + ("%s: %s$%s (%s%%)" % (val, curr_cfs, ocfs[idx].replace("-", u'\U00002796'), change_pct)) + EL
+    
+    passage = "<i>Net Operating Cashflow</i>"  + DEL + passage
+
+    passage_new = ""
+    
+    for idx, val in enumerate(dates):
+
+        if idx > 0:
+            print("%s / %s" % (oncs[idx], oncs[idx-1]))
+            change_pct = (int(oncs[idx]) - int(oncs[idx-1])) / abs(int(oncs[idx-1]))
+            if change_pct > 0:
+                change_pct = u'\U0001F332' + ("%.2f" % (change_pct*100))
+            elif change_pct < 0:
+                change_pct = u'\U0001F53B' + ("%.2f" % (change_pct*100)).replace("-","")
+        else:
+            change_pct = "-"
+        
+        passage_new = passage_new + ("%s: %s$%s (%s%%)" % (val, curr_ncs, oncs[idx].replace("-", u'\U00002796'), change_pct)) + EL
+    
+    passage_new = "<i>Change in Cash Equivalents</i>"  + DEL + passage_new
+    
+    passage = passage + DEL + passage_new
+    
+    if (not passage):
+        return ("No Cashflow Info found for [%s]" % code)
+    else:
+        passage = ("<a href='%s'>Cashflow History for %s.HK</a>" % (url, code)) + DEL + passage
+    
+    return passage   
+ 
 
 def get_profile(code):
 
@@ -217,8 +295,9 @@ def get_profile(code):
     
 def main():
 
-    for code in ["1233", "700", "1660", "87001"]:
-        print(get_ocf(code))
+    #for code in ["1233", "700", "1660", "87001"]:
+    for code in ["5"]:
+        print(get_cashflow(code))
         #print(get_dividend(code))
 
     #print(get_ocf("1660"))
