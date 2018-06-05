@@ -163,7 +163,7 @@ def get_cashflow(code):
         else:
             change_pct = "-"
         
-        passage = passage + ("%s: %s$%s (%s%%)" % (val, curr_cfs, ocfs[idx].replace("-", u'\U00002796'), change_pct)) + EL
+        passage = passage + ("%s: %s$%s (%s%%)" % (val, curr_cfs, rf2s(ocfs[idx]).replace("-", u'\U00002796'), change_pct)) + EL
     
     passage = "<i>Net Operating Cashflow</i>"  + DEL + passage
 
@@ -181,7 +181,7 @@ def get_cashflow(code):
         else:
             change_pct = "-"
         
-        passage_new = passage_new + ("%s: %s$%s (%s%%)" % (val, curr_ncs, oncs[idx].replace("-", u'\U00002796'), change_pct)) + EL
+        passage_new = passage_new + ("%s: %s$%s (%s%%)" % (val, curr_ncs, rf2s(oncs[idx]).replace("-", u'\U00002796'), change_pct)) + EL
     
     passage_new = "<i>Change in Cash Equivalents</i>"  + DEL + passage_new
     
@@ -308,6 +308,31 @@ def is_number(s):
         return True
     except ValueError:
         return False
+    
+def is_float(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+def rf2s(number):
+    if (number and (is_number(number) or is_float(number))):
+
+        length = len(str(abs(number)).split(".")[0])
+        #print(length)
+        if (length >= 10):
+            return ("%.2f" % (number/1000000000) + "B")
+        elif (length >= 7):
+            return ("%.2f" % (number/1000000) + "M")
+        elif (length >= 4):
+            return ("%.2f" % (number/1000) + "K")
+        elif (length >= 2):
+            return ("%.2f" % (number))
+        else:
+            return str(number)
+    else:
+        return number
      
 if __name__ == "__main__":
     main()                
