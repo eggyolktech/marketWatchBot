@@ -40,18 +40,19 @@ def get_dividend(code):
         t = ast.literal_eval(t)
         dates = [date.replace("\\","").strip() for date in t[2]]
         dpsl = [dps for dps in t[3]]
+        curr = t[9].strip()
         ratios = [ratio for ratio in t[4]]
     else:
         return ("No dividend history for [%s]" % code)
 
     for idx, val in enumerate(dates):
 
-        passage = passage + ("%s: $%.3f (%s%%)" % (val, dpsl[idx], ratios[idx])) + EL
+        passage = passage + ("%s: %s$%.3f (%s%%)" % (val, curr, dpsl[idx], ratios[idx])) + EL
     
     if (not passage):
         return ("No dividend history for [%s]" % code)
     else:
-        passage = "<i>Dividend History for " + code + ".HK</i>" + DEL + passage
+        passage = ("<a href='%s'>Dividend History for %s.HK</a>" % (url, code)) + DEL + passage
     
     return passage   
  
@@ -98,7 +99,7 @@ def get_ocf(code):
 
         if idx > 0:
             print("%s / %s" % (ocfs[idx], ocfs[idx-1]))
-            change_pct = (int(ocfs[idx]) - int(ocfs[idx-1])) / int(ocfs[idx-1])
+            change_pct = (int(ocfs[idx]) - int(ocfs[idx-1])) / abs(int(ocfs[idx-1]))
             if change_pct > 0:
                 change_pct = u'\U0001F332' + ("%.2f" % (change_pct*100))
             elif change_pct < 0:
@@ -111,7 +112,7 @@ def get_ocf(code):
     if (not passage):
         return ("No ocf history for [%s]" % code)
     else:
-        passage = "<i>Net Operating Cashflow for " + code + ".HK</i>" + DEL + passage
+        passage = "<a href='%s'>Net Operation Cashflow for %s.HK</a>" % (url, code)) + DEL + passage
     
     return passage   
  
