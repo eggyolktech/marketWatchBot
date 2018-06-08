@@ -30,7 +30,7 @@ from market_watch.alpha import analysis_loader
 from market_watch.fool import fool_loader
 from market_watch.qq import us_company_news
 from market_watch.twitter import tweet
-from market_watch.finviz import charting as fcharting
+from market_watch.finviz import heatmap, charting as fcharting
 from market_watch.cnn import ust
 from market_watch.quantum import tickersearch
 from market_watch.bondsupermart import tickersearch as super_tickersearch
@@ -312,6 +312,7 @@ def on_chat_message(msg):
                     {'command': '/qr[code1] [code2]', 'desc': 'Relative Strength', 'icon': u'\U0001F42E'},
                     {'command': '/qs', 'desc': 'Chicken Sectormap', 'icon': u'\U0001F414'},
                     {'command': '/qS[code]', 'desc': 'Get Company Profile', 'icon': u'\U0001F414'},
+                    {'command': '/qv[code]', 'desc': 'Finviz qChart (US only)', 'icon': u'\U0001F414'}, 
                     {'command': '/qY', 'desc': 'Treasury Yield', 'icon': u'\U0001F414'}, 
                     {'command': '/l', 'desc': 'Live Quote Commands', 'icon': u'\U0001F414'},
         ]
@@ -569,6 +570,13 @@ def on_chat_message(msg):
             else:
                 bot.sendPhoto(chat_id, f)                
             return                 
+
+        elif (action == "v"):
+
+            if (is_number(code)):
+                bot.sendMessage(chat_id, "Non US-stock is not supported!", parse_mode='HTML')
+            else:
+                bot.sendMessage(chat_id, heatmap.get_chart(code), parse_mode='HTML')
     
         elif (action == "Y"):
             result = ust.get_ust_yield()

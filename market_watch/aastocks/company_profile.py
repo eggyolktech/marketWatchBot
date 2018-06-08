@@ -98,7 +98,7 @@ def get_ocf(code):
     for idx, val in enumerate(dates):
 
         if idx > 0:
-            print("%s / %s" % (ocfs[idx], ocfs[idx-1]))
+            #print("%s / %s" % (ocfs[idx], ocfs[idx-1]))
             change_pct = (int(ocfs[idx]) - int(ocfs[idx-1])) / abs(int(ocfs[idx-1]))
             if change_pct > 0:
                 change_pct = u'\U0001F332' + ("%.2f" % (change_pct*100))
@@ -141,6 +141,9 @@ def get_cashflow(code):
         toc = ast.literal_eval(toc)
         dates = [date.strip() for date in toc[3]]
         ocfs = [cf for cf in toc[4]]
+        if (ocfs[-1] == 0):
+            print("Last OCF is 0, change to Aastocks")
+            return get_ocf(code) 
         curr_cfs = toc[6].strip()
 
         tnc = div.findAll("script")[1].text.strip().replace("drawBarChart", "").replace(";","")
@@ -154,7 +157,7 @@ def get_cashflow(code):
     for idx, val in enumerate(dates):
 
         if idx > 0:
-            print("%s / %s" % (ocfs[idx], ocfs[idx-1]))
+            #print("%s / %s" % (ocfs[idx], ocfs[idx-1]))
             change_pct = (int(ocfs[idx]) - int(ocfs[idx-1])) / abs(int(ocfs[idx-1]))
             if change_pct > 0:
                 change_pct = u'\U0001F332' + ("%.2f" % (change_pct*100))
@@ -296,9 +299,9 @@ def get_profile(code):
 def main():
 
     #for code in ["1233", "700", "1660", "87001"]:
-    for code in ["5"]:
+    for code in ["581"]:
         print(get_cashflow(code))
-        #print(get_dividend(code))
+        print(get_ocf(code))
 
     #print(get_ocf("1660"))
     
@@ -318,7 +321,6 @@ def is_float(s):
 
 def rf2s(number):
     if (number and (is_number(number) or is_float(number))):
-
         length = len(str(abs(number)).split(".")[0])
         #print(length)
         if (length >= 10):
@@ -332,7 +334,7 @@ def rf2s(number):
         else:
             return str(number)
     else:
-        return number
+        return str(number)
      
 if __name__ == "__main__":
     main()                

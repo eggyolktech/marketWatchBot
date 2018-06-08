@@ -74,9 +74,20 @@ def get_map():
     #print(divOverlay)
     imgurl = divOverlay.find("img")['src']
     return imgurl
+
+def get_chart(code):
+
+    purl = "https://finviz.com/quote.ashx?t=%s" % code
+    furl = "https://finviz.com/chart.ashx?t=%s&ta=1&p=d&s=l" % code
+
+    message = "<a href='%s'>Quick Chart for %s</a> (<a href='%s'>Profile</a>)" % (furl, code.upper(), purl)
+    return message
     
 def main():
+    
+    #print(get_chart("baba"))    
 
+    url = None
     url = get_map()
     if (url):
         bot_sender.send_remote_image(url, "telegram-twitter")
