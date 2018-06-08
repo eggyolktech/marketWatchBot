@@ -188,7 +188,7 @@ def get_cashflow(code):
     
     passage_new = "<i>Change in Cash Equivalents</i>"  + DEL + passage_new
     
-    passage = passage + DEL + passage_new
+    passage = passage + EL + passage_new
     
     if (not passage):
         return ("No Cashflow Info found for [%s]" % code)
