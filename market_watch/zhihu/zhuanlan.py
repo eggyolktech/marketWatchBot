@@ -16,7 +16,7 @@ DEL = "\n\n"
 
 def get_posts_list(group):
 
-    url = "https://www.facebook.com/pg/%s/posts/?ref=page_internal" % group
+    url = "https://zhuanlan.zhihu.com/%s" % group
 
     print("URL: [" + url + "]")
 
@@ -26,22 +26,24 @@ def get_posts_list(group):
     html = r.text 
 
     soup = BeautifulSoup(html, "html.parser")
-    divs = soup.find_all("div", id=re.compile("^feed_subtitle_"))
-    
+    articles = soup.find_all("li", {"class": "ArticleItem"})
     posts_list = []
     
-    for div in divs:
-        idlist = div.get('id').split(";")
-
-        if (len(idlist) > 1):
-            posts_list.append(idlist[1].strip())
+    for article in articles:
+        art_a = article.find("a", {"class": "ArticleItem-Excerpt"})
+        
+        if (art_a):
+            url = art_a['href']
+            title = article.find("h3", {"class": "ArticleItem-Title"}).text.strip()
+            post = {"url": url, "title": title}        
+            posts_list.append(post)
     
     print("Post List Size: %s" % len(posts_list))
     return posts_list
 
 def push_posts_list(group, plist, tg_group):
 
-    rkey = "FB:" + group
+    rkey = "ZH:" + group
     json_arr = redis_pool.getV(rkey)
     posts_list = []    
     messages_list = []
@@ -56,14 +58,16 @@ def push_posts_list(group, plist, tg_group):
     else:
         get_count = NEW_POSTS_COUNT
 
-    for pid in plist[:get_count]:
+    for post in plist[:get_count]:
+        
+        pid = post['url'].split("/")[-1]
     
         if (pid in posts_list):
             print("Post ID [%s] is OLD! Skip sending...." % (pid))
         else:
             print("Post ID [%s] is NEW! Prepare for sending...." % (pid))
             new_posts_list.append(pid)
-            message = "https://www.facebook.com/%s/posts/%s" % (group, pid)
+            message = "%s\n%s" % (post['title'], post['url'])
             messages_list.append(message)
     
     print("BEFORE Post List %s" % posts_list)
@@ -77,7 +81,7 @@ def push_posts_list(group, plist, tg_group):
     for msg in messages_list:
     
         if (send_count == 1):
-            msg  = u'\U0001F4F0' + " <b>Latest Posts Updates</b>" + DEL + msg
+            msg  = u'\U0001F4F0' + " <b>Latest Zhihu Updates</b>" + DEL + msg
         
         print("Msg sent: [%s]" % msg)
         bot_sender.broadcast_list(msg, tg_group)
@@ -86,16 +90,10 @@ def push_posts_list(group, plist, tg_group):
     
 def main():
 
-    isTest = False 
+    isTest = True 
         
-    grpList = ['ivanliresearch', #Ivan Li 李聲揚 - 華麗后台
-                'DrLamInv', #Dr Lam
-                'sky788', #張士佳 - Sky Sir
-                '112243028856273', #英之見 - 基金經理黃國英Alex Wong
-                'eddietamcai', #Eddie Team
-                'thinkingweb',
-                'Starmancapital', #Starman 資本攻略
-                ]
+    grpList = ['diqiuzhishiju', #地球知识局
+              ]
     
     if (isTest):
         grpList = []
@@ -105,24 +103,7 @@ def main():
 
     for group in grpList:
         plist = get_posts_list(group)
-        push_posts_list(group, plist, tg_group)          
-
-    grpList = [
-                'SimonIRBasilica', #平行時空：沈旭暉國際學術新聞台
-                'shensimon', #堅離地城：沈旭暉國際生活台 Simon's Glocal World
-                'SimonStamps', #萬國郵政 Simon's Stamps International
-                'mshktech', #Microsoft HK Technical Community
-                ]
-
-    if (isTest):
-        grpList = ['SimonStamps',]
-        tg_group = "telegram-chat-test"
-    else:
-        tg_group = "telegram-itdog"
-        
-    for group in grpList:
-        plist = get_posts_list(group)
-        push_posts_list(group, plist, tg_group)
+        push_posts_list(group, plist, tg_group) 
 
 if __name__ == "__main__":
     main()        
