@@ -573,10 +573,16 @@ def on_chat_message(msg):
 
         elif (action == "v"):
 
-            if (is_number(code)):
-                bot.sendMessage(chat_id, "Non US-stock is not supported!", parse_mode='HTML')
-            else:
-                bot.sendMessage(chat_id, heatmap.get_chart(code), parse_mode='HTML')
+            urls = heatmap.get_charts(code, params)
+
+            for url in urls:
+                try:
+                    f = urllib.request.urlopen(url, timeout=10)
+                except:
+                    bot.sendMessage(chat_id, u'\U0001F423' + ' Request Timeout', parse_mode='HTML')
+                else:
+                    bot.sendPhoto(chat_id, f)
+            return
     
         elif (action == "Y"):
             result = ust.get_ust_yield()

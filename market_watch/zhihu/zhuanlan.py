@@ -6,9 +6,16 @@ import json
 import re
 import time
 import requests
+import os
 from bs4 import BeautifulSoup
 from market_watch.telegram import bot_sender
 from market_watch.redis import redis_pool
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 NEW_POSTS_COUNT = 25
 GET_POSTS_COUNT = 10 
@@ -16,14 +23,42 @@ DEL = "\n\n"
 
 def get_posts_list(group):
 
+    if (os.name == 'nt'):
+        options = Options()
+        options.add_experimental_option("excludeSwitches",["ignore-certificate-errors"])
+        options.add_argument('--disable-gpu')
+        options.add_argument('--headless')
+        browser = webdriver.Chrome(executable_path="C:\Wares\chromedriver.exe", chrome_options=options)
+    else:
+        browser = webdriver.PhantomJS()
+
     url = "https://zhuanlan.zhihu.com/%s" % group
 
     print("URL: [" + url + "]")
 
-    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+    browser.get(url)
 
-    r = requests.get(url, headers=headers)
-    html = r.text 
+    print("Start dummy pass...")
+    try:
+        browser.implicitly_wait(3) # seconds
+        myDynamicElement = browser.find_element_by_id("dummyid")
+    except:
+        pass
+
+    try:
+        browser.implicitly_wait(5) # seconds
+        alert = browser.switch_to_alert()
+        error = alert.text
+        alert.accept()
+        print("alert accepted")
+        browser.close()
+    except:
+        print("no alert")
+
+    html = browser.page_source
+    browser.close()
+
+    #print(html)
 
     soup = BeautifulSoup(html, "html.parser")
     articles = soup.find_all("li", {"class": "ArticleItem"})
@@ -90,16 +125,16 @@ def push_posts_list(group, plist, tg_group):
     
 def main():
 
-    isTest = True 
+    isTest = False
         
     grpList = ['diqiuzhishiju', #地球知识局
               ]
     
     if (isTest):
-        grpList = []
+        grpList = ['diqiuzhishiju', ]
         tg_group = "telegram-chat-test"
     else:
-        tg_group = "telegram-notice"
+        tg_group = "telegram-itdog"
 
     for group in grpList:
         plist = get_posts_list(group)

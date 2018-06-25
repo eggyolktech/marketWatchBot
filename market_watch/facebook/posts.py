@@ -112,10 +112,15 @@ def main():
                 'shensimon', #堅離地城：沈旭暉國際生活台 Simon's Glocal World
                 'SimonStamps', #萬國郵政 Simon's Stamps International
                 'mshktech', #Microsoft HK Technical Community
+                'parentingtw',
+                'hk01parenting',
+                #'parenting.reading',
+                #'parenting.lifebuzz', #親子天下‧寶寶生活
+                'gushi.tw',
                 ]
 
     if (isTest):
-        grpList = ['SimonStamps',]
+        grpList = ['gushi.tw',]
         tg_group = "telegram-chat-test"
     else:
         tg_group = "telegram-itdog"

@@ -122,14 +122,16 @@ def main():
                 'https://parisvalueinvesting.blogspot.com/feeds/posts/default', #巴黎的價值投資
                 'https://happyvalleyjockey.blogspot.com/feeds/posts/default', #巴黎的價值投資
                 'http://www.justacafe.com/feeds/posts/default', #Just a Cafe
+                'http://kenjinrong.com/feed/', #Kenjinrong
+                'http://blog.sina.com.cn/rss/1182426800.xml', #陶冬的博客
                 #'http://fb2rss.altervista.org/?id=974946689232967' #Starman 資本攻略
                 ]
     
-    isTest = False 
+    isTest = False
     tg_group = "telegram-notice" 
     
     if (isTest):
-        repoList = ['http://fb2rss.altervista.org/?id=974946689232967', ]
+        repoList = ['http://feed.tw.wxwenku.com/a/4153/feed', ]
         tg_group = "telegram-chat-test"   
 
     push_rss(repoList, tg_group)
@@ -141,7 +143,9 @@ def main():
                 #'http://fb2rss.altervista.org/?id=223783954322429', #堅離地城：沈旭暉國際生活台 Simon's Glocal World
                 #'http://fb2rss.altervista.org/?id=393581457698786', #萬國郵政 Simon's Stamps International
                 #'http://fb2rss.altervista.org/?id=713511925511617', #Glollege放眼
+                'http://feed.tw.wxwenku.com/a/4153/feed', #Kenjinrong (new)
                 'https://www.finlab.tw/atom.xml', #回測與選股教學部落格
+                'http://feed.tw.wxwenku.com/a/326/feed', #混子曰
                 #'http://fb2rss.altervista.org/?id=246310051900', #Microsoft HK Technical Community
                 ]
 

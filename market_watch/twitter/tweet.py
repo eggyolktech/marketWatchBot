@@ -25,7 +25,7 @@ API = twitter.Api(consumer_key=config.get("twitter","consumer_key"),
                     access_token_secret=config.get("twitter","access_token_secret"),
                     tweet_mode='extended')
 
-def push_tweet(name, tcount=1, test=False):
+def push_tweet(name, tcount=1, test=False, group="telegram-twitter"):
 
     sname = '@%s' % name
     rkey = "Twitter:" + name.lower()
@@ -76,7 +76,7 @@ def push_tweet(name, tcount=1, test=False):
         if (test):
             bot_sender.broadcast_list(full_message)
         else:
-            bot_sender.broadcast_list(full_message, "telegram-twitter")
+            bot_sender.broadcast_list(full_message, group) 
     
 def get_tweet(name, tcount=1):
 
@@ -110,7 +110,7 @@ def trump(tcount=1):
 def main(args):
     
     start_time = time.time()
-    isTest = False 
+    isTest = False
 
     if (len(args) > 1 and args[1] == "push_tweet"):
         WATCHER = ['realDonaldTrump',
@@ -129,13 +129,22 @@ def main(args):
                     'AsennaWealth',
                     'topdowncharts',
                     'AmyAtrade',
-                    'zerohedge',
+                    'barronsonline',
+                    'raydalio',
+                    'tradingsim',
+                    #'zerohedge',
                     ]
         if isTest:
-            WATCHER = ['AmyAtrade']
+            WATCHER = ['tradingsim']
 
         for w in WATCHER:
             push_tweet(w, test=isTest)
+
+        WATCHER = ['zerohedge']
+
+        for w in WATCHER:
+            push_tweet(w, group="telegram-twitter-zerohedge")
+
     else:
         get_tweet('sjosephburns', 15)
     

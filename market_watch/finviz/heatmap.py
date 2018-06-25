@@ -41,7 +41,7 @@ def get_map():
         myDynamicElement.click()
     except:
         pass   
-        
+    
     print("Start dummy pass...") 
     try:
         browser.implicitly_wait(3) # seconds
@@ -50,6 +50,13 @@ def get_map():
         pass
 
     print("Start dummy pass 2...") 
+    try:
+        browser.implicitly_wait(3) # seconds
+        myDynamicElement = browser.find_element_by_id("dummyid")
+    except:
+        pass
+
+    print("Start dummy pass 3...") 
     try:
         browser.implicitly_wait(3) # seconds
         myDynamicElement = browser.find_element_by_id("dummyid")
@@ -75,13 +82,26 @@ def get_map():
     imgurl = divOverlay.find("img")['src']
     return imgurl
 
+def get_charts(code, params):
+
+    urls = []
+
+    if (not is_number(code)):
+        urls.append(get_chart(code))
+
+    for p in params:
+        if (not is_number(p)):
+            urls.append(get_chart(p))
+    print(urls)
+    return urls
+
 def get_chart(code):
 
     purl = "https://finviz.com/quote.ashx?t=%s" % code
     furl = "https://finviz.com/chart.ashx?t=%s&ta=1&p=d&s=l" % code
 
-    message = "<a href='%s'>Quick Chart for %s</a> (<a href='%s'>Profile</a>)" % (furl, code.upper(), purl)
-    return message
+    #message = "<a href='%s'>Quick Chart for %s</a> (<a href='%s'>Profile</a>)" % (furl, code.upper(), purl)
+    return furl
     
 def main():
     
@@ -91,6 +111,7 @@ def main():
     url = get_map()
     if (url):
         bot_sender.send_remote_image(url, "telegram-twitter")
+        bot_sender.send_remote_image(url, "telegram-twitter-zerohedge")
     
 def is_number(s):
     try:
