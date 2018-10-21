@@ -32,19 +32,18 @@ def get_result_calendar(code):
     now = datetime.now()
 
     print("Timestamp now: [" + str(now) + "]")
-    rows = soup.find_all("tr", {"class": "CalRABorder"})
+    rows = soup.find("table", {"class": "CalendarResultTable"}).find_all("tr")
 
     if (len(rows) >= 3):
-        rdate = rows[1].text.strip()
-        rcode = rows[2].findAll("td")[0].text.strip()
-        rname = rows[2].findAll("td")[1].text.strip()
-        rind = rows[2].findAll("td")[2].text.strip()
-        rdetail = rows[2].findAll("td")[3].text.strip()
+        cols = rows[1].findAll("td")
+        rdate = cols[0].text.strip()
+        rcode = cols[1].text.strip()
+        rdetail = cols[3].text.strip()
 
-        passage = "<b>" + rcode + "</b>" + EL + rname + " (" + rind + ")" + EL + rdate + " - " + rdetail
+        passage = "<b>" + rcode + "</b>" + EL + rdate + " - " + rdetail
 
     else:
-        passage = soup.find("div", {"id": "cp_pCalErrMsg"}).text.strip()
+        passage = rows[1].text.strip()
 
     return passage
 

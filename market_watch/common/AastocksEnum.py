@@ -4,7 +4,8 @@ class TimeFrame(Enum):
     MONTHLY = 2060
     MONTHLYSHORT = 54
     WEEKLY = 11
-    DAILY = 6
+    #DAILY = 6
+    DAILY = 9
     HOURLY = 5023
     HOURLYSHORT = 4
     MINUTE = 5012

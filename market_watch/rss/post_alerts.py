@@ -52,7 +52,9 @@ def get_rss_alerts_with_redis(url):
         else:
             print("Post created at %s is NEW! Prepare for sending...." % (stime))
             new_posts_list.append(stime)
-            message = post.link
+            #message = post.link
+            message = "<b>" + stitle + "</b>\n"
+            message = message + post.link
             messages_list.append(message)
 
     #print("New Posts List %s" % posts_list)
@@ -86,7 +88,7 @@ def get_rss_alerts(url):
         elapse = time.mktime(gmtime()) - time.mktime(post.published_parsed)
         print("Post #" + str(count) + " - " + post.published + " - " + str(elapse/60) + " mins ago")
         if(elapse/60 <= CHECK_PERIOD):
-            #passage = passage + "<b>" + post.title + "</b> (" + ftitle + ")\n"
+            #passage = passage + "<b>" + post.title + "</b>\n"
             #passage = passage + post.description + "\n"
             #passage = passage + "Published @ " + post.published + "\n\n"
             passage = passage + post.link + "\n\n"
@@ -110,7 +112,8 @@ def push_rss(repo_list, tg_group):
 
 def main():
 
-    repoList = ['http://oldjimpacific.blogspot.com/feeds/posts/default', 
+    repoList = [
+                #'http://oldjimpacific.blogspot.com/feeds/posts/default', 
                 'https://medium.com/feed/@ivansyli', 
                 'http://feeds.feedburner.com/bituzi', 
                 #'http://fb2rss.altervista.org/?id=1744632715750914', #Ivan Li 李聲揚 - 華麗后台
@@ -122,16 +125,17 @@ def main():
                 'https://parisvalueinvesting.blogspot.com/feeds/posts/default', #巴黎的價值投資
                 'https://happyvalleyjockey.blogspot.com/feeds/posts/default', #巴黎的價值投資
                 'http://www.justacafe.com/feeds/posts/default', #Just a Cafe
-                'http://kenjinrong.com/feed/', #Kenjinrong
+                #'http://kenjinrong.com/feed/', #Kenjinrong
                 'http://blog.sina.com.cn/rss/1182426800.xml', #陶冬的博客
                 #'http://fb2rss.altervista.org/?id=974946689232967' #Starman 資本攻略
+                #'http://decky88888888.blogspot.com/feeds/posts/default', #周顯
                 ]
     
-    isTest = False
+    isTest = False 
     tg_group = "telegram-notice" 
     
     if (isTest):
-        repoList = ['http://feed.tw.wxwenku.com/a/4153/feed', ]
+        repoList = ['https://tokuhon.blog/?feed=rss2', ]
         tg_group = "telegram-chat-test"   
 
     push_rss(repoList, tg_group)
@@ -146,6 +150,22 @@ def main():
                 'http://feed.tw.wxwenku.com/a/4153/feed', #Kenjinrong (new)
                 'https://www.finlab.tw/atom.xml', #回測與選股教學部落格
                 'http://feed.tw.wxwenku.com/a/326/feed', #混子曰
+                'https://simonshen.blog/feed/',
+                'http://hk70s.blogspot.com/feeds/posts/default', #七十後
+                'http://asam15.blogspot.com/feeds/posts/default', #
+                'https://investwithcuriosity.blogspot.com/feeds/posts/default?alt=rss', #好奇投資
+                'http://stealjobs.com/feed/', #好工
+                'http://laxinvest.blogspot.com/feeds/posts/default', #懶系爸爸
+                'http://halfemptypapa.blogspot.com/feeds/posts/default', #半桶水爸爸
+                'http://www.airmanblue.com/feeds/posts/default', #藍冰
+                'http://cherry1201.blogspot.com/feeds/posts/default', #自由工作者的自由投資路
+                'https://purposelife42583.blogspot.com/feeds/posts/default', #80後標竿人生
+                'https://sanrenxing80s.blogspot.com/feeds/posts/default', #三人行
+                'http://wisdominvesting.blogspot.com/feeds/posts/default', #Wisdom
+                'https://magicianyang.blogspot.com/feeds/posts/default',
+                'http://shawntsai.blogspot.com/feeds/posts/default',
+                'http://aska-flybird.blogspot.com/feeds/posts/default',
+                'https://tokuhon.blog/?feed=rss2'
                 #'http://fb2rss.altervista.org/?id=246310051900', #Microsoft HK Technical Community
                 ]
 

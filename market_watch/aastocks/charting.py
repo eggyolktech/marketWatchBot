@@ -20,16 +20,26 @@ def get_hkg_chart_list_by_type(code, action, params):
     
     for p in params:
         pl = p.lower()
-        if (pl == "bb" or pl == "sma" or pl == "night"):
+        if pl in ("bb", "sma", "night", "gcc"):
             ind_params.append(pl)
 
     url_dict_list.append({'code': code, 'url': get_hkg_chart_by_type(code, action, ind_params)})
     
     for p in params:
-        if (not p == "bb" and not p == "sma" and not p == "night"):
+        if not p in ("bb", "sma", "night", "gcc"):
             url_dict_list.append({'code': p, 'url': get_hkg_chart_by_type(p, action, ind_params)})
     
     return url_dict_list
+
+
+def get_hkg_chart_by_type_list(code, params):
+
+    url_list = []
+
+    for tf in ("M", "w", "d", "h"):
+        url_list.append(get_hkg_chart_by_type(code, tf, params))
+
+    return url_list        
 
 def get_hkg_chart_by_type(code, action, params):
 
@@ -39,6 +49,7 @@ def get_hkg_chart_by_type(code, action, params):
     is_sma = False
     is_night = False
     is_ahft = False
+    is_gcc = False
     is_num = False
     is_CN = False
     is_US = False
@@ -51,6 +62,8 @@ def get_hkg_chart_by_type(code, action, params):
             is_sma = True
         elif (p.lower() == "night"):
             is_night = True
+        elif (p.lower() == "gcc"):
+            is_gcc = True
     
     # Determine which code type base on input format
     is_num = is_number(code)
@@ -117,6 +130,8 @@ def get_hkg_chart_by_type(code, action, params):
         indicator = "&Indicator=9&indpara1=20&indpara2=2&indpara3=0&indpara4=0&indpara5=0"
     if (is_sma):
         indicator = "&Indicator=1&indpara1=4&indpara2=6&indpara3=14&indpara4=27&indpara5=40&indpara6=52"
+    if (is_gcc):
+        indicator = "&Indicator=1&indpara1=50&indpara2=200"
     
     if (is_ahft):
         ahft_param = "&AHFT=T"
@@ -158,17 +173,17 @@ def get_aastocks_alpha_code(code):
 def main():
 
     tf = "h"
-    print(get_hkg_chart_list_by_type("4911j", "m", []))
-    print(get_hkg_chart_list_by_type("4911J", "h", []))
-    print(get_hkg_chart_list_by_type("49111", "m", []))
-    print(get_hkg_chart_list_by_type("4922k", "m", []))
-    print(get_hkg_chart_list_by_type("4933J", "M", []))
+    #print(get_hkg_chart_list_by_type("4911j", "m", []))
+    #print(get_hkg_chart_list_by_type("4911J", "h", []))
+    #print(get_hkg_chart_list_by_type("49111", "m", []))
+    #print(get_hkg_chart_list_by_type("4922k", "m", []))
+    #print(get_hkg_chart_list_by_type("4933J", "M", []))
     #print(get_hkg_chart_list_by_type("MHSIF", tf, []))
     #print(get_hkg_chart_list_by_type("NIKKEI", tf, []))
     #print(get_hkg_chart_list_by_type("BTC", tf, []))
     #print(get_hkg_chart_list_by_type("939", tf, ["night"]))
     #print(get_hkg_chart_list_by_type("939", tf, ["3988", "2388", "BABA"]))
-    #print(get_hkg_chart_list_by_type("939", tf, ["HSIFN", "2388", "BABA", "bb", "night"]))
+    print(get_hkg_chart_by_type_list("939", ["gcc", "night"]))
     
 def is_number(s):
     try:

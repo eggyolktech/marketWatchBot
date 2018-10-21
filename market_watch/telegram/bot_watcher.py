@@ -2,6 +2,7 @@
 
 # django shell import
 import os
+import io
 import sys
 import time
 import telepot
@@ -10,6 +11,8 @@ from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
 from decimal import Decimal
 import urllib.request
 import urllib.error
+import requests
+import traceback
 from socket import timeout
 import random
 import resource
@@ -31,6 +34,7 @@ from market_watch.fool import fool_loader
 from market_watch.qq import us_company_news
 from market_watch.twitter import tweet
 from market_watch.finviz import heatmap, charting as fcharting
+from market_watch.stockcharts import charting as scharting
 from market_watch.cnn import ust
 from market_watch.quantum import tickersearch
 from market_watch.bondsupermart import tickersearch as super_tickersearch
@@ -304,6 +308,7 @@ def on_chat_message(msg):
                     {'command': '/qf [next] [hscei] [night]', 'desc': 'Quote HSI Mini Futures', 'icon': u'\U0001F414'},
                     {'command': '/qF [next] [hscei] [night]', 'desc': 'Quote HSI Futures', 'icon': u'\U0001F414'},                   
                     {'command': '/qj[jp_code]', 'desc': 'Tokyo Stock Quote', 'icon': u'\U0001F414'}, 
+                    {'command': '/ql[code]', 'desc': 'Return Charts for all Timeframes', 'icon': u'\U0001F4C8'},                    
                     {'command': '/qN[code]', 'desc': 'Result Calendar (HK Only)', 'icon': u'\U0001F4C8'},                    
                     {'command': '/qn[code]', 'desc': 'Latest News (HK Only)', 'icon': u'\U0001F4C8'},                    
                     {'command': '/qq', 'desc': 'Quick Quote', 'icon': u'\U0001F42E'},
@@ -323,7 +328,7 @@ def on_chat_message(msg):
         for menuitem in menuitemlist:
             menu = menu + EL + ' ' + menuitem['command'] + ' - ' + menuitem['desc']
         
-        menu = menu + DEL + "[option]: bb - Bollinger Band, sma - SMA"
+        menu = menu + DEL + "[option]: bb - Bollinger Band, sma/gcc - SMAs, night - Night Futures"
         
         menu = menu + DEL + "<b>Sample</b>"
         menu = menu + EL + "Stock: /qd5, /qm601318, /qMAAPL, /qwMCD"   
@@ -454,7 +459,27 @@ def on_chat_message(msg):
                     bot.sendMessage(chat_id, jp_stock_quote.get_quote_message(stockCd, simpleMode), parse_mode='HTML')
                 else:
                     bot.sendMessage(chat_id, "Invalid JP Stock Code: [%s]" % stockCd, parse_mode='HTML')
-                    
+        elif (action == "l"):
+
+            # get all timeframe charting
+            if code:
+
+                if(is_white_listed(chat_id)):
+                    print("White Listed: [" + str(chat_id) + "]")
+                    bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')
+
+                    linklist = charting.get_hkg_chart_by_type_list(code, params)
+
+                    for link in linklist:
+                        try:
+                            f = urllib.request.urlopen(link, timeout=10)
+                        except:
+                            bot.sendMessage(chat_id, u'\U000026D4' + ' Request Timeout for [' + code + ']', parse_mode='HTML')
+                        else:
+                            bot.sendPhoto(chat_id, f)
+            else:
+                    bot.sendMessage(chat_id, "Usage: /ql[code] (Only 1 code)", parse_mode='HTML')
+
         elif (action == "N"):
             bot.sendMessage(chat_id, result_announcement.get_result_calendar(code), parse_mode='HTML')                    
 
@@ -579,6 +604,22 @@ def on_chat_message(msg):
                 try:
                     f = urllib.request.urlopen(url, timeout=10)
                 except:
+                    bot.sendMessage(chat_id, u'\U0001F423' + ' Request Timeout', parse_mode='HTML')
+                else:
+                    bot.sendPhoto(chat_id, f)
+            return
+        
+        elif (action == "V"):
+
+            urls = scharting.get_charts(code, params)
+
+            for url in urls:
+                try:
+                    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+                    remote_image = requests.get(url, headers=headers)
+                    f = io.BytesIO(remote_image.content)
+                except:
+                    traceback.print_exc()
                     bot.sendMessage(chat_id, u'\U0001F423' + ' Request Timeout', parse_mode='HTML')
                 else:
                     bot.sendPhoto(chat_id, f)

@@ -49,7 +49,7 @@ def push_tweet(name, tcount=1, test=False, group="telegram-twitter"):
 
     messages_list = []
     new_tweet_list = []
-    for s in statuses:
+    for s in reversed(statuses):
         if (str(s.id) in tweet_list):
             print("%s created at %s is OLD! Skip sending...." % (s.id, s.created_at))
         else:
@@ -63,7 +63,7 @@ def push_tweet(name, tcount=1, test=False, group="telegram-twitter"):
 
     
     print("BEFORE Tweet List %s" % tweet_list)
-    tweet_list = new_tweet_list + tweet_list
+    tweet_list = list(reversed(new_tweet_list)) + tweet_list
     print("AFTER Tweet List %s" % tweet_list)
     print("AFTER Tweet List (LIMIT) %s" % tweet_list[:NEW_TWEET_COUNT])
     new_json_arr = json.dumps(tweet_list[:NEW_TWEET_COUNT])
@@ -107,18 +107,31 @@ def get_tweet(name, tcount=1):
 def trump(tcount=1):
     return get_tweet('realDonaldTrump', tcount)
 
+def push_tweet_list(watcher, group):
+
+    for w in watcher:
+        push_tweet(w, group=group)
+
+
 def main(args):
     
     start_time = time.time()
-    isTest = False
+    isTest = True 
 
     if (len(args) > 1 and args[1] == "push_tweet"):
+        
+        isTest = False 
+        if isTest:
+            print("=== Test Only Mode ===")
+            push_tweet('Hugh_Son', test=isTest)
+            return
+
         WATCHER = ['realDonaldTrump',
                     'usstockcaptain', 
                     #'webbhk', 
                     #'muddywatersre', 
                     'stocktwits', 
-                    'citronresearch', 
+                    #'citronresearch', 
                     'sjosephburns', 
                     #'RRGresearch', 
                     #'RyanDetrick'
@@ -126,24 +139,31 @@ def main(args):
                     'tradeciety',
                     'sunrisetrader',
                     'rayner_teo',
-                    'AsennaWealth',
-                    'topdowncharts',
+                    #'AsennaWealth',
+                    #'topdowncharts',
                     'AmyAtrade',
                     'barronsonline',
                     'raydalio',
                     'tradingsim',
+                    'Hugh_Son',
+                    #'ChineseWSJ',
+                    #'laodounim',
                     #'zerohedge',
                     ]
-        if isTest:
-            WATCHER = ['tradingsim']
 
-        for w in WATCHER:
-            push_tweet(w, test=isTest)
+        push_tweet_list(WATCHER, group="telegram-twitter")
 
+        # Master
         WATCHER = ['zerohedge']
+        push_tweet_list(WATCHER, group="telegram-twitter-zerohedge")
 
-        for w in WATCHER:
-            push_tweet(w, group="telegram-twitter-zerohedge")
+        # IT Dog
+        WATCHER = ['freecodecamp']
+        push_tweet_list(WATCHER, group="telegram-itdog")
+
+        # Leisure
+        WATCHER = ['warofoneman']
+        push_tweet_list(WATCHER, group="telegram-leisure")
 
     else:
         get_tweet('sjosephburns', 15)

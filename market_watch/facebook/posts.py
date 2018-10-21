@@ -39,7 +39,25 @@ def get_posts_list(group):
     print("Post List Size: %s" % len(posts_list))
     return posts_list
 
-def push_posts_list(group, plist, tg_group):
+def get_post_content(url):
+
+    print("Post URL: [%s]" % url)
+
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+
+    r = requests.get(url, headers=headers)
+    html = r.text
+
+    soup = BeautifulSoup(html, "html.parser")
+    title = soup.find("title")    
+    
+    if title:
+        msg = title.text.strip().split("-")[0]
+        return msg
+    else:
+        return None
+
+def push_posts_list(group, plist, tg_group, excerpt=False):
 
     rkey = "FB:" + group
     json_arr = redis_pool.getV(rkey)
@@ -63,13 +81,18 @@ def push_posts_list(group, plist, tg_group):
         else:
             print("Post ID [%s] is NEW! Prepare for sending...." % (pid))
             new_posts_list.append(pid)
-            message = "https://www.facebook.com/%s/posts/%s" % (group, pid)
+            url = "https://www.facebook.com/%s/posts/%s" % (group, pid)
+            if (excerpt):
+                message = get_post_content(url) + DEL
+                message = message + url
+            else:
+                message = url
             messages_list.append(message)
     
-    print("BEFORE Post List %s" % posts_list)
+    #print("BEFORE Post List %s" % posts_list)
     posts_list = new_posts_list + posts_list
-    print("AFTER Posts List %s" % posts_list)
-    print("AFTER Posts List (Limited) %s" % posts_list[:NEW_POSTS_COUNT])
+    #print("AFTER Posts List %s" % posts_list)
+    #print("AFTER Posts List (Limited) %s" % posts_list[:NEW_POSTS_COUNT])
     new_json_arr = json.dumps(posts_list[:NEW_POSTS_COUNT])
     redis_pool.setV(rkey, new_json_arr)         
     send_count = 1
@@ -83,52 +106,83 @@ def push_posts_list(group, plist, tg_group):
         bot_sender.broadcast_list(msg, tg_group)
         
         send_count = send_count + 1
+
+def distribute_posts(grpList, tg_group, isTest=False):
+
+    if (isTest):
+        grpList = [
+                    ('mamaigo', True),
+                    ('unclesiu', True),
+                    ]
+        tg_group = "telegram-chat-test"
+
+    for group in grpList:
+        plist = get_posts_list(group[0])
+        push_posts_list(group=group[0], plist=plist, tg_group=tg_group, excerpt=group[1])
+
     
 def main():
 
-    isTest = False 
-        
-    grpList = ['ivanliresearch', #Ivan Li 李聲揚 - 華麗后台
-                'DrLamInv', #Dr Lam
-                'sky788', #張士佳 - Sky Sir
-                '112243028856273', #英之見 - 基金經理黃國英Alex Wong
-                'eddietamcai', #Eddie Team
-                'thinkingweb',
-                'Starmancapital', #Starman 資本攻略
-                ]
-    
-    if (isTest):
-        grpList = []
-        tg_group = "telegram-chat-test"
-    else:
-        tg_group = "telegram-notice"
-
-    for group in grpList:
-        plist = get_posts_list(group)
-        push_posts_list(group, plist, tg_group)          
+    isTest = False
 
     grpList = [
-                'SimonIRBasilica', #平行時空：沈旭暉國際學術新聞台
-                'shensimon', #堅離地城：沈旭暉國際生活台 Simon's Glocal World
-                'SimonStamps', #萬國郵政 Simon's Stamps International
-                'mshktech', #Microsoft HK Technical Community
-                'parentingtw',
-                'hk01parenting',
-                #'parenting.reading',
-                #'parenting.lifebuzz', #親子天下‧寶寶生活
-                'gushi.tw',
+                ('ivanliresearch', False), #Ivan Li 李聲揚 - 華麗后台
+                ('DrLamInv', False), #Dr Lam
+                ('sky788', False), #張士佳 - Sky Sir
+                ('112243028856273', True), #英之見 - 基金經理黃國英Alex Wong
+                ('eddietamcai', True), #Eddie Team
+                ('thinkingweb', False),
+                ('Starmancapital', False), #Starman 資本攻略
+                ('brian.finance.share', False),
+                ('CaptainHK80', True),
+                ('macandmic', True),
+                ('EdwinNetwork', True),
+                ('microchow', True),
+                ('muddydirtywater', True),
+                ('speculatorjunior', True),
+                ('advanceguy1', True),
+                ('landmarkreporter', True),
+                ('203829452994495', True), #Oldjim
+                ('2012jason', True), #Ngai Nick
+                ('bituzi', True),
+                ('stockwing1', True),
                 ]
+    tg_group = "telegram-notice"
+    distribute_posts(grpList, tg_group, isTest)
 
-    if (isTest):
-        grpList = ['gushi.tw',]
-        tg_group = "telegram-chat-test"
-    else:
-        tg_group = "telegram-itdog"
-        
-    for group in grpList:
-        plist = get_posts_list(group)
-        push_posts_list(group, plist, tg_group)
+    grpList = [
+                ('mshktech', False), #Microsoft HK Technical Community
+                ('therootshk', False),
+                ('fuklopedia', True),
+                ('itdogcom', True),
+                ]
+    tg_group = "telegram-itdog"
+    distribute_posts(grpList, tg_group, isTest)
+    
+    grpList = [
+                #('parentingtw', False),
+                ('hk01parenting', False),
+                ('ohpamahk', False),
+                ('mphappypama', False), 
+                #'parenting.lifebuzz', #親子天下‧寶寶生活
+                ('378287442642919', True),
+                ]
+    tg_group = "telegram-parents"
+    distribute_posts(grpList, tg_group, isTest)
 
+    grpList = [
+                ('SimonIRBasilica', True), #平行時空：沈旭暉國際學術新聞台
+                ('shensimon', True), #堅離地城：沈旭暉國際生活台 Simon's Glocal World
+                ('SimonStamps', True), #萬國郵政 Simon's Stamps International
+                ('tokit.channel', False),
+                ('gushi.tw', True),
+                ('mamaigo', True),
+                ('unclesiu', True),
+                ('Cuson.LoChiKong', True),
+                ]
+    tg_group = "telegram-leisure"
+    distribute_posts(grpList, tg_group, isTest)
+ 
 if __name__ == "__main__":
     main()        
         

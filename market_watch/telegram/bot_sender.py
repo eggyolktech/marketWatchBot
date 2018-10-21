@@ -69,8 +69,11 @@ def send_remote_image(image_url, chatlist="telegram-chat-test"):
     for key, chat_id in chat_list:
     
         print("Chat to send: " + key + " => " + chat_id)
-        
-        remote_image = requests.get(image_url)
+    
+        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+        remote_image = requests.get(image_url, headers=headers)
+    
+        #print(remote_image.content)
         photo = io.BytesIO(remote_image.content)
         photo.name = 'img.png'
         files = {'photo': photo}
@@ -90,7 +93,7 @@ def main():
     send_image(local_image_path)
     
     image_url = "http://pbs.twimg.com/profile_images/874276197357596672/kUuht00m_normal.jpg"
-    
+    #image_url = "http://stockcharts.com/c-sc/sc?s=MSFT&p=D&b=5&g=0&i=t88829675938&r=1530024897841" 
     send_remote_image(image_url)
 
 if __name__ == "__main__":
