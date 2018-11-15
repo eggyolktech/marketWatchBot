@@ -69,7 +69,9 @@ def get_latest_ccass_info(code, number, is_simple=False):
     DEL = "\n\n"
     EL = "\n"
     passage = ""
-    
+   
+    return "Job failed, please go to <a href='http://www.hkexnews.hk/sdw/search/searchsdw_c.aspx'>here</a> directly"
+ 
     if (os.name == 'nt'):
         browser = webdriver.Chrome('C:\project\common\chromedriver.exe')
     else:

@@ -121,6 +121,7 @@ def main():
                 #'http://fb2rss.altervista.org/?id=247333838767466', #張士佳 - Sky Sir
                 #'http://fb2rss.altervista.org/?id=112243028856273', #英之見 - 基金經理黃國英Alex Wong
                 #'http://fb2rss.altervista.org/?id=767813843325038', #Eddie Team
+                'https://news.mingpao.com/rss/ins/s00003.xml',
                 'http://hkstockinvestment.blogspot.com/feeds/posts/default', #偉哥投資手札
                 'https://parisvalueinvesting.blogspot.com/feeds/posts/default', #巴黎的價值投資
                 'https://happyvalleyjockey.blogspot.com/feeds/posts/default', #巴黎的價值投資

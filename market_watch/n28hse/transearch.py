@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 from decimal import Decimal
 import urllib.request
 import urllib.parse
+import resource
 import requests
 import re
 import os
@@ -29,7 +30,16 @@ def get_pricehist(name):
         options.add_argument('--headless')
         browser = webdriver.Chrome(executable_path="C:\Wares\chromedriver.exe", chrome_options=options)  
     else:
-        browser = webdriver.PhantomJS() 
+        options = Options()
+        options.add_experimental_option("excludeSwitches",["ignore-certificate-errors"])
+        options.add_argument('--disable-gpu')
+        options.add_argument('--headless')
+        options.add_argument('--no-sandbox')
+        browser = webdriver.Chrome(executable_path="/usr/lib/chromium-browser/chromedriver", chrome_options=options)
+        #browser = webdriver.PhantomJS() 
+
+    if (name.strip() == ""):
+        return "Usage: /qt[search name] e.g. /qt德寶"
 
     url = "https://data.28hse.com/"    
     print("URL: [" + url + "]")
@@ -40,6 +50,7 @@ def get_pricehist(name):
     selectb[0].click()
     
     input = browser.find_elements_by_class_name("select2-search__field");
+    #print(input)
     input[0].send_keys(name)
 
     try:
@@ -65,11 +76,24 @@ def get_pricehist(name):
         #browser.close()
     except:
         print("no alert")
-    
+
+    furl = browser.current_url    
     html = browser.page_source
     browser.close()
     #print(html)
     soup = BeautifulSoup(html, "html.parser")    
+
+    txnhead = soup.find("div", {"class": "data-txn"})
+
+    if (txnhead):
+        return "沒有找到相符的資料: %s" % name
+
+    info = soup.find("div", {"class": "estate-info"})
+
+    pname = name
+    if (info):
+        pname = info.findAll("td")[1].text
+        print(pname) 
     
     tbody = soup.find("tbody", {"class": "data-txn-table-body"})
     
@@ -82,7 +106,10 @@ def get_pricehist(name):
     
     for row in rows[:10]:
         cols = row.findAll("td")
-        
+       
+        if len(cols) == 1:
+            return "暫無成交紀錄: %s" % pname
+ 
         date = cols[0].text.strip()
         price = cols[1].text.strip()
         change = cols[2].text.strip() 
@@ -104,7 +131,7 @@ def get_pricehist(name):
         passage = passage + ("<i>%s</i> - %s - %s (%s)" + EL + "%s (%s) %s") % (date, address, price, change, size, unitprice, contract) + DEL
         
     if (passage):
-        passage = u'\U0001F514' + " Prices History for Search Name: %s" % (name) + DEL + passage
+        passage = u'\U0001F514' + " Prices History for: %s" % (pname) + DEL + passage + furl
  
     return passage
 
@@ -128,8 +155,19 @@ def is_number(s):
     
 def main():
 
+    # Set resource limit
+    #rsrc = resource.RLIMIT_DATA
+    #soft, hard = resource.getrlimit(rsrc)
+    #print('Soft limit start as :' + str(soft))
+
+    #resource.setrlimit(rsrc, (20 * 1024, hard))
+    #soft, hard = resource.getrlimit(rsrc)
+
+    #print('Soft limit start as :' + str(soft))
+
     list = ["淘大", "駿發", "喜"]
-    list = ["淘大", "駿發", "天匯"]
+    list = ["", "天匯"]
+    list = ["軒大屋","黃埔","天鑄"]
     for ticker in list:
         print(get_pricehist(ticker))
 

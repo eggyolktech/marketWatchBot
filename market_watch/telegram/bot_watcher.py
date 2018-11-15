@@ -38,6 +38,7 @@ from market_watch.stockcharts import charting as scharting
 from market_watch.cnn import ust
 from market_watch.quantum import tickersearch
 from market_watch.bondsupermart import tickersearch as super_tickersearch
+from market_watch.n28hse import transearch as house_search
 
 from market_watch.util import config_loader
 from market_watch import quick_list, quick_tracker
@@ -317,6 +318,7 @@ def on_chat_message(msg):
                     {'command': '/qr[code1] [code2]', 'desc': 'Relative Strength', 'icon': u'\U0001F42E'},
                     {'command': '/qs', 'desc': 'Chicken Sectormap', 'icon': u'\U0001F414'},
                     {'command': '/qS[code]', 'desc': 'Get Company Profile', 'icon': u'\U0001F414'},
+                    {'command': '/qt[searchkey]', 'desc': 'Get 28hse Price History', 'icon': u'\U0001F414'},
                     {'command': '/qv[code]', 'desc': 'Finviz qChart (US only)', 'icon': u'\U0001F414'}, 
                     {'command': '/qY', 'desc': 'Treasury Yield', 'icon': u'\U0001F414'}, 
                     {'command': '/l', 'desc': 'Live Quote Commands', 'icon': u'\U0001F414'},
@@ -596,6 +598,13 @@ def on_chat_message(msg):
                 bot.sendPhoto(chat_id, f)                
             return                 
 
+        elif (action == "t"):
+
+            bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')
+            message = house_search.get_pricehist(code)
+            bot.sendMessage(chat_id, message, parse_mode='HTML')
+            return
+
         elif (action == "v"):
 
             urls = heatmap.get_charts(code, params)
@@ -708,7 +717,7 @@ rsrc = resource.RLIMIT_DATA
 soft, hard = resource.getrlimit(rsrc)
 print('Soft limit start as :' + str(soft))
 
-resource.setrlimit(rsrc, (220 * 1024, hard))
+resource.setrlimit(rsrc, (230 * 1024, hard))
 soft, hard = resource.getrlimit(rsrc)
 
 print('Soft limit start as :' + str(soft))

@@ -124,7 +124,7 @@ def get_hkg_chart_by_type(code, action, params):
     
     
     #indicator = "&Indicator=1&indpara1=4&indpara2=6&indpara3=14&indpara4=27&indpara5=40&indpara6=52"
-    indicator= "&Indicator=3&indpara1=10&indpara2=20&indpara3=50&indpara4=100&indpara5=250"
+    indicator= "&Indicator=3&indpara1=10&indpara2=20&indpara3=50&indpara4=100&indpara5=200"
     
     if (is_bb):
         indicator = "&Indicator=9&indpara1=20&indpara2=2&indpara3=0&indpara4=0&indpara5=0"

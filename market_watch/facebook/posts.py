@@ -111,8 +111,9 @@ def distribute_posts(grpList, tg_group, isTest=False):
 
     if (isTest):
         grpList = [
-                    ('mamaigo', True),
-                    ('unclesiu', True),
+                    #('Brian.DTHSF', True),
+                    #('101121253309673', True),
+                    ('Leesimon.hk', True),
                     ]
         tg_group = "telegram-chat-test"
 
@@ -123,21 +124,26 @@ def distribute_posts(grpList, tg_group, isTest=False):
     
 def main():
 
-    isTest = False
+    isTest = False 
 
     grpList = [
                 ('ivanliresearch', False), #Ivan Li 李聲揚 - 華麗后台
                 ('DrLamInv', False), #Dr Lam
                 ('sky788', False), #張士佳 - Sky Sir
                 ('112243028856273', True), #英之見 - 基金經理黃國英Alex Wong
+                ('1906376359381666', True),
                 ('eddietamcai', True), #Eddie Team
+                ('Leesimon.hk', True),
                 ('thinkingweb', False),
                 ('Starmancapital', False), #Starman 資本攻略
-                ('brian.finance.share', False),
+                ('Brian.DTHSF', True),
                 ('CaptainHK80', True),
-                ('macandmic', True),
-                ('EdwinNetwork', True),
-                ('microchow', True),
+                ('101121253309673', True),
+                ('GreenHornFans', True),
+                #('macandmic', True), #Chan Tai Wai
+                #('EdwinNetwork', True),
+                ('Investopedia', True),
+                #('microchow', True),
                 ('muddydirtywater', True),
                 ('speculatorjunior', True),
                 ('advanceguy1', True),
@@ -145,14 +151,18 @@ def main():
                 ('203829452994495', True), #Oldjim
                 ('2012jason', True), #Ngai Nick
                 ('bituzi', True),
+                ('rainingmanhk', True),
                 ('stockwing1', True),
+                ('cablefinance', True),
+                #('p.outlook', True),
+                ('stockfarmerhk', True),
                 ]
     tg_group = "telegram-notice"
     distribute_posts(grpList, tg_group, isTest)
 
     grpList = [
                 ('mshktech', False), #Microsoft HK Technical Community
-                ('therootshk', False),
+                #('therootshk', False),
                 ('fuklopedia', True),
                 ('itdogcom', True),
                 ]
@@ -164,8 +174,12 @@ def main():
                 ('hk01parenting', False),
                 ('ohpamahk', False),
                 ('mphappypama', False), 
-                #'parenting.lifebuzz', #親子天下‧寶寶生活
                 ('378287442642919', True),
+                ('JollyKingdom', True),
+                ('rightalent', True),
+                ('unclesiu', True),
+                ('eztalk', True),
+                ('popachannel', True),
                 ]
     tg_group = "telegram-parents"
     distribute_posts(grpList, tg_group, isTest)
@@ -176,8 +190,8 @@ def main():
                 ('SimonStamps', True), #萬國郵政 Simon's Stamps International
                 ('tokit.channel', False),
                 ('gushi.tw', True),
+                ('learn.english.free', True),
                 ('mamaigo', True),
-                ('unclesiu', True),
                 ('Cuson.LoChiKong', True),
                 ]
     tg_group = "telegram-leisure"
