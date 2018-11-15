@@ -10,6 +10,7 @@ from market_watch.util import config_loader
 from market_watch.telegram import bot_sender
 from market_watch.redis import redis_pool
 import json
+from textblob import TextBlob
 
 config = config_loader.load()
 
@@ -25,6 +26,18 @@ API = twitter.Api(consumer_key=config.get("twitter","consumer_key"),
                     access_token_secret=config.get("twitter","access_token_secret"),
                     tweet_mode='extended')
 
+def get_sentiment(text):                    
+ 
+    analysis = TextBlob(text)
+    #print(analysis.sentiment)
+    
+    if analysis.sentiment[0] > 0:
+       return u'\U0001F603'
+    elif analysis.sentiment[0] < 0:
+       return u'\U0001F621'
+    else:
+       return u'\U0001F610'
+ 
 def push_tweet(name, tcount=1, test=False, group="telegram-twitter"):
 
     sname = '@%s' % name
@@ -58,7 +71,8 @@ def push_tweet(name, tcount=1, test=False, group="telegram-twitter"):
             url = ('https://mobile.twitter.com/i/web/status/%s' % s.id)
             created = str(s.created_at)
             text = re.sub(r"\$([A-Za-z]+)",r"/qd\1", s.full_text)
-            message = "%s\n(<a href='%s'>%s</a>)" % (text, url, "Post@ " + created.split('+')[0] + "GMT")
+            analysis = get_sentiment(s.full_text)
+            message = "[%s] %s\n(<a href='%s'>%s</a>)" % (analysis, text, url, "Post@ " + created.split('+')[0] + "GMT")
             messages_list.append(message)
 
     
@@ -92,7 +106,8 @@ def get_tweet(name, tcount=1):
         url = ('https://mobile.twitter.com/i/web/status/%s' % s.id)
         created = str(s.created_at)
         text = re.sub(r"\$([A-Za-z]+)",r"/qd\1", s.full_text)
-        message = "%s\n(<a href='%s'>%s</a>)" % (text, url, "Post@ " + created.split('+')[0] + "GMT")
+        analysis = get_sentiment(s.full_text)
+        message = "[%s] %s\n(<a href='%s'>%s</a>)" % (analysis, text, url, "Post@ " + created.split('+')[0] + "GMT")
         messages_list.append(message)
     
     full_message = "No tweets were found!"
