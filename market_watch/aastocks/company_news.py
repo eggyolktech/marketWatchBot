@@ -34,17 +34,19 @@ def get_latest_news_by_code(code, number):
     passage = ""
     count = 0
 
-    for a in soup.findAll('a', id=re.compile("^cp_ucAAFNSearch_repNews")):
+    for a in soup.findAll('a', id=re.compile("^cp_ucAAFNSearch_repNews_lnkNews_")):
         #print(link)
         t = a.parent.find_next_sibling("div")
+        print("==" * 40)
+        dtime = t.findAll("div")[0].text
         aURL = a['href']
         aTitle = a['title']
         if aURL.startswith("/"):
-             aURL = "http://www.aastocks.com" + aURL
-
+            aURL = "http://www.aastocks.com" + aURL
+        
         if not any(x in aTitle for x in ["窩輪", "牛熊證", "輪證"]):
             count = count + 1
-            passage = passage + DEL + "<a href='" + aURL + "' target='_blank'>" + a['title'] + "</a> (" + t.getText()[-11:] + ")"
+            passage = passage + DEL + "<a href='" + aURL + "' target='_blank'>" + a['title'] + "</a> (" + dtime + ")"
 
         if count >= number:
             break

@@ -17,7 +17,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from market_watch.telegram import bot_sender
 
-def get_map():
+def get_map(cat="sec"):
 
     DEL = "\n\n"
     EL = "\n"
@@ -31,7 +31,7 @@ def get_map():
     else:
         browser = webdriver.PhantomJS() 
 
-    url = "https://finviz.com/map.ashx?t=sec"    
+    url = "https://finviz.com/map.ashx?t=%s" % cat    
     print("URL: [" + url + "]")
 
     browser.get(url)
@@ -41,28 +41,17 @@ def get_map():
         myDynamicElement.click()
     except:
         pass   
-    
-    print("Start dummy pass...") 
-    try:
-        browser.implicitly_wait(3) # seconds
-        myDynamicElement = browser.find_element_by_id("dummyid")
-    except:
-        pass
 
-    print("Start dummy pass 2...") 
-    try:
-        browser.implicitly_wait(3) # seconds
-        myDynamicElement = browser.find_element_by_id("dummyid")
-    except:
-        pass
 
-    print("Start dummy pass 3...") 
-    try:
-        browser.implicitly_wait(3) # seconds
-        myDynamicElement = browser.find_element_by_id("dummyid")
-    except:
-        pass
-   
+    for i in range(4):
+        print("Start dummy pass %s..." % i) 
+
+        try:
+            browser.implicitly_wait(3) # seconds
+            myDynamicElement = browser.find_element_by_id("dummyid")
+        except:
+            pass
+
     try:
         browser.implicitly_wait(5) # seconds
         alert = browser.switch_to_alert()
@@ -106,12 +95,23 @@ def get_chart(code):
 def main():
     
     #print(get_chart("baba"))    
+    #print(get_map('geo'))
+    #return
 
-    url = None
-    url = get_map()
-    if (url):
+    urls = []
+
+    for cat in ('sec', 'geo', 'etf'):
+        
+        try:
+            urls.append(get_map(cat))
+        except:
+            print("Error in getting cat %s" % cat)
+
+    print(urls)
+
+    for url in urls:
         bot_sender.send_remote_image(url, "telegram-twitter")
-        bot_sender.send_remote_image(url, "telegram-twitter-zerohedge")
+        bot_sender.send_remote_image(url, "telegram-zerohedge")
     
 def is_number(s):
     try:

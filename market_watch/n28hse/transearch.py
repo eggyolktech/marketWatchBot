@@ -35,6 +35,7 @@ def get_pricehist(name):
         options.add_argument('--disable-gpu')
         options.add_argument('--headless')
         options.add_argument('--no-sandbox')
+        driver_path = "/usr/lib/chromium-browser/chromedriver"
         browser = webdriver.Chrome(executable_path="/usr/lib/chromium-browser/chromedriver", chrome_options=options)
         #browser = webdriver.PhantomJS() 
 
@@ -156,14 +157,14 @@ def is_number(s):
 def main():
 
     # Set resource limit
-    #rsrc = resource.RLIMIT_DATA
-    #soft, hard = resource.getrlimit(rsrc)
-    #print('Soft limit start as :' + str(soft))
+    rsrc = resource.RLIMIT_DATA
+    soft, hard = resource.getrlimit(rsrc)
+    print('Soft limit start as :' + str(soft))
 
-    #resource.setrlimit(rsrc, (20 * 1024, hard))
-    #soft, hard = resource.getrlimit(rsrc)
+    resource.setrlimit(rsrc, (100 * 1024, hard))
+    soft, hard = resource.getrlimit(rsrc)
 
-    #print('Soft limit start as :' + str(soft))
+    print('Soft limit start as :' + str(soft))
 
     list = ["淘大", "駿發", "喜"]
     list = ["", "天匯"]

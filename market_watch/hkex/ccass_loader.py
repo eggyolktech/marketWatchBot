@@ -60,7 +60,7 @@ def get_shareholding_disclosure(code):
                 passage = passage + "Shares: " + (", ".join(cols[2].strings)) + EL + "% of Capital: " + cols[3].text.replace("(","%(") + DEL
    
     if (not passage):
-        passage =  u'\U000026D4' + "No matching info is found!"
+        passage =  u'\U000026D4' + (" %s 沒有股權披露" % code)
 
     return passage
         
@@ -70,7 +70,7 @@ def get_latest_ccass_info(code, number, is_simple=False):
     EL = "\n"
     passage = ""
    
-    return "Job failed, please go to <a href='http://www.hkexnews.hk/sdw/search/searchsdw_c.aspx'>here</a> directly"
+    #return "Job failed, please go to <a href='http://www.hkexnews.hk/sdw/search/searchsdw_c.aspx'>here</a> directly"
  
     if (os.name == 'nt'):
         browser = webdriver.Chrome('C:\project\common\chromedriver.exe')
@@ -88,7 +88,7 @@ def get_latest_ccass_info(code, number, is_simple=False):
     elemCode = browser.find_element_by_name('txtStockCode')
     elemCode.send_keys(code)
     
-    elemSearch = browser.find_element_by_name('btnSearch')
+    elemSearch = browser.find_element_by_id('btnSearch')
     elemSearch.click()
     
     # Detect if there is any alert
@@ -110,37 +110,36 @@ def get_latest_ccass_info(code, number, is_simple=False):
     
     soup = BeautifulSoup(html, "html.parser")
     masterDiv = soup.find('div', id="pnlResultSummary")
-    masterTable = masterDiv.findAll('table')[0]
+   
+    if not (masterDiv):
+        return u'\U000026D4' + " " +  ('股票號碼 %s 不存在或不設查詢' % code)
+ 
+    totalDiv = masterDiv.find('div', {'class': 'ccass-search-total'})
     
-    div = soup.find('div', id="pnlResultHeader")    
-    tables = div.findAll('table')
+    div = soup.find('div', id="pnlResultNormal")    
     title = ""
     simple_result = []
     
     # Stock code exists
-    if (tables[3]):
+    if (div):
     
         # get total participants info first
-        num_intermediates = masterTable.findAll('tr')[1].findAll('td')[2].text.strip()
-        shares_percentage = masterTable.findAll('tr')[1].findAll('td')[3].text.strip()
+        num_intermediates = totalDiv.find('div', {'class': 'number-of-participants'}).find('div', {'class': 'value'}).text.strip()
+        shares_percentage = totalDiv.find('div', {'class': 'shareholding'}).find('div', {'class': 'value'}).text.strip()
         
-        passage = "Number of Participants: " + num_intermediates + " (" + shares_percentage + ")"
+        passage = "Number of Participants: " + num_intermediates + " (Shares: " + shares_percentage + ")"
         simple_result.append(num_intermediates)
         simple_result.append(shares_percentage)
 
         passage = passage + DEL
-        cols = tables[3].findAll('td')
-        title = cols[3].text.strip("/r/n").strip() + " (" + cols[1].text.strip("/r/n").strip() + ")"
-
-        ctable = soup.find('table', id="participantShareholdingList")        
-        rows = ctable.findAll('tr')[3:3+number]
-        
-        #print(len(rows))
-        
+       
+        title = "%s (%s)" % (soup.find('input', {'name': 'txtStockName'}).get('value'), code) 
+        ctable = soup.find('table', {'class': 'table-mobile-list'})  
+        rows = ctable.findAll('tr')[1:1+number]
         count = 1
-        
+            
         for row in rows:
-            cols = row.findAll('td')
+            cols = row.findAll('div', {'class': 'mobile-list-body'})
               
             pid = cols[0].text.strip("/r/n").strip()
             pname = cols[1].text.strip("/r/n").strip()
@@ -150,15 +149,14 @@ def get_latest_ccass_info(code, number, is_simple=False):
             simple_result.append([pid, pname, pshares, ppercentage])
             
             #passage = passage + str(count) + ": " + pid + " - " + pname + " (" + pshares + ", " + ppercentage + ")" + EL
-            passage = passage + str(count) + ". " + pname + "" + EL + "Shares: " + pshares + " (" + ppercentage + ")" + DEL
-            
+            passage = passage + str(count) + ". " + pname + "" + EL + "Shares: " + pshares + " (" + ppercentage + ")" + DEL           
             count = count + 1
     
     if (is_simple):
         return simple_result
 
     if (not passage):
-        passage =  u'\U000026D4' + "No matching info is found!"
+        passage =  u'\U000026D4' + " " +  ('股票號碼 %s 不存在或不設查詢' % code)
     else:
         passage = "<i>Top CCASS for " + title + "</i>" + DEL + passage
     
@@ -166,13 +164,14 @@ def get_latest_ccass_info(code, number, is_simple=False):
     
 def main():
 
-    print(get_latest_ccass_info("8091", 5).encode("utf-8"))
+    print(get_latest_ccass_info("2630", 5))
  
-    print(get_latest_ccass_info("939", 5, True))
+    #print(get_latest_ccass_info("939", 5, True))
    
     #print(get_latest_ccass_info("99999", 5).encode("utf-8"))
     
     #print(get_shareholding_disclosure("1980").encode("utf-8"))
+    #print(get_shareholding_disclosure("1810").encode("utf-8"))
 
     
 def is_number(s):

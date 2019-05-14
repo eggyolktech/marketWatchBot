@@ -9,6 +9,8 @@ import random
 from market_watch.util import config_loader
 from market_watch.telegram import bot_sender
 from market_watch.redis import redis_pool
+from market_watch.mongodb import watcher_repo as wp
+
 import json
 from textblob import TextBlob
 
@@ -55,7 +57,7 @@ def push_tweet(name, tcount=1, test=False, group="telegram-twitter"):
         get_count = NEW_TWEET_COUNT
       
     try:
-        statuses = API.GetUserTimeline(screen_name=sname, include_rts=True, exclude_replies=True, count=get_count)
+        statuses = API.GetUserTimeline(screen_name=sname, include_rts=True, exclude_replies=False, count=get_count)
     except:
         print("User Timeline Error: [%s]" % name)
         return
@@ -66,6 +68,10 @@ def push_tweet(name, tcount=1, test=False, group="telegram-twitter"):
         if (str(s.id) in tweet_list):
             print("%s created at %s is OLD! Skip sending...." % (s.id, s.created_at))
         else:
+            source = (re.sub('<[^<]+?>', '', s.source)).strip()
+            if source == "IFTTT":
+                continue
+
             print("%s created at %s is NEW! Prepare for sending...." % (s.id, s.created_at))
             new_tweet_list.append(str(s.id))
             url = ('https://mobile.twitter.com/i/web/status/%s' % s.id)
@@ -85,12 +91,19 @@ def push_tweet(name, tcount=1, test=False, group="telegram-twitter"):
 
     if messages_list:
         messages_list.insert(0, "<pre>\n</pre>" + random.choice(LOADING) + "<b>@%s is Tweeting...</b>" % name)
-        full_message = DEL.join(messages_list)
+        
+        # zerohedge summary
+        if name == "zerohedge":
+            full_message = DEL.join(messages_list)
+            bot_sender.broadcast_list(full_message, group)
+            return
 
-        if (test):
-            bot_sender.broadcast_list(full_message)
-        else:
-            bot_sender.broadcast_list(full_message, group) 
+        for msg in messages_list:
+
+            if (test):
+                bot_sender.broadcast_list(msg)
+            else:
+                bot_sender.broadcast_list(msg, group) 
     
 def get_tweet(name, tcount=1):
 
@@ -99,15 +112,21 @@ def get_tweet(name, tcount=1):
     #print("UserImg %s" % user.profile_image_url)
     
     sname = '@%s' % name
-    statuses = API.GetUserTimeline(screen_name=sname, include_rts=True, exclude_replies=True, count=tcount)    
+    statuses = API.GetUserTimeline(screen_name=sname, include_rts=True, exclude_replies=False, count=tcount)    
     messages_list = []
 
     for s in statuses:    
+        #print(dir(s))
+        source = (re.sub('<[^<]+?>', '', s.source)).strip()
+        
+        if source == "IFTTT":
+            continue
+
         url = ('https://mobile.twitter.com/i/web/status/%s' % s.id)
         created = str(s.created_at)
         text = re.sub(r"\$([A-Za-z]+)",r"/qd\1", s.full_text)
         analysis = get_sentiment(s.full_text)
-        message = "[%s] %s\n(<a href='%s'>%s</a>)" % (analysis, text, url, "Post@ " + created.split('+')[0] + "GMT")
+        message = "[%s] %s\n(<a href='%s'>%s</a>·%s)" % (analysis, text, url, "Post@ " + created.split('+')[0] + "GMT", source)
         messages_list.append(message)
     
     full_message = "No tweets were found!"
@@ -122,66 +141,29 @@ def get_tweet(name, tcount=1):
 def trump(tcount=1):
     return get_tweet('realDonaldTrump', tcount)
 
-def push_tweet_list(watcher, group):
+def push_tweet_list(watcher, group, isTest=False):
 
     for w in watcher:
-        push_tweet(w, group=group)
+        push_tweet(w, group=group, test=isTest)
 
 
 def main(args):
     
     start_time = time.time()
-    isTest = True 
 
     if (len(args) > 1 and args[1] == "push_tweet"):
         
-        isTest = False 
+        isTest = not wp.repo_status('twitter') 
         if isTest:
             print("=== Test Only Mode ===")
-            push_tweet('Hugh_Son', test=isTest)
+            push_tweet_list(wp.repo_twitter('test'), 'dummy', isTest)
             return
 
-        WATCHER = ['realDonaldTrump',
-                    'usstockcaptain', 
-                    #'webbhk', 
-                    #'muddywatersre', 
-                    'stocktwits', 
-                    #'citronresearch', 
-                    'sjosephburns', 
-                    #'RRGresearch', 
-                    #'RyanDetrick'
-                    'alsabogal',
-                    'tradeciety',
-                    'sunrisetrader',
-                    'rayner_teo',
-                    #'AsennaWealth',
-                    #'topdowncharts',
-                    'AmyAtrade',
-                    'barronsonline',
-                    'raydalio',
-                    'tradingsim',
-                    'Hugh_Son',
-                    #'ChineseWSJ',
-                    #'laodounim',
-                    #'zerohedge',
-                    ]
-
-        push_tweet_list(WATCHER, group="telegram-twitter")
-
-        # Master
-        WATCHER = ['zerohedge']
-        push_tweet_list(WATCHER, group="telegram-twitter-zerohedge")
-
-        # IT Dog
-        WATCHER = ['freecodecamp']
-        push_tweet_list(WATCHER, group="telegram-itdog")
-
-        # Leisure
-        WATCHER = ['warofoneman']
-        push_tweet_list(WATCHER, group="telegram-leisure")
+        for repo in ['twitter', 'zerohedge', 'itdog', 'leisure']:
+            push_tweet_list(wp.repo_twitter(repo), group="telegram-%s" % repo)
 
     else:
-        get_tweet('sjosephburns', 15)
+        get_tweet('warofoneman', 15)
     
     print("Time elapsed: " + "%.3f" % (time.time() - start_time) + "s")    
 

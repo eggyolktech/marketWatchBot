@@ -9,6 +9,7 @@ import requests
 from bs4 import BeautifulSoup
 from market_watch.telegram import bot_sender
 from market_watch.redis import redis_pool
+from market_watch.mongodb import watcher_repo as wp
 
 NEW_POSTS_COUNT = 25
 GET_POSTS_COUNT = 10 
@@ -34,7 +35,10 @@ def get_posts_list(group):
         idlist = div.get('id').split(";")
 
         if (len(idlist) > 1):
-            posts_list.append(idlist[1].strip())
+            idd = idlist[1].strip()
+            if ":" in idd:
+                idd = idd.split(":")[1]
+            posts_list.append(idd)
     
     print("Post List Size: %s" % len(posts_list))
     return posts_list
@@ -50,9 +54,19 @@ def get_post_content(url):
 
     soup = BeautifulSoup(html, "html.parser")
     title = soup.find("title")    
-    
+    meta = soup.findAll("meta", {"name":"description"})    
+    cont = None   
+ 
+    if meta and 'content' in meta[0].attrs:
+        cont = (meta[0]['content'])
+
     if title:
-        msg = title.text.strip().split("-")[0]
+        #print("title [%s]" % title)
+        msg = "<b>%s</b>" % title.text.strip().split("|")[0]
+       
+        if cont:
+            msg = msg + DEL + cont
+        print("msg [%s]" % msg)
         return msg
     else:
         return None
@@ -110,94 +124,40 @@ def push_posts_list(group, plist, tg_group, excerpt=False):
 def distribute_posts(grpList, tg_group, isTest=False):
 
     if (isTest):
-        grpList = [
-                    #('Brian.DTHSF', True),
-                    #('101121253309673', True),
-                    ('Leesimon.hk', True),
-                    ]
+        grpList =  wp.repo_facebook('test')
         tg_group = "telegram-chat-test"
 
     for group in grpList:
         plist = get_posts_list(group[0])
+        #print(plist)
         push_posts_list(group=group[0], plist=plist, tg_group=tg_group, excerpt=group[1])
 
     
 def main():
 
-    isTest = False 
+    isTest = not wp.repo_status('facebook') 
+    gList = ['notice', 'zerohedge', 'itdog', 'parents', 'leisure', 'ptgroup', 'jetso']
+    #gList = ['leisure']
 
-    grpList = [
-                ('ivanliresearch', False), #Ivan Li 李聲揚 - 華麗后台
-                ('DrLamInv', False), #Dr Lam
-                ('sky788', False), #張士佳 - Sky Sir
-                ('112243028856273', True), #英之見 - 基金經理黃國英Alex Wong
-                ('1906376359381666', True),
-                ('eddietamcai', True), #Eddie Team
-                ('Leesimon.hk', True),
-                ('thinkingweb', False),
-                ('Starmancapital', False), #Starman 資本攻略
-                ('Brian.DTHSF', True),
-                ('CaptainHK80', True),
-                ('101121253309673', True),
-                ('GreenHornFans', True),
-                #('macandmic', True), #Chan Tai Wai
-                #('EdwinNetwork', True),
-                ('Investopedia', True),
-                #('microchow', True),
-                ('muddydirtywater', True),
-                ('speculatorjunior', True),
-                ('advanceguy1', True),
-                ('landmarkreporter', True),
-                ('203829452994495', True), #Oldjim
-                ('2012jason', True), #Ngai Nick
-                ('bituzi', True),
-                ('rainingmanhk', True),
-                ('stockwing1', True),
-                ('cablefinance', True),
-                #('p.outlook', True),
-                ('stockfarmerhk', True),
-                ]
-    tg_group = "telegram-notice"
-    distribute_posts(grpList, tg_group, isTest)
+    for channel in gList:
+        grpList = wp.repo_facebook(channel)
+        tg_group = "telegram-%s" % channel
+        distribute_posts(grpList, tg_group, isTest)
 
-    grpList = [
-                ('mshktech', False), #Microsoft HK Technical Community
-                #('therootshk', False),
-                ('fuklopedia', True),
-                ('itdogcom', True),
-                ]
-    tg_group = "telegram-itdog"
-    distribute_posts(grpList, tg_group, isTest)
-    
-    grpList = [
-                #('parentingtw', False),
-                ('hk01parenting', False),
-                ('ohpamahk', False),
-                ('mphappypama', False), 
-                ('378287442642919', True),
-                ('JollyKingdom', True),
-                ('rightalent', True),
-                ('unclesiu', True),
-                ('eztalk', True),
-                ('popachannel', True),
-                ]
-    tg_group = "telegram-parents"
-    distribute_posts(grpList, tg_group, isTest)
+        if isTest:
+            break
 
-    grpList = [
-                ('SimonIRBasilica', True), #平行時空：沈旭暉國際學術新聞台
-                ('shensimon', True), #堅離地城：沈旭暉國際生活台 Simon's Glocal World
-                ('SimonStamps', True), #萬國郵政 Simon's Stamps International
-                ('tokit.channel', False),
-                ('gushi.tw', True),
-                ('learn.english.free', True),
-                ('mamaigo', True),
-                ('Cuson.LoChiKong', True),
-                ]
-    tg_group = "telegram-leisure"
-    distribute_posts(grpList, tg_group, isTest)
+def maintest():
+
+    urls = ['https://www.facebook.com/unclesiu/posts/761382460874325', 
+            'https://www.facebook.com/cablefinance/posts/2195615380489521'
+            ]
+
+    for url in urls:
+        get_post_content(url)
  
 if __name__ == "__main__":
-    main()        
+    main()
+    #maintest()        
         
 

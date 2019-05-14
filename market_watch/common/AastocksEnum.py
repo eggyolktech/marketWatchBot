@@ -12,7 +12,7 @@ class TimeFrame(Enum):
     MINUTESHORT = 0
 
 class FxCode(Enum):
-    USD    = 900200
+    USDA   = 900200
     USDJPY = 900202
     USDCAD = 900207
     USDCHF = 900204

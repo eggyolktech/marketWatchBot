@@ -128,7 +128,7 @@ def main():
     isTest = False
         
     grpList = ['diqiuzhishiju', #地球知识局
-                'mittechreview', #DeepTech深科技
+               #'mittechreview', #DeepTech深科技
               ]
     
     if (isTest):

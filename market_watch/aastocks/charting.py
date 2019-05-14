@@ -17,16 +17,17 @@ def get_hkg_chart_list_by_type(code, action, params):
     
     url_dict_list = []
     ind_params = []
+    ATTRS = ("bb", "sma", "night", "gcc", "line")
     
     for p in params:
         pl = p.lower()
-        if pl in ("bb", "sma", "night", "gcc"):
+        if pl in ATTRS:
             ind_params.append(pl)
 
     url_dict_list.append({'code': code, 'url': get_hkg_chart_by_type(code, action, ind_params)})
     
     for p in params:
-        if not p in ("bb", "sma", "night", "gcc"):
+        if not p in ATTRS:
             url_dict_list.append({'code': p, 'url': get_hkg_chart_by_type(p, action, ind_params)})
     
     return url_dict_list
@@ -54,7 +55,8 @@ def get_hkg_chart_by_type(code, action, params):
     is_CN = False
     is_US = False
     is_FX = False
-    
+    is_line = False   
+ 
     for p in params:
         if (p.lower() == "bb"):
             is_bb = True
@@ -64,6 +66,8 @@ def get_hkg_chart_by_type(code, action, params):
             is_night = True
         elif (p.lower() == "gcc"):
             is_gcc = True
+        elif (p.lower() == "line"):
+            is_line = True
     
     # Determine which code type base on input format
     is_num = is_number(code)
@@ -120,25 +124,30 @@ def get_hkg_chart_by_type(code, action, params):
         else:
             timeframe = TimeFrame.MINUTE
     
-    main = "http://charts.aastocks.com/servlet/Charts?fontsize=12&15MinDelay=F&lang=1&titlestyle=1&vol=1&chart=left&type=1"
-    
-    
     #indicator = "&Indicator=1&indpara1=4&indpara2=6&indpara3=14&indpara4=27&indpara5=40&indpara6=52"
     indicator= "&Indicator=3&indpara1=10&indpara2=20&indpara3=50&indpara4=100&indpara5=200"
-    
+    ahft_param = ""    
+    chart_type = "1" # candle-stick
+
     if (is_bb):
         indicator = "&Indicator=9&indpara1=20&indpara2=2&indpara3=0&indpara4=0&indpara5=0"
     if (is_sma):
         indicator = "&Indicator=1&indpara1=4&indpara2=6&indpara3=14&indpara4=27&indpara5=40&indpara6=52"
     if (is_gcc):
         indicator = "&Indicator=1&indpara1=50&indpara2=200"
-    
     if (is_ahft):
         ahft_param = "&AHFT=T"
-    else:
-        ahft_param = ""
+    if (is_line):
+        chart_type = "5" # line
+        indicator = "&Indicator=1&indpara1=0"
 
-    subchart = "&subChart1=3&ref1para1=12&ref1para2=26&ref1para3=9" + "&subChart2=7&ref2para1=16&ref2para2=8&ref2para3=8" +                     "&subChart3=2&ref3para1=16&ref3para2=0&ref3para3=0" + "&subChart4=2&ref4para1=3&ref4para2=0&ref4para3=0"
+    main = "http://charts.aastocks.com/servlet/Charts?"
+    main = main + "fontsize=12&15MinDelay=F&lang=1&titlestyle=1&vol=1&chart=left&type=" + chart_type
+ 
+    subchart = ("&subChart1=3&ref1para1=12&ref1para2=26&ref1para3=9" 
+                + "&subChart2=7&ref2para1=16&ref2para2=8&ref2para3=8" 
+                + "&subChart3=2&ref3para1=16&ref3para2=0&ref3para3=0" 
+                + "&subChart4=2&ref4para1=3&ref4para2=0&ref4para3=0")
     scheme = "&scheme=1&com=100&chartwidth=1073&chartheight=950&stockid=" + code
     period = 6
     
@@ -183,7 +192,9 @@ def main():
     #print(get_hkg_chart_list_by_type("BTC", tf, []))
     #print(get_hkg_chart_list_by_type("939", tf, ["night"]))
     #print(get_hkg_chart_list_by_type("939", tf, ["3988", "2388", "BABA"]))
-    print(get_hkg_chart_by_type_list("939", ["gcc", "night"]))
+    print(get_hkg_chart_by_type("939", tf, ["line"]))
+    print(get_hkg_chart_by_type("MHSIF", tf, ["line", "night"]))
+    print(get_hkg_chart_by_type("939", tf, ["gcc", "night"]))
     
 def is_number(s):
     try:

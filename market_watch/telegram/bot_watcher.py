@@ -31,7 +31,7 @@ from market_watch.google import stock_history
 from market_watch.sl886 import hkadr
 from market_watch.alpha import analysis_loader
 from market_watch.fool import fool_loader
-from market_watch.qq import us_company_news
+from market_watch.alpha import us_company_news
 from market_watch.twitter import tweet
 from market_watch.finviz import heatmap, charting as fcharting
 from market_watch.stockcharts import charting as scharting
@@ -253,6 +253,14 @@ def on_chat_message(msg):
             bot.sendMessage(chat_id, indices.get_indices("hk"), parse_mode='HTML') 
         elif (action == "cn"):
             bot.sendMessage(chat_id, indices.get_indices("cn"), parse_mode='HTML') 
+        elif (action.startswith("ib")):
+
+            print("parameters [%s]" % command[4:])
+            [p1, p2] = command[4:].split()
+            ibcard_dict = dict(config.items('ibcard'))
+            result = ("[%s %s] ==> (%s %s)" % (p1, p2, ibcard_dict.get(p1), ibcard_dict.get(p2)))            
+            bot.sendMessage(chat_id, result, parse_mode='HTML')
+
         elif (action == "w"):
              bot.sendMessage(chat_id, worldindices.get_indices(), parse_mode='HTML') 
         elif (action == "fx"):

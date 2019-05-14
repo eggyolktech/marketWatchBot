@@ -40,7 +40,7 @@ def load():
 def main():
 
     config = load()
-    print("Load Config Test: [" + config.get("telegram","bot-send-url") + "]")
+    print("Load Config Test: [%s]" % config.items("ibcard"))
    
 if __name__ == "__main__":
     main()        
