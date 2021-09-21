@@ -17,6 +17,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from market_watch.telegram import bot_sender
 
+import traceback
+import time
+
+current_milli_time = lambda: int(round(time.time() * 1000))
+
 def get_map(cat="sec"):
 
     DEL = "\n\n"
@@ -40,6 +45,7 @@ def get_map(cat="sec"):
         myDynamicElement = browser.find_element_by_id("share-map")
         myDynamicElement.click()
     except:
+        traceback.print_exc()
         pass   
 
 
@@ -50,6 +56,7 @@ def get_map(cat="sec"):
             browser.implicitly_wait(3) # seconds
             myDynamicElement = browser.find_element_by_id("dummyid")
         except:
+            traceback.print_exc()
             pass
 
     try:
@@ -60,11 +67,14 @@ def get_map(cat="sec"):
         print("alert accepted")
         browser.close()
     except:
+        traceback.print_exc()
         print("no alert")
     
     html = browser.page_source
     browser.close()
-    #print(html)
+    print("*" * 100)
+    print(html)
+    print("*" * 100)
     soup = BeautifulSoup(html, "html.parser")
     divOverlay = soup.find("div", {"class": "overlay"})
     #print(divOverlay)
@@ -87,7 +97,7 @@ def get_charts(code, params):
 def get_chart(code):
 
     purl = "https://finviz.com/quote.ashx?t=%s" % code
-    furl = "https://finviz.com/chart.ashx?t=%s&ta=1&p=d&s=l" % code
+    furl = "https://finviz.com/chart.ashx?t=%s&ta=1&p=d&s=l&ts=%s" % (code, current_milli_time())
 
     #message = "<a href='%s'>Quick Chart for %s</a> (<a href='%s'>Profile</a>)" % (furl, code.upper(), purl)
     return furl
@@ -95,8 +105,8 @@ def get_chart(code):
 def main():
     
     #print(get_chart("baba"))    
-    #print(get_map('geo'))
-    #return
+    print(get_map('geo'))
+    return
 
     urls = []
 

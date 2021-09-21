@@ -31,12 +31,31 @@ def get_pricehist(name):
         browser = webdriver.Chrome(executable_path="C:\Wares\chromedriver.exe", chrome_options=options)  
     else:
         options = Options()
-        options.add_experimental_option("excludeSwitches",["ignore-certificate-errors"])
-        options.add_argument('--disable-gpu')
+        #options.add_experimental_option("excludeSwitches",["ignore-certificate-errors"])
+        options.add_experimental_option("useAutomationExtension", False)
         options.add_argument('--headless')
         options.add_argument('--no-sandbox')
-        driver_path = "/usr/lib/chromium-browser/chromedriver"
-        browser = webdriver.Chrome(executable_path="/usr/lib/chromium-browser/chromedriver", chrome_options=options)
+        #options.add_argument('--disable-gpu')
+        options.add_argument('--disable-dev-shm-usage')
+        print(options)
+        #options.add_argument('--no-sandbox')
+        #options.add_argument('--disable-gpu')
+        #options.add_argument('--disable-extensions')
+        #options.add_argument('--headless')
+        #options.add_argument('--disable-dev-shm-usage')
+        #driver_path = "/usr/lib/chromium-browser/chromedriver"
+        
+        capabilities = {
+            'browserName': 'chrome',
+            'chromeOptions':  {
+                'useAutomationExtension': False,
+                'args': ['--headless', '--no-sandbox']
+            }
+        }    
+
+        browser = webdriver.Chrome(desired_capabilities=capabilities)
+
+        #browser = webdriver.Chrome(executable_path="/usr/lib/chromedriver", chrome_options=options, service_args=["--verbose", "--log-path=qc1.log"])
         #browser = webdriver.PhantomJS() 
 
     if (name.strip() == ""):

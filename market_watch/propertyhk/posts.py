@@ -97,9 +97,9 @@ def distribute_posts(grpList, tg_group, isTest=False):
 
     if (isTest):
         grpList = [
-                    ('PHK_TML', True),
-                    ('PHK_TML3', True),
-                    ('PHK_TML2', True),
+#                    ('PHK_TML', True),
+#                    ('PHK_TML3', True),
+#                    ('PHK_TML2', True),
                     ('PHK_TSOTINGSHAN', True),
                     #('kenjinrong', True),
                     #('1508136705939326', True),
@@ -119,9 +119,9 @@ def main():
     isTest = False 
 
     grpList = [
-               ('PHK_TML', True),
-               ('PHK_TML3', True),
-               ('PHK_TML2', True),
+               #('PHK_TML', True),
+               #('PHK_TML3', True),
+               #('PHK_TML2', True),
                ('PHK_TSOTINGSHAN', True),
                ('PHK_PETERWONG', True),
                ]

@@ -88,7 +88,7 @@ def main():
     # result annountcement (aastocks)
     for passage in result_announcement.get_latest_result_announcement():
         print(passage)
-        bot_sender.broadcast(passage)
+        bot_sender.broadcast(passage, False, False)
    
 if __name__ == "__main__":
     main()                

@@ -24,8 +24,11 @@ def get_indices():
     html = r.text 
     #print(html)
     soup = BeautifulSoup(html, "html.parser")
-   
-    rows = soup.find("table", {"class": "yfinlist-table"}).find("tbody").findAll("tr")
+
+    section = soup.find("section", {"id": "yfin-list"})
+    #print(section)
+    
+    rows = section.find("table").find("tbody").findAll("tr")
 
     passage = "<b>" + "世界指數" + "</b>" + DEL
 

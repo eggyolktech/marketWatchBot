@@ -40,9 +40,9 @@ def get_breadth(chart_type):
  
 def main():
 
-    for ct in ["sp500-vs-sp500-stocks-above-20d-sma-params-x-x-x-x",
-               "djia-vs-djia-stocks-above-20d-sma-params-x-x-x-x",
-               "nasdaq100-vs-nasdaq100-stocks-above-20d-sma-params-x-x-x-x",
+    for ct in ["sp500-vs-sp500-stocks-above-100d-sma-params-x-x-x-x",
+               "djia-vs-djia-stocks-above-100d-sma-params-x-x-x-x",
+               "nasdaq100-vs-nasdaq100-stocks-above-100d-sma-params-x-x-x-x",
               ]:
         url = get_breadth(ct)
         if (url):

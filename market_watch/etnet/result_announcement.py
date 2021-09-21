@@ -77,7 +77,7 @@ def main():
 
     for passage in get_latest_result_announcement():
         print(passage)
-        bot_sender.broadcast(passage, True)
+        bot_sender.broadcast(passage, True, url_preview=False)
    
 if __name__ == "__main__":
     main()                

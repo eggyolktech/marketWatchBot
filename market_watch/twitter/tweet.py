@@ -18,7 +18,7 @@ config = config_loader.load()
 
 DEL = '\n\n'
 NEW_TWEET_COUNT = 30 
-GET_TWEET_COUNT = 10
+GET_TWEET_COUNT = 20
 
 LOADING = [u'\U0000231B', u'\U0001F6AC', u'\U0001F37B', u'\U0001F377', u'\U000023F3', u'\U0000231A', u'\U0001F30F']
 
@@ -57,7 +57,7 @@ def push_tweet(name, tcount=1, test=False, group="telegram-twitter"):
         get_count = NEW_TWEET_COUNT
       
     try:
-        statuses = API.GetUserTimeline(screen_name=sname, include_rts=True, exclude_replies=False, count=get_count)
+        statuses = API.GetUserTimeline(screen_name=sname, include_rts=False, exclude_replies=False, count=get_count)
     except:
         print("User Timeline Error: [%s]" % name)
         return
@@ -69,8 +69,8 @@ def push_tweet(name, tcount=1, test=False, group="telegram-twitter"):
             print("%s created at %s is OLD! Skip sending...." % (s.id, s.created_at))
         else:
             source = (re.sub('<[^<]+?>', '', s.source)).strip()
-            if source == "IFTTT":
-                continue
+            #if source == "IFTTT" and not ("Facebook" in s.full_text):
+            #    continue
 
             print("%s created at %s is NEW! Prepare for sending...." % (s.id, s.created_at))
             new_tweet_list.append(str(s.id))
@@ -78,7 +78,8 @@ def push_tweet(name, tcount=1, test=False, group="telegram-twitter"):
             created = str(s.created_at)
             text = re.sub(r"\$([A-Za-z]+)",r"/qd\1", s.full_text)
             analysis = get_sentiment(s.full_text)
-            message = "[%s] %s\n(<a href='%s'>%s</a>)" % (analysis, text, url, "Post@ " + created.split('+')[0] + "GMT")
+            message = "[%s] %s\n(<a href='%s'>%s</a>)" % (analysis, text, url, created.split('+')[0] + "GMT")
+            #message = "[%s] %s\n(%s)" % (analysis, text, created.split('+')[0] + "GMT")
             messages_list.append(message)
 
     
@@ -90,20 +91,29 @@ def push_tweet(name, tcount=1, test=False, group="telegram-twitter"):
     redis_pool.setV(rkey, new_json_arr)    
 
     if messages_list:
-        messages_list.insert(0, "<pre>\n</pre>" + random.choice(LOADING) + "<b>@%s is Tweeting...</b>" % name)
+
+        surl = "https://mobile.twitter.com/%s" % name
+        smsg = "<pre>\n</pre>" + random.choice(LOADING) + ("<a href='%s'>@%s</a> is Tweeting..." % (surl, name))
+        bot_sender.broadcast_list(smsg, group, url_preview=False)
+
+        #messages_list.insert(0, "<pre>\n</pre>" + random.choice(LOADING) + "<b>@%s is Tweeting...</b>" % name)
         
         # zerohedge summary
-        if name == "zerohedge":
-            full_message = DEL.join(messages_list)
-            bot_sender.broadcast_list(full_message, group)
-            return
-
+        if name in ("zerohedge", "barronsonline", "xhnews"):
+            #full_message = DEL.join(messages_list)
+            #bot_sender.broadcast_list(full_message, group)
+            #return
+            up = False
+        else:
+            up = True
+        
+        #test=True
         for msg in messages_list:
 
             if (test):
                 bot_sender.broadcast_list(msg)
             else:
-                bot_sender.broadcast_list(msg, group) 
+                bot_sender.broadcast_list(msg, group, url_preview = up) 
     
 def get_tweet(name, tcount=1):
 
@@ -112,15 +122,15 @@ def get_tweet(name, tcount=1):
     #print("UserImg %s" % user.profile_image_url)
     
     sname = '@%s' % name
-    statuses = API.GetUserTimeline(screen_name=sname, include_rts=True, exclude_replies=False, count=tcount)    
+    statuses = API.GetUserTimeline(screen_name=sname, include_rts=False, exclude_replies=False, count=tcount)    
     messages_list = []
 
-    for s in statuses:    
+    for s in reversed(statuses):    
         #print(dir(s))
         source = (re.sub('<[^<]+?>', '', s.source)).strip()
         
-        if source == "IFTTT":
-            continue
+        #if source == "IFTTT":
+        #    continue
 
         url = ('https://mobile.twitter.com/i/web/status/%s' % s.id)
         created = str(s.created_at)
@@ -139,7 +149,7 @@ def get_tweet(name, tcount=1):
     return full_message
 
 def trump(tcount=1):
-    return get_tweet('realDonaldTrump', tcount)
+    return get_tweet('realDonaldTrump', 12)
 
 def push_tweet_list(watcher, group, isTest=False):
 
@@ -159,11 +169,13 @@ def main(args):
             push_tweet_list(wp.repo_twitter('test'), 'dummy', isTest)
             return
 
-        for repo in ['twitter', 'zerohedge', 'itdog', 'leisure']:
+        #for repo in ['ptgroup']:
+        for repo in ['ptgroup', 'twitter', 'gwc_global', 'zerohedge', 'itdog', 'leisure']:
             push_tweet_list(wp.repo_twitter(repo), group="telegram-%s" % repo)
 
     else:
-        get_tweet('warofoneman', 15)
+        trump()
+        #get_tweet('warofoneman', 15)
     
     print("Time elapsed: " + "%.3f" % (time.time() - start_time) + "s")    
 

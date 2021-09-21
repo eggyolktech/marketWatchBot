@@ -47,12 +47,15 @@ def main():
 
     #columns = ['https://www.google.com.hk/alerts/feeds/17097742724167324955/8551375453331312334', 'https://www.google.com.hk/alerts/feeds/17097742724167324955/12218577883122648771','https://www.google.com.hk/alerts/feeds/17097742724167324955/14866853673326524888']
     columns = [
-            'https://www.google.com.hk/alerts/feeds/17097742724167324955/12218577883122648771',
-            'https://www.google.com.hk/alerts/feeds/17097742724167324955/6235280641080477545',
-            'https://www.google.com.hk/alerts/feeds/17097742724167324955/12185381887594353633', 
-            'https://www.google.com.hk/alerts/feeds/17097742724167324955/3555398835609438380',
-            'https://www.google.com.hk/alerts/feeds/17097742724167324955/3555398835609440167',
-
+            'https://www.google.com.hk/alerts/feeds/17097742724167324955/12218577883122648771', # winson
+            'https://www.google.com.hk/alerts/feeds/17097742724167324955/6235280641080477545', #choi kam 
+            'https://www.google.com.hk/alerts/feeds/17097742724167324955/12185381887594353633', # lam boon
+            'https://www.google.com.hk/alerts/feeds/17097742724167324955/3555398835609438380', # fu hoi
+            'https://www.google.com.hk/alerts/feeds/17097742724167324955/3555398835609440167', # leung chung
+            'https://www.google.com.hk/alerts/feeds/17097742724167324955/15712087392887966231', # ivan li
+            'https://www.google.com.hk/alerts/feeds/17097742724167324955/6954474239905041744', # chow hin 
+            'https://www.google.com.hk/alerts/feeds/17097742724167324955/2752388232462749823', # shum wing lin
+            'https://www.google.com/alerts/feeds/17097742724167324955/2656866248812261984', # tang kin chor
             ]
     
     for colurl in columns:    

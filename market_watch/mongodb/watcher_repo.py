@@ -40,7 +40,7 @@ def repo_facebook(channel):
 
     if 'feeds' in fres:
         for acc in fres['feeds']:
-            if acc['active']:    
+            if ('active' in acc) and acc['active']:    
                 res.append((acc['username'], True))        
     return res
 

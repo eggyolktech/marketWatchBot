@@ -12,7 +12,7 @@ config = config_loader.load()
 
 MAX_MSG_SIZE = 4096
 
-def broadcast(passage, is_test=False):
+def broadcast(passage, is_test=False, url_preview=True):
 
     if (is_test):
         chat_list = config.items("telegram-chat-test")
@@ -27,10 +27,10 @@ def broadcast(passage, is_test=False):
 
         for message in messages:
 
-            result = urllib.request.urlopen(bot_send_url, urllib.parse.urlencode({ "parse_mode": "HTML", "chat_id": chat_id, "text": message }).encode("utf-8")).read()
+            result = urllib.request.urlopen(bot_send_url, urllib.parse.urlencode({ "parse_mode": "HTML", "chat_id": chat_id, "text": message, "disable_web_page_preview": not url_preview }).encode("utf-8")).read()
             print(result)
 
-def broadcast_list(passage, chatlist="telegram-chat-test"): 
+def broadcast_list(passage, chatlist="telegram-chat-test", url_preview=True): 
     
     chat_list = config.items(chatlist)
     bot_send_url = config.get("telegram","bot-send-url")
@@ -41,8 +41,8 @@ def broadcast_list(passage, chatlist="telegram-chat-test"):
         messages = [passage[i:i+MAX_MSG_SIZE] for i in range(0, len(passage), MAX_MSG_SIZE)]
 
         for message in messages:
-
-            result = urllib.request.urlopen(bot_send_url, urllib.parse.urlencode({ "parse_mode": "HTML", "chat_id": chat_id, "text": message }).encode("utf-8")).read()
+            print("url %s, query %s" % (bot_send_url,  urllib.parse.urlencode({ "parse_mode": "HTML", "chat_id": chat_id, "text": message, "disable_web_page_preview": not url_preview }).encode("utf-8")))
+            result = urllib.request.urlopen(bot_send_url, urllib.parse.urlencode({ "parse_mode": "HTML", "chat_id": chat_id, "text": message, "disable_web_page_preview": not url_preview }).encode("utf-8")).read()
         
             print(result)
 

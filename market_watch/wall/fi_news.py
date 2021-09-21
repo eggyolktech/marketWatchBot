@@ -31,9 +31,11 @@ def news():
     r = requests.get(url, headers=headers)
     r.encoding = "UTF-8"
     html = r.content
+    #html = selenium_helper.get_content(url)
     soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(html, "html5lib")
 
-    #print(soup.prettify())  
+    print(soup.prettify())  
     passages = [] 
     passage = ""
     now = datetime.now()
@@ -43,6 +45,7 @@ def news():
     divs = soup.find_all("div", {"class": "live-item"})
 
     for div in divs:
+        print(div)
         timest = div.find("time")
         ltime = timest['datetime'].strip()
         ltimetext = timest.text.strip()
@@ -89,14 +92,15 @@ def main(args):
             print("Post ID [%s] is NEW! Prepare for sending...." % (pid))
             print(ptext)
             new_posts_list.append(pid)
-            bot_sender.broadcast_list(ptext, "telegram-zerohedge")
+            #bot_sender.broadcast_list(ptext, "telegram-zerohedge")
+            bot_sender.broadcast_list(ptext)
   
             #print("BEFORE Post List %s" % posts_list)
             posts_list = new_posts_list + posts_list
             #print("AFTER Posts List %s" % posts_list)
             #print("AFTER Posts List (Limited) %s" % posts_list[:NEW_POSTS_COUNT])
             new_json_arr = json.dumps(posts_list[:NEW_POSTS_COUNT])
-            redis_pool.setV(rkey, new_json_arr)
+            #redis_pool.setV(rkey, new_json_arr)
     
 
 if __name__ == "__main__":

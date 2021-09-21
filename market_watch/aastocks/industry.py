@@ -19,7 +19,7 @@ def get_aastocks_industry():
 
     #print("Url: [" + url + "]")
     
-    r = requests.get(url)
+    r = requests.get(url, timeout=10)
     html = r.text
     soup = BeautifulSoup(html, 'html5lib')
     
@@ -31,7 +31,7 @@ def get_aastocks_industry():
             list_url = "http://services1.aastocks.com/web/cjsh/IndustrySection.aspx?CJSHLanguage=Eng&symbol=&industry=" + option['value']
             #print ("List URL: [" + list_url + "]")
             
-            r = requests.get(list_url)
+            r = requests.get(list_url, timeout=10)
             html = r.text
             soup2 = BeautifulSoup(html, 'html5lib')
             

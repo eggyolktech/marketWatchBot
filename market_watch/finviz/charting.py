@@ -8,6 +8,9 @@ import requests
 import re
 from datetime import date
 from datetime import datetime
+import time
+
+current_milli_time = lambda: int(round(time.time() * 1000))
 
 DICT_FINVIZ_FUTURES = {'DJI':['YM', 'Dow Jones Index'], 
                 'SPX':['ES', 'S&P 500'],
@@ -59,7 +62,7 @@ def get_futures_chart(code, period):
     else:
         p = period + "1"
 
-    return "https://finviz.com/fut_chart.ashx?t=%s&p=%s" % (code.upper(),  p)
+    return "https://finviz.com/fut_chart.ashx?t=%s&p=%s&ts=%s" % (code.upper(),  p, current_milli_time())
 
 def get_crypto_chart(code, period):
 
@@ -70,7 +73,7 @@ def get_crypto_chart(code, period):
     else:
         p = period + "1"
 
-    return "https://finviz.com/fx_image.ashx?%s_%s_l.png" % (code.lower(),  p)
+    return "https://finviz.com/fx_image.ashx?%s_%s_l.png&ts=%s" % (code.lower(),  p, current_milli_time())
 
 def is_finviz_code(code):
 
@@ -91,7 +94,7 @@ def get_finviz_chart(code, period):
 
 def main():
 
-    for code in ["BTC","NIKKEI","LTC","30YB"]:
+    for code in ["BTC","MDB","NIKKEI","LTC","30YB"]:
         print(get_finviz_chart(code, "d"))
     #print(get_futures_chart("YM", "d"))
     #print(get_crypto_chart("BTCUSD", "d"))

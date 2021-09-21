@@ -6,7 +6,7 @@ from datetime import datetime
 import time
 import hashlib
 import json
-
+import traceback
 from market_watch.telegram import bot_sender
 from market_watch.redis import redis_pool
 from market_watch.mongodb import watcher_repo as wp
@@ -24,15 +24,16 @@ def get_rss_alerts_with_redis(url):
     new_posts_list = []
 
     posts = feedparser.parse(url)
+    #print("posts [%s]" % posts)
     url_hash = int(hashlib.md5(url.encode()).hexdigest(), 16)
-    ftitle = posts['feed']['title']
+    ftitle = posts['feed']['title'] if 'title' in posts['feed'] else ""
     
     rkey = "RSS:" + str(url_hash)
     json_arr = redis_pool.getV(rkey)
     posts_list = []    
 
     if (json_arr):
-        print("Posts Redis Cache exists for [%s]" % url)
+        print("Posts Redis Cache exists for [%s] [%s]" % (url, rkey))
         json_arr = json_arr.decode()        
         posts_list = json.loads(json_arr)
         print("Loaded Posts List %s" % posts_list)
@@ -111,11 +112,16 @@ def get_rss_alerts(url):
 def push_rss(repo_list, tg_group):
 
     for rss in repo_list:
+        
         passage = get_rss_alerts_with_redis(rss)
 
         if(passage):
             print(passage)
-            bot_sender.broadcast_list(passage, tg_group)
+            #if 'lpt' in tg_group or 'zerohedge' in tg_group:
+            if 'lpt' in tg_group:
+                bot_sender.broadcast_list(passage, tg_group, False)
+            else:
+                bot_sender.broadcast_list(passage, tg_group)
 
 def main():
 
@@ -127,7 +133,8 @@ def main():
         push_rss(repoList, tg_group)
         return
 
-    for repo in ['zerohedge', 'notice', 'itdog', 'lpt', 'parents']:
+    for repo in ['zerohedge', 'notice', 'itdog', 'lpt', 'gwc_leisure', 'parents']:
+    #for repo in ['lpt']:
         repoList = wp.repo_rss(repo)
         tg_group = "telegram-%s" % repo
         push_rss(repoList, tg_group)

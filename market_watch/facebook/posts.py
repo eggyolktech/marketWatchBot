@@ -10,6 +10,10 @@ from bs4 import BeautifulSoup
 from market_watch.telegram import bot_sender
 from market_watch.redis import redis_pool
 from market_watch.mongodb import watcher_repo as wp
+import traceback
+import urllib3
+import urllib.parse as urlparse
+from urllib.parse import parse_qs
 
 NEW_POSTS_COUNT = 25
 GET_POSTS_COUNT = 10 
@@ -18,16 +22,31 @@ DEL = "\n\n"
 def get_posts_list(group):
 
     url = "https://www.facebook.com/pg/%s/posts/?ref=page_internal" % group
-
+    url = "https://m.facebook.com/pg/%s/posts/?ref=page_internal" % group
+    #url = "https://www.facebook.com/Vcp%E5%9E%8B%E6%85%8B-%E8%82%A1%E7%A5%A8%E8%B6%A8%E5%8B%A2%E4%BA%A4%E6%98%93Swing-trade-105888807793932"
     print("URL: [" + url + "]")
 
     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
 
-    r = requests.get(url, headers=headers)
-    html = r.text 
-
+    try:
+        r = requests.get(url, headers=headers, timeout=10)
+        html = r.text
+    except:
+        http = urllib3.PoolManager()
+        r = http.request('GET', url)
+        html = r.data
+ 
+    print(html)
     soup = BeautifulSoup(html, "html.parser")
-    divs = soup.find_all("div", id=re.compile("^feed_subtitle_"))
+    posts_list = []
+    
+    hrefs = soup.find_all("a", {'href': True, 'aria-label': 'Open story'})
+    for aurl in hrefs:
+        if "story_fbid" in aurl['href']:
+           parsed = urlparse.urlparse(aurl['href'])
+           pqs = parse_qs(parsed.query)['story_fbid']
+           posts_list.append(pqs[0])
+    '''divs = soup.find_all("div", id=re.compile("^feed_subtitle_"))
     
     posts_list = []
     
@@ -38,8 +57,9 @@ def get_posts_list(group):
             idd = idlist[1].strip()
             if ":" in idd:
                 idd = idd.split(":")[1]
-            posts_list.append(idd)
+            posts_list.append(idd)'''
     
+    #print(posts_list)
     print("Post List Size: %s" % len(posts_list))
     return posts_list
 
@@ -49,8 +69,12 @@ def get_post_content(url):
 
     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
 
-    r = requests.get(url, headers=headers)
-    html = r.text
+    try:
+        r = requests.get(url, headers=headers, timeout=10)
+        html = r.text
+    except:
+        traceback.print_exc()
+        return ""
 
     soup = BeautifulSoup(html, "html.parser")
     title = soup.find("title")    
@@ -128,16 +152,22 @@ def distribute_posts(grpList, tg_group, isTest=False):
         tg_group = "telegram-chat-test"
 
     for group in grpList:
-        plist = get_posts_list(group[0])
-        #print(plist)
-        push_posts_list(group=group[0], plist=plist, tg_group=tg_group, excerpt=group[1])
-
+        try:
+            plist = get_posts_list(group[0])
+            #print(plist)         
+            push_posts_list(group=group[0], plist=plist, tg_group=tg_group, excerpt=group[1])
+        except:
+            print("Error getting post list....")
+            traceback.print_exc()
     
 def main():
 
+    maintest()
+    return
+
     isTest = not wp.repo_status('facebook') 
-    gList = ['notice', 'zerohedge', 'itdog', 'parents', 'leisure', 'ptgroup', 'jetso']
-    #gList = ['leisure']
+    gList = ['notice', 'gwc_global', 'gwc_leisure', 'zerohedge', 'itdog', 'parents', 'leisure', 'ptgroup', 'jetso']
+    #gList = ['gwc_leisure']
 
     for channel in gList:
         grpList = wp.repo_facebook(channel)
@@ -149,7 +179,10 @@ def main():
 
 def maintest():
 
-    urls = ['https://www.facebook.com/unclesiu/posts/761382460874325', 
+    plist = get_posts_list('sspgadgetoutlet')
+    return
+
+    urls = [#'https://www.facebook.com/unclesiu/posts/761382460874325', 
             'https://www.facebook.com/cablefinance/posts/2195615380489521'
             ]
 

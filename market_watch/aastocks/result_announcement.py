@@ -24,7 +24,7 @@ def get_result_calendar(code):
 
     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
 
-    r = requests.get(url, headers=headers)
+    r = requests.get(url, headers=headers, timeout=10)
     html = r.text
     soup = BeautifulSoup(html, "html.parser")
 
@@ -57,7 +57,7 @@ def get_latest_result_announcement():
 
     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
 
-    r = requests.get(url, headers=headers)
+    r = requests.get(url, headers=headers, timeout=10)
     html = r.text
     soup = BeautifulSoup(html, "html.parser")
 
@@ -94,7 +94,7 @@ def get_aastocks_calendar():
 
     print("Url: [" + url + "]")
     
-    r = requests.get(url)
+    r = requests.get(url, timeout=10)
     html = r.text
     soup = BeautifulSoup(html, "html5lib")
     

@@ -93,7 +93,7 @@ def distribute_posts(grpList, tg_group, isTest=False):
 
     if (isTest):
         grpList = [
-                    ('diqiuzhishiju', True),
+                    #('diqiuzhishiju', True),
                     #('kenjinrong', True),
                     #('1508136705939326', True),
                     #('anthony.wealth', True),
@@ -119,7 +119,7 @@ def main():
     distribute_posts(grpList, tg_group, isTest)
 
     grpList = [
-                ('diqiuzhishiju', True),
+                #('diqiuzhishiju', True),
                 ]
     tg_group = "telegram-itdog"
     distribute_posts(grpList, tg_group, isTest)

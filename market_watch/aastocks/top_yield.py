@@ -18,11 +18,11 @@ def get_etf_stat(url):
 
     print("ETF Url: [" + url + "]")
     
-    r = requests.get(url)
+    r = requests.get(url, timeout=10)
     html = r.text
     soup = BeautifulSoup(html, "html5lib")
     
-    table = soup.find('table', id="tabETF1")
+    table = soup.find('table', id="tblTS2")
     tbody = table.find('tbody')
     rows = tbody.findAll('tr')
     
@@ -64,11 +64,11 @@ def get_hy_stat(url, industry):
     
     print("Url: [" + url + "]")
     
-    r = requests.get(url)
+    r = requests.get(url, timeout=10)
     html = r.text
     soup = BeautifulSoup(html, "html5lib")
     
-    table = soup.find('table', id="tbTS")
+    table = soup.find('table', id="tblTS2")
     tbody = table.find('tbody')
     rows = tbody.findAll('tr')
     

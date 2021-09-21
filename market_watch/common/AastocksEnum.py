@@ -50,6 +50,7 @@ class IndexCode(Enum):
     DJI = 111000
     NASDAQ = 111100
     HSIF = 221000
+    HSIT = 110078
     HSIFN = 221002
     MHSIF = 221004
     MHSIFN = 221003

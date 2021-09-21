@@ -32,6 +32,22 @@ def get_hkg_chart_list_by_type(code, action, params):
     
     return url_dict_list
 
+def get_hkg_chart_list_by_action(action, params):
+    
+    url_dict_list = []
+    ind_params = []
+    ATTRS = ("bb", "sma", "night", "gcc", "line")
+    
+    for p in params:
+        pl = p.lower()
+        if pl in ATTRS:
+            ind_params.append(pl)
+
+    for p in params:
+        if not p in ATTRS:
+            url_dict_list.append({'code': p, 'url': get_hkg_chart_by_type(p, action, ind_params)})
+    
+    return url_dict_list   
 
 def get_hkg_chart_by_type_list(code, params):
 
@@ -141,7 +157,7 @@ def get_hkg_chart_by_type(code, action, params):
         chart_type = "5" # line
         indicator = "&Indicator=1&indpara1=0"
 
-    main = "http://charts.aastocks.com/servlet/Charts?"
+    main = "https://charts.aastocks.com/servlet/Charts?"
     main = main + "fontsize=12&15MinDelay=F&lang=1&titlestyle=1&vol=1&chart=left&type=" + chart_type
  
     subchart = ("&subChart1=3&ref1para1=12&ref1para2=26&ref1para3=9" 

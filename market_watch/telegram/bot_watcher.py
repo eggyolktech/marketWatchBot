@@ -6,6 +6,7 @@ import io
 import sys
 import time
 import telepot
+from bs4 import BeautifulSoup
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
 from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
 from decimal import Decimal
@@ -16,7 +17,7 @@ import traceback
 from socket import timeout
 import random
 import resource
-
+import datetime
 from market_watch.common.AastocksEnum import TimeFrame, FxCode, IndexCode
 from market_watch.common.AastocksConstants import *
 
@@ -33,19 +34,22 @@ from market_watch.alpha import analysis_loader
 from market_watch.fool import fool_loader
 from market_watch.alpha import us_company_news
 from market_watch.twitter import tweet
+from market_watch.etfdb import etf_info
 from market_watch.finviz import heatmap, charting as fcharting
 from market_watch.stockcharts import charting as scharting
 from market_watch.cnn import ust
 from market_watch.quantum import tickersearch
 from market_watch.bondsupermart import tickersearch as super_tickersearch
 from market_watch.n28hse import transearch as house_search
-
+from market_watch.hkex import options, options_report
+from market_watch.yahoo import usearning
 from market_watch.util import config_loader
 from market_watch import quick_list, quick_tracker
 
 from hickory.crawler.aastocks import stock_quote
 from hickory.crawler.iextrading import stock_quote as iex_stock_quote
 from hickory.crawler.alphavantage import fx_quote
+from hickory.crawler.cnyes import crypto_quote
 from hickory.crawler.hkex import mutual_market
 from hickory.crawler.wsj import jp_stock_quote
 
@@ -56,8 +60,12 @@ config = config_loader.load()
 #old_stdout = sys.stdout
 #sys.stdout = open("xxxx.log", 'w')
 
-DICT_CURRENCY = {'BTC':'BTCUSD', 'ETH':'ETHUSD', 'XRP':'XRPUSD',
-                 'LTC':'LTCUSD', 'EUR':'EURUSD', 'GBP':'GBPUSD',
+CRYPTO_CURRENCY = ['BTC', 'ETH', 'XRP', 'LTC', 'BCH']
+
+DICT_CURRENCY = {
+                 #'BTC':'BTCUSD', 'ETH':'ETHUSD', 'XRP':'XRPUSD',
+                 #'LTC':'LTCUSD', 
+                 'EUR':'EURUSD', 'GBP':'GBPUSD',
                  'AUD':'AUDUSD', 'NZD':'NZDUSD', 'JPY':'USDJPY',
                  'CAD':'USDCAD', 'HKD':'USDHKD', 'CHF':'USDCHF',
                  'SGD':'USDSGD', 'CNY':'USDCNY', 'CNYHKD':'CNYHKD',
@@ -244,6 +252,10 @@ def on_chat_message(msg):
                     {'command': '/lw', 'desc': 'World Indices', 'icon': u'\U0001F4C8'},
                     {'command': '/lm', 'desc': 'Commodities and Metals', 'icon': u'\U0001F4C8'},
                     {'command': '/lfx', 'desc': 'Forex', 'icon': u'\U0001F4C8'},
+                    {'command': '/lop', 'desc': 'Options', 'icon': u'\U0001F4C8'},
+                    {'command': '/lvix', 'desc': 'HSI and its VIX', 'icon': u'\U0001F4C8'},
+                    {'command': '/lmr', 'desc': 'HKFE Margin Requirement (IB)', 'icon': u'\U0001F4C8'},
+                    {'command': '/letf', 'desc': 'Top ETF', 'icon': u'\U0001F4C8'},
         ]
 
         for menuitem in menuitemlist:
@@ -252,13 +264,46 @@ def on_chat_message(msg):
         if (action == "hk"):
             bot.sendMessage(chat_id, indices.get_indices("hk"), parse_mode='HTML') 
         elif (action == "cn"):
-            bot.sendMessage(chat_id, indices.get_indices("cn"), parse_mode='HTML') 
+            bot.sendMessage(chat_id, indices.get_indices("cn"), parse_mode='HTML')
+        elif (action == "etf"):
+            bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')
+            for passage in etf_info.get_top_etf_holdings():
+                bot.sendMessage(chat_id, passage, parse_mode='HTML')
+        elif (action == "vix"):
+            bot.sendMessage(chat_id, 'http://charts.aastocks.com/servlet/Charts?indicator2=1&ind2para1=2&ind2para2=3&ind2para3=HSI&fontsize=12&15MinDelay=T&lang=1&titlestyle=1&vol=1&scheme=3&com=100&chartwidth=1200&chartheight=600&stockid=110041.HK&period=6&type=1&logoStyle=1&' , parse_mode='HTML')
+        elif (action == "mr"):
+            pass
+            url = 'https://www.interactivebrokers.com/en/index.php?f=26662&hm=hk&ex=hk&rgt=0&rsk=1&pm=0&rst=040404040401'
+            page = requests.get(url)
+            soup = BeautifulSoup(page.text, 'html.parser')
+            table = soup.find("div", {"id": "hkfe"}).find("table")
+            for row in table.find("tbody").find_all("tr"):
+                cols = row.find_all("td")
+                if cols[3].text.strip() in ('HSI', 'MHI', 'HHI'):
+                    msg = '%s - Intraday Init [$%s]' % (cols[3].text.strip(), cols[4].text.strip())
+                    bot.sendMessage(chat_id, msg, parse_mode='HTML')
+
+        elif (action == "op"):
+            #options_list = options.get_options_list()
+            #message = ""
+            #for option in options_list:
+            #    msg = "/qd%s - %s" % (option[0], option[1])
+            #    message = message + DEL + msg
+
+            d = datetime.datetime.today()
+            if (d.weekday() < 5):
+                iurl = options_report.gen_opx_report()
+                message = "<a href='%s'>每日市場報告</a>" % iurl + EL
+                bot.sendMessage(chat_id, message, parse_mode='HTML') 
+                message2 = "<a href='https://www.bsgroup.com.hk/futureoption/futureoption/stockoptionslist/'>可供買賣名單</a>"
+                bot.sendMessage(chat_id, message2, parse_mode='HTML')
+            
         elif (action.startswith("ib")):
 
             print("parameters [%s]" % command[4:])
             [p1, p2] = command[4:].split()
             ibcard_dict = dict(config.items('ibcard'))
-            result = ("[%s %s] ==> (%s %s)" % (p1, p2, ibcard_dict.get(p1), ibcard_dict.get(p2)))            
+            result = ("%s %s" % (ibcard_dict.get(p1), ibcard_dict.get(p2)))            
             bot.sendMessage(chat_id, result, parse_mode='HTML')
 
         elif (action == "w"):
@@ -269,13 +314,15 @@ def on_chat_message(msg):
             bot.sendMessage(chat_id, hkadr.get_hkadr(), parse_mode='HTML') 
         elif (action == "m"):
             bot.sendMessage(chat_id, commodities.get_commodities(), parse_mode='HTML') 
-            bot.sendMessage(chat_id, sina_commodities.get_commodities(), parse_mode='HTML') 
+            #bot.sendMessage(chat_id, sina_commodities.get_commodities(), parse_mode='HTML') 
         elif (action == "l"):
             msg = "<a href='http://eggyolk.tech/heatmap.html' target='_blank'>Chicken Heatmap (HK)</a>" + DEL
-            msg = msg + "<a href='http://eggyolk.tech/heatmap_us.html' target='_blank'>Chicken Heatmap (US)</a>" + DEL
+            #msg = msg + "<a href='http://eggyolk.tech/heatmap_us.html' target='_blank'>Chicken Heatmap (US)</a>" + DEL
             msg = msg + "<a href='http://eggyolk.tech/y8.html' target='_blank'>Y8 List (HK)</a>" + DEL
-            msg = msg + "<a href='http://eggyolk.tech/y8_us.html' target='_blank'>Y8 List (US)</a>" + DEL
+            #msg = msg + "<a href='http://eggyolk.tech/y8_us.html' target='_blank'>Y8 List (US)</a>" + DEL
             msg = msg + "<a href='http://eggyolk.tech/moneyflow.html' target='_blank'>Southbound Moneyflow Track</a>" + DEL
+            msg = msg + "<a href='http://eggyolk.tech/f.html' target='_blank'>Finviz Charts</a>" + DEL
+            #msg = msg + "<a href='http://eggyolk.tech/y.html' target='_blank'>Y8 Charts</a>" + DEL
 
             bot.sendMessage(chat_id, msg, parse_mode='HTML')
         else:        
@@ -318,10 +365,10 @@ def on_chat_message(msg):
                     {'command': '/qF [next] [hscei] [night]', 'desc': 'Quote HSI Futures', 'icon': u'\U0001F414'},                   
                     {'command': '/qj[jp_code]', 'desc': 'Tokyo Stock Quote', 'icon': u'\U0001F414'}, 
                     {'command': '/ql[code]', 'desc': 'Return Charts for all Timeframes', 'icon': u'\U0001F4C8'},                    
-                    {'command': '/qN[code]', 'desc': 'Result Calendar (HK Only)', 'icon': u'\U0001F4C8'},                    
+                    {'command': '/qN[code]', 'desc': 'Result Calendar', 'icon': u'\U0001F4C8'},                    
                     {'command': '/qn[code]', 'desc': 'Latest News (HK Only)', 'icon': u'\U0001F4C8'},                    
                     {'command': '/qq', 'desc': 'Quick Quote', 'icon': u'\U0001F42E'},
-                    {'command': '/qp', 'desc': 'Dividenc & OCF History', 'icon': u'\U0001F42E'},
+                    {'command': '/qp', 'desc': 'Dividend & OCF History', 'icon': u'\U0001F42E'},
                     {'command': '/qR', 'desc': 'Industries List', 'icon': u'\U0001F42E'},
                     {'command': '/qr[code1] [code2]', 'desc': 'Relative Strength', 'icon': u'\U0001F42E'},
                     {'command': '/qs', 'desc': 'Chicken Sectormap', 'icon': u'\U0001F414'},
@@ -349,7 +396,7 @@ def on_chat_message(msg):
         menu = menu + EL + "Southbound Moneyflow: /qe5, /qe581"     
         menu = menu + EL + "Rel Strength: /qr5 2388 3988, /qR (by sectors)"           
         
-        if (action in ["M", "w", "W", "d", "D", "h", "H", "m"]):
+        if (action in ["M", "w", "d", "h", "m"]):
         
             # Bucket Scenario to display stock chart
             if code:
@@ -364,7 +411,10 @@ def on_chat_message(msg):
                         try:
                             f = urllib.request.urlopen(link_dict['url'], timeout=10)
                         except:
-                            bot.sendMessage(chat_id, u'\U000026D4' + ' Request Timeout for [' + link_dict['code'] + ']', parse_mode='HTML')
+                            if 'finviz' in link_dict['url']:
+                                bot.sendMessage(chat_id, u'\U0001F423 ' + ('<a href="%s">%s</a>' % (link_dict['url'], link_dict['code'])), parse_mode='HTML')
+                            else:
+                                bot.sendMessage(chat_id, u'\U000026D4' + ' Request Timeout for [' + link_dict['code'] + ']', parse_mode='HTML')
                         else:
                             bot.sendPhoto(chat_id, f)
                 else:
@@ -456,6 +506,15 @@ def on_chat_message(msg):
         elif (action == "F"):
             bot.sendMessage(chat_id, futures.get_futures("N", params), parse_mode='HTML')
             return
+
+        elif (action == "H"):
+
+            if (not is_number(code)):
+                bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')         
+                bot.sendMessage(chat_id, etf_info.get_etf_profile(code), parse_mode='HTML')
+                bot.sendMessage(chat_id, etf_info.get_etf_holdings(code), parse_mode='HTML')
+            else:
+                bot.sendMessage(chat_id, "Only US ETFs are supported", parse_mode='HTML')
         
         elif (action.lower() == "j"):
 
@@ -491,7 +550,16 @@ def on_chat_message(msg):
                     bot.sendMessage(chat_id, "Usage: /ql[code] (Only 1 code)", parse_mode='HTML')
 
         elif (action == "N"):
-            bot.sendMessage(chat_id, result_announcement.get_result_calendar(code), parse_mode='HTML')                    
+            
+            if (is_number(code)):
+                bot.sendMessage(chat_id, result_announcement.get_result_calendar(code), parse_mode='HTML')
+            else:
+                path = usearning.gen_earning_chart(code)
+                if path:
+                    bot.sendMessage(chat_id, u'\U0001F333' + ' ' + ("Earning History for %s" % code), parse_mode='HTML')
+                    bot.sendPhoto(chat_id=chat_id, photo=open(path, 'rb'))
+                else:
+                    bot.sendMessage(chat_id, u'\U000026D4' + ' No History found for [' + code + ']', parse_mode='HTML')
 
         elif (action == "n"):
 
@@ -524,10 +592,14 @@ def on_chat_message(msg):
                     bot.sendMessage(chat_id, stock_quote.get_quote_message(stockCd, "HK", simpleMode), parse_mode='HTML')
                 elif (stockCd.strip()):
 
-                    if (stockCd.upper() in DICT_CURRENCY):
+                    if (stockCd.upper() in CRYPTO_CURRENCY):
+                        bot.sendMessage(chat_id, crypto_quote.get_crypto_quote_message(stockCd.upper()), parse_mode='HTML')
+       
+                    elif (stockCd.upper() in DICT_CURRENCY):
                         fromCur = DICT_CURRENCY[stockCd.upper()][0:3]
                         toCur = DICT_CURRENCY[stockCd.upper()][3:6]
                         bot.sendMessage(chat_id, fx_quote.get_fx_quote_message(fromCur, toCur), parse_mode='HTML')
+
                     else:
                         bot.sendMessage(chat_id, iex_stock_quote.get_quote_message(stockCd, "US", simpleMode), parse_mode='HTML')
                 #else:
@@ -600,16 +672,19 @@ def on_chat_message(msg):
             
             try:
                 f = urllib.request.urlopen("http://www.fafaworld.com/usectors.jpg", timeout=10)
+                f2 = urllib.request.urlopen("http://www.fafaworld.com/usectorsus.jpg", timeout=10)
             except:
                 bot.sendMessage(chat_id, u'\U0001F423' + ' Request Timeout', parse_mode='HTML')
             else:
                 bot.sendPhoto(chat_id, f)                
+                bot.sendPhoto(chat_id, f2)                
             return                 
 
         elif (action == "t"):
 
             bot.sendMessage(chat_id, random.choice(LOADING), parse_mode='HTML')
-            message = house_search.get_pricehist(code)
+            message = "Server Error, Sorry!"
+            #message = house_search.get_pricehist(code)
             bot.sendMessage(chat_id, message, parse_mode='HTML')
             return
 
@@ -619,9 +694,12 @@ def on_chat_message(msg):
 
             for url in urls:
                 try:
-                    f = urllib.request.urlopen(url, timeout=10)
+                    print(url)
+                    f = urllib.request.urlopen(url, timeout=15)
                 except:
-                    bot.sendMessage(chat_id, u'\U0001F423' + ' Request Timeout', parse_mode='HTML')
+                    #bot.sendMessage(chat_id, u'\U0001F423' + ' Request Timeout', parse_mode='HTML')
+                    cdd = url.split('?')[1].split('&')[0].split('=')[1]
+                    bot.sendMessage(chat_id, u'\U0001F423 ' + ('<a href="%s">%s</a>' % (url, cdd)), parse_mode='HTML')
                 else:
                     bot.sendPhoto(chat_id, f)
             return

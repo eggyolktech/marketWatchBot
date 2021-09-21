@@ -23,8 +23,7 @@ GET_POSTS_COUNT = 10
  
 def news(cat):
 
-   
-    url = ("http://m.on.cc/nc/%s/%s-1.html") % (cat, cat)
+    url = ("https://hk.on.cc/hk/%s/index.html") % (cat)
     print("URL: [" + url + "]")  
  
     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
@@ -32,9 +31,10 @@ def news(cat):
     r = requests.get(url, headers=headers)
     r.encoding = "UTF-8"
     html = r.text
+    #print(html)
     #html = selenium_helper.get_content(url, 1)
-    soup = BeautifulSoup(html, "html5lib")
-
+    #soup = BeautifulSoup(html, "html5lib")
+    soup = BeautifulSoup(html, "html.parser")
     #print(html)  
     passages = [] 
     passage = ""
@@ -42,27 +42,30 @@ def news(cat):
     
     print("Timestamp now: [" + str(now) + "]")
     #print(soup)
-    mtable = soup.find("table", {"class": "style_mainbg"})
-    
+    #latest = soup.find("div", {"id": "breakingnewsContent"}).find("div", {"class": "latest"})
+    latest = soup.find("div", {"id": "focusNews"})
+    divs = latest.find_all("div", {"class": "focusItem"})
+    #print(latest)
     #print("-"*100)
-    #print(mtable.find_all("table")[1].find_all("a")[4:])
-    #print("-"*100)
+    #print(divs)
+     
+    for div in divs:
+       
+        disTxt = "" 
+        #print("disTxt [%s]" % div.attrs)
+        
+        if 'district' in div.attrs and div.attrs['district']:
+            disTxt = "[" + div.attrs['district'] + "] "
+  
+        #print("-"*100)
+        aa = div.find("a")
 
-    hrefs = mtable.find_all("table")[1].find_all("a")[4:]
-    for href in hrefs:
-
-        if ("(" in href.text):
-
-            link = href['href']
-            #print(link)
-            #print(href.text.strip())
-            #print("#"*100)
-            #time = href.text.strip().split("(")[1].split(")")[0]
-            #print(time)
-            title = href.text.strip()
-
-            passage = u'\U0001F3E0' + " <a href='http://m.on.cc%s'>%s</a>" % (link, title)
-            #print(passage)
+        if aa:
+            img = aa.find("img")
+            #print("-"*100)
+            title = img['alt']
+            link = aa['href']
+            passage = u'\U0001F31E' + " <a href='http://hk.on.cc%s'>%s%s</a>" % (link, disTxt, title)
             passageid = link.split("/")[-1].split(".")[0]
             passages.append((passageid, passage))
 
@@ -74,6 +77,7 @@ def main(args):
     cat = args[1]
     passages = news(cat)
     print(passages)
+    #return
     rkey = "NEWS:MONCC%s" % (cat)
     json_arr = redis_pool.getV(rkey)
     posts_list = []
@@ -100,7 +104,7 @@ def main(args):
             print("Post ID [%s] is NEW! Prepare for sending...." % (pid))
             print(ptext)
             new_posts_list.append(pid)
-            bot_sender.broadcast(ptext, False)
+            bot_sender.broadcast(ptext, is_test=False, url_preview=False)
   
             #print("BEFORE Post List %s" % posts_list)
             posts_list = new_posts_list + posts_list

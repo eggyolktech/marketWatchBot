@@ -72,7 +72,7 @@ def get_dxy_live_rate():
 def get_full_live_rate():
 
     passage = ""
-    passage = passage + "<b>DXY: </b> " + get_dxy_live_rate() + EL
+    #passage = passage + "<b>DXY: </b> " + get_dxy_live_rate() + EL
 
     url = config.get("fxcm","rates-xml")
    
