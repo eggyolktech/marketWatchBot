@@ -114,3 +114,8 @@ config.properties
 # db
 market_db.dat
 
+#secret
+test.py
+1
+token.pickle*
+token.pickle
