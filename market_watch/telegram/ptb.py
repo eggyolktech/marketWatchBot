@@ -26,9 +26,11 @@ from market_watch.alpha import analysis_loader
 from market_watch.hkex import ccass_loader
 from market_watch.etfdb import etf_info
 from market_watch.google import stock_history
+from market_watch.investors import rs
 from market_watch.finviz import heatmap, charting as fcharting
 from market_watch.stockcharts import charting as scharting
 from market_watch.cnn import ust
+from market_watch.gmail import mmalerts
 
 from telegram.ext import (
     Updater,
@@ -78,12 +80,12 @@ MAX_MSG_SIZE = 4096
 
 ################### commmon functions
 
-def is_white_listed(in_chat_id):
+def is_white_listed(in_chat_id, group="telegram-chart"):
     
-    chat_list = config.items("telegram-chart")
+    chat_list = config.items(group)
     
     for key, chat_id in chat_list:
-        #print("Compare: " + str(chat_id) + " <=> " + str(in_chat_id));
+        print("Compare: " + str(chat_id) + " <=> " + str(in_chat_id));
         if (str(in_chat_id) == str(chat_id)):
             return True;
     
@@ -347,6 +349,20 @@ def quickquote(update, context):
 
     sHTML(update, context, menu)
 
+def mmalertsHandler(update, context):
+
+    logger.info("MMA Command received: [%s]" % (update.message.text))
+    
+    commands = update.message.text
+    commands = commands.split("@")[0] #remove bot suffix
+    chat_id = update.effective_chat.id
+    
+    if(is_white_listed(chat_id, "telegram-mm_alerts")):
+        randomIcon(update, context)
+        sHTML(update, context, mmalerts.get_alerts())                
+    else:
+        sHTML(update, context, u'\U0001F423' + ' Request Error')   
+
 def quickquoteHandler(update, context):
 
     logger.info("QQ Command received: [%s]" % (update.message.text))
@@ -526,6 +542,11 @@ def quickquoteHandler(update, context):
 
                     else:
                         sHTML(update, context, iex_stock_quote.get_quote_message(stockCd, "US", simpleMode))
+                        
+                        rsm = rs.get_rs_message(stockCd)
+                        
+                        if rsm:
+                            sHTML(update, context, rsm)
         
         elif (action == "r"):
         
@@ -630,7 +651,7 @@ def quickquoteHandler(update, context):
         else:
             unknown(update, context)  
     else:
-        unknown(update, context)            
+        unknown(update, context)                                
     
 def commandHandler(update, context):
 
@@ -682,6 +703,8 @@ handler_list = [
     CommandHandler('lmr', livequote),
     CommandHandler('letf', livequote),
     CommandHandler('ll', livequote),
+    
+    CommandHandler('mma', mmalertsHandler),
     
     CommandHandler('q', quickquote),  
 

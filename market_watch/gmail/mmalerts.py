@@ -17,7 +17,8 @@ pp = pprint.PrettyPrinter(indent=4)
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
-def main():
+def get_alerts():
+
     """Shows basic usage of the Gmail API.
     Lists the user's Gmail labels.
     """
@@ -43,7 +44,7 @@ def main():
     service = build('gmail', 'v1', credentials=creds)
 
     # Call the Gmail API
-    result = service.users().messages().list(userId='me', labelIds=['Label_1352622790776435189'], maxResults=10).execute()
+    result = service.users().messages().list(userId='me', labelIds=['Label_1352622790776435189'], maxResults=50).execute()
 
     #print(result)
     msgid_list = []
@@ -52,27 +53,32 @@ def main():
         print("message id - %s" % message['id'])
         msgid_list.append(message['id'])
 
-    print("message list [%s]" % msgid_list)
+    #print("message list [%s]" % msgid_list)
     redis_key = 'GMAIL:TRADEPA'
-    #redis_key = 'GMAIL:TRADEPA:TEST'
-    msgid_list = redis_helper.get_new_key_list(redis_key, msgid_list, 20, dryrun=False)
-    print("message list - only new [%s]" % msgid_list)
+    redis_key = 'GMAIL:TRADEPA:TEST'
+    msgid_list = redis_helper.get_new_key_list(redis_key, msgid_list, 50, dryrun=True)
+    #print("message list - only new [%s]" % msgid_list)
+    ptext = u'\U0001F4E3' + " MM Price Alerts\n\n"
 
     for msgid in msgid_list:
 
         content = service.users().messages().get(userId='me', id=msgid).execute()
-       
+        #pp.pprint(content)
+        #return
         headers = content['payload']['headers']
         subject = ""
+        receive_dt = ""
         for header in headers:
             if header['name'] == 'Subject':
                 subject = header['value']
+            elif header['name'] == 'Received':
+                receive_dt = header['value'].split()
 
-        #pp.pprint(content) 
-
+        receive_dt = (' '.join([str(elem) for elem in receive_dt[10:]])) 
+        
         if 'parts' in content['payload']:
 
-            pp.pprint("I am in!!!")
+            #pp.pprint("I am in!!!")
             parts = content['payload']['parts']
             part = parts[0]
             body = part['body']
@@ -81,39 +87,25 @@ def main():
             soup = BeautifulSoup(txt)
             txt = ''.join(soup.findAll(text=True))
             txt = txt.replace("\n", "  ")
+            txt = txt.replace("An update was just posted to the Livestream:", "")
             while "  " in txt: txt = txt.replace("  ", " ")
+            while "\r" in txt: txt = txt.replace("\r", "")
+            txt = txt.strip()
             txt = txt.replace("html ", "").replace(" end post-item 1", "")
-            pp.pprint(txt)
-            print("subject [%s], content [%s]" % (subject, txt))            
-            ptext = u'\U0001F4E3' + " %s\n\n" % subject + txt
+            #pp.pprint(txt)
+            #print("subject [%s], content [%s]" % (subject, txt))          
             
-            bot_sender.broadcast_list(ptext, 'telegram-ptgroup')
-            #print(ptext)
-            bot_sender.broadcast_list(ptext, 'telegram-mm')
-            #bot_sender.broadcast_list(ptext)
-            #
-
-        # only one body, no parts
-        elif 'body' in content['payload']: 
-
-            body = content['payload']['body']
-            txt = base64.b64decode(body['data'], '-_')
-            soup = BeautifulSoup(txt)
-            txt = ''.join(soup.findAll(text=True))
-            txt = txt.replace("\n", "  ")
-            while "  " in txt: txt = txt.replace("  ", " ")
-            txt = txt.replace("html ", "").replace(" end post-item 1", "")
             
-            #txt = content['snippet']
-            print("msgid[%s] subject [%s], content [%s]" % (msgid, subject, txt))            
-            #print("subject [%s], content [%s]" % (subject, content.decode('utf-8')))            
-            ptext = u'\U0001F4E3' + " PriceAlerts \n[%s]\n\n" % subject + txt
-            #pp.pprint(ptext)
-            bot_sender.broadcast_list(ptext, 'telegram-ptgroup')
-            bot_sender.broadcast_list(ptext, 'telegram-mm')
-            #bot_sender.broadcast_list(ptext)
+            ##bot_sender.broadcast_list(ptext, 'telegram-ptgroup')
+            if "@" in txt:
+                #print(receive_dt + "\n" + txt)
+                ptext = ptext + "<b>" + receive_dt + "</b>\n" + txt + "\n\n"
+    
+    return ptext
 
-        #return
+def main():
 
+    print(get_alerts())
+    
 if __name__ == '__main__':
     main()

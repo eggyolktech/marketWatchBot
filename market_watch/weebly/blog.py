@@ -64,7 +64,8 @@ def main(args):
         print("Post ID [%s] is OLD! Skip sending...." % (newhash))
     else:
         print("Post ID [%s] is NEW! Prepare for sending...." % (newhash))
-        bot_sender.broadcast(content, is_test=False, url_preview=True)
+        #bot_sender.broadcast(content, is_test=False, url_preview=True)
+        bot_sender.broadcast_list(content, "telegram-ptgroup", True)
         redis_pool.setV(rkey, newhash)
     
 
